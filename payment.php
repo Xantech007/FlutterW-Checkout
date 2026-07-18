@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Payment - 9jaCash</title>
+<title>Payment - FlutterW Euro Earn</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
@@ -322,7 +322,7 @@ body.light-mode .flow-badge{background:#f1f5f9;color:#64748b;border-color:#e2e8f
 </button>
 
 <div class="footer anim d7">
-  <div class="footer-text">9jaCash 2026 • Secured Payments</div>
+  <div class="footer-text">FlutterW Euro Earn 2026 • Secured Payments</div>
 </div>
 
 </div>
