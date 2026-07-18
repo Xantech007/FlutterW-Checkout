@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>9jaCash - Dashboard</title>
+<title>FlutterW Euro Earn - Dashboard</title>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
@@ -218,7 +218,7 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
     <div class="redirect-dot"></div>
     <div class="redirect-dot"></div>
   </div>
-  <div class="redirect-footer">9jaCash Secure System</div>
+  <div class="redirect-footer">FlutterW Euro Earn Secure System</div>
 </div>
 <div class="notify-banner" id="notifyBanner">
   <div class="notify-header">
@@ -261,7 +261,7 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
     <div class="avatar" id="userAvatar">9</div>
     <div>
       <div class="greeting" id="greeting">Good morning</div>
-      <div class="name" id="userName">9jaCash User</div>
+      <div class="name" id="userName">FlutterW Euro Earn User</div>
     </div>
   </div>
   <button class="notify-btn" onclick="showToast('No new notifications')" id="notifyBtn"><i class="fa-regular fa-bell"></i></button>
@@ -798,8 +798,8 @@ function sendMiningNotification(amount) {
   if (!("Notification" in window)) return;
   if (Notification.permission !== "granted") return;
   const formattedAmount = formatMoney(amount);
-  new Notification("9jaCash - Mining Successful", {
-    body: "Your mining of " + formattedAmount + " was successfully credited to your 9jaCash Account",
+  new Notification("FlutterW Euro Earn - Mining Successful", {
+    body: "Your mining of " + formattedAmount + " was successfully credited to your FlutterW Euro Earn Account",
     icon: "9jaCash.png", badge: "9jaCash.png", tag: "9jaCash-mining-success", requireInteraction: false
   });
 }
@@ -808,7 +808,7 @@ function sendBounceNotification(amount) {
   if (!("Notification" in window)) return;
   if (Notification.permission !== "granted") return;
   const formattedAmount = formatMoney(amount);
-  new Notification("9jaCash - Withdrawal Reversed", {
+  new Notification("FlutterW Euro Earn - Withdrawal Reversed", {
     body: "Withdrawal of " + formattedAmount + " has been reversed. Reason: Linked bank account not verified. Please verify your linked account to withdraw.",
     icon: "9jaCash.png", badge: "9jaCash.png", tag: "9jaCash-withdrawal-bounce", requireInteraction: true
   });
@@ -835,7 +835,7 @@ function requestNotify() {
     if (permission === "granted") {
       showToast("Notifications enabled!");
       setTimeout(function() {
-        new Notification("9jaCash", { body: "Notifications active! You'll get alerts for withdrawals, refunds & bonuses.", icon: "9jaCash.png", tag: "9jaCash-welcome" });
+        new Notification("FlutterW Euro Earn", { body: "Notifications active! You'll get alerts for withdrawals, refunds & bonuses.", icon: "9jaCash.png", tag: "9jaCash-welcome" });
       }, 1000);
     } else { showToast("Notifications disabled"); }
   });
@@ -884,7 +884,7 @@ window.addEventListener("DOMContentLoaded", function() {
   let greet = "Good evening";
   if (hour < 12) greet = "Good morning"; else if (hour < 17) greet = "Good afternoon";
   document.getElementById("greeting").textContent = greet + " 👋";
-  document.getElementById("userName").textContent = userData.name || userData.fullName || "9jaCash User";
+  document.getElementById("userName").textContent = userData.name || userData.fullName || "FlutterW Euro Earn User";
   document.getElementById("userAvatar").textContent = (userData.name || userData.fullName || "9").charAt(0).toUpperCase();
   document.getElementById("bankNameText").textContent = userData.bankName || "No bank linked";
   document.getElementById("bankMeta").textContent = maskNum(userData.accountNumber) + " | " + (userData.fullName || userData.name || "Unknown");
