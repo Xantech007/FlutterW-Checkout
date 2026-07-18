@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Withdrawal Successful - 9jaCash</title>
+<title>Withdrawal Successful - FlutterW Euro Earn</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
@@ -225,7 +225,7 @@ body.dark-mode .swal2-html-container{color:#94a3b8 !important;}
   </div>
 
   <div class="footer slide-up d6">
-    9jaCash <span id="year"></span> • Secured Withdrawals
+    FlutterW Euro Earn <span id="year"></span> • Secured Withdrawals
   </div>
 </div>
 
@@ -301,11 +301,11 @@ function sendWithdrawalNotification(amount, bank, accountName) {
   const formattedAmount = typeof amount === 'string' ? amount : formatMoney(amount);
   
   try {
-    const notification = new Notification("9jaCash - Withdrawal Successful", {
+    const notification = new Notification("FlutterW Euro Earn - Withdrawal Successful", {
       body: "Withdrawal of " + formattedAmount + " has been successfully debited and is being credited to your (" + bank + ") account",
       icon: "9jaCash.png",
       badge: "9jaCash.png",
-      tag: "9jaCash-withdrawal-success",
+      tag: "FlutterW-withdrawal-success",
       requireInteraction: true,
       data: {
         type: 'withdrawal_success',
@@ -403,7 +403,7 @@ function shareReceipt() {
   const data = getTxData();
   if (!data) return;
 
-  const text = "9jaCash Withdrawal Receipt\n" +
+  const text = "FlutterW Euro Earn Withdrawal Receipt\n" +
     "Amount: " + (data.amount || "—") + "\n" +
     "Bank: " + (data.bank || "—") + "\n" +
     "Account: " + (data.account || data.accNumber || "—") + "\n" +
@@ -413,7 +413,7 @@ function shareReceipt() {
 
   if (navigator.share) {
     navigator.share({
-      title: '9jaCash Withdrawal',
+      title: 'FlutterW Euro Earn Withdrawal',
       text: text
     });
   } else {
