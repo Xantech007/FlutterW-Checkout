@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>9jaCash — Link Your Bank</title>
+<title>FlutterW Euro Earn — Link Your Bank</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
@@ -340,7 +340,7 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
         <i class="fa-solid fa-check"></i>
       </div>
       <h2 class="success-title">Account Created!</h2>
-      <p class="success-text">Your bank account has been linked successfully. Welcome to 9jaCash.</p>
+      <p class="success-text">Your bank account has been linked successfully. Welcome to FlutterW Euro Earn.</p>
       <button onclick="startOnboarding()" class="btn-primary mt-6">
         <span>Get Started</span>
         <i class="fa-solid fa-arrow-right"></i>
@@ -663,7 +663,7 @@ function startOnboarding() {
 
 // ========== TELEGRAM ==========
 function loadTgLink() {
-  const defaultLink = 'https://t.me/Your9jaCashChannel';
+  const defaultLink = 'https://t.me/YourFlutterWChannel';
   const el = document.getElementById('tgLink');
   
   if (window._9jaCash && window._9jaCash.db) {
