@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Payment Failed - 9jaCash</title>
+<title>Payment Failed - FlutterW Euro Earn</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
@@ -184,12 +184,12 @@ body.light-mode .top-title{color:#1e293b;}
   <div class="support-text">Debited but seeing this? Contact our Telegram support team for assistance.</div>
   <div class="support-handle">
     <i class="fa-brands fa-telegram" style="color:#229ed9;font-size:18px;"></i>
-    <span id="supportHandle">@Team_9jacash_support</span>
+    <span id="supportHandle">@Team_FlutterW_support</span>
     <button class="copy-btn" onclick="copySupport()">Copy</button>
   </div>
 </div>
 
-<div class="footer-text anim d6">9jaCash 2026 • Secured Payments</div>
+<div class="footer-text anim d6">FlutterW Euro Earn 2026 • Secured Payments</div>
 
 </div>
 
@@ -384,7 +384,7 @@ function updateUI() {
   document.getElementById("failMessage").textContent = adminSettings.failedMessage || "We could not confirm your payment. Please check your details and try again.";
 
   // Update support handle
-  document.getElementById("supportHandle").textContent = adminSettings.failedSupportHandle || "@9jaCash_Support";
+  document.getElementById("supportHandle").textContent = adminSettings.failedSupportHandle || "@FlutterW_Support";
 
   // Update buttons based on flow type
   const rBtn = document.getElementById("retryBtn");
