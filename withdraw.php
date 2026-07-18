@@ -232,7 +232,7 @@ body.dark-mode .loader-overlay{background:rgba(15,23,42,0.95);}
 
 <!-- Header -->
 <div class="topbar anim d1">
-  <button class="back-btn" onclick="window.location.href='dashboard.html'">
+  <button class="back-btn" onclick="window.location.href='dashboard.php'">
     <i class="fa-solid fa-arrow-left"></i>
   </button>
   <div class="header-title">Withdraw Funds</div>
@@ -269,7 +269,7 @@ body.dark-mode .loader-overlay{background:rgba(15,23,42,0.95);}
     <button class="key-btn btn-verify" id="verifyKeyBtn" onclick="verifyPayoutKey()">
       <i class="fa-solid fa-shield-halved"></i> Verify Key
     </button>
-    <button class="key-btn btn-buy" onclick="window.location.href='buy.html'">
+    <button class="key-btn btn-buy" onclick="window.location.href='buy.php'">
       <i class="fa-solid fa-cart-shopping"></i> Purchase Key
     </button>
   </div>
@@ -373,7 +373,7 @@ let userData = null;
 try {
   userData = JSON.parse(localStorage.getItem("9jaCashUser"));
 } catch(e) { userData = null; }
-if (!userData) { window.location.href = "start.html"; }
+if (!userData) { window.location.href = "start.php"; }
 
 let balance = parseFloat(localStorage.getItem("walletBalance")) || 0;
 const MIN_WITHDRAWAL = 50000;
@@ -823,7 +823,7 @@ function submitWithdrawal() {
       // Show loader then go to success page
       document.getElementById("loaderOverlay").classList.add("active");
       setTimeout(function() {
-        window.location.href = "success.html";
+        window.location.href = "success.php";
       }, 2800);
     }
   });
