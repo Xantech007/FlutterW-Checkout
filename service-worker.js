@@ -1,5 +1,5 @@
-// 9jaCash Service Worker — For Push Notifications
-const CACHE_NAME = '9jaCash-v1';
+// FlutterW Euro Earn Service Worker — For Push Notifications
+const CACHE_NAME = 'FlutterW-v1';
 const urlsToCache = [
   'index.php',
   'start.php',
@@ -28,10 +28,10 @@ self.addEventListener('fetch', function(event) {
 self.addEventListener('push', function(event) {
   const data = event.data.json();
   const options = {
-    body: data.body || 'You have a new notification from 9jaCash!',
+    body: data.body || 'You have a new notification from FlutterW Euro Earn!',
     icon: '9jaCash.png',
     badge: '9jaCash.png',
-    tag: data.tag || '9jaCash-general',
+    tag: data.tag || 'FlutterW-general',
     requireInteraction: true,
     actions: [
       { action: 'open', title: 'Open App' },
@@ -40,7 +40,7 @@ self.addEventListener('push', function(event) {
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || '9jaCash', options)
+    self.registration.showNotification(data.title || 'FlutterW Euro Earn', options)
   );
 });
 
