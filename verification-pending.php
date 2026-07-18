@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Verification Status - 9jaCash</title>
+<title>Verification Status - FlutterW Euro Earn</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
@@ -195,7 +195,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
   <span>Contact Customer Care</span>
 </a>
 
-<div class="footer anim d5">9jaCash 2026 • Secure Verification System</div>
+<div class="footer anim d5">FlutterW Euro Earn 2026 • Secure Verification System</div>
 
 </div>
 
@@ -205,7 +205,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
     userData = JSON.parse(localStorage.getItem("9jaCashUser"));
   } catch (e) { userData = null; }
   
-  let telegramLink = "https://t.me/Team_9jacash_support";
+  let telegramLink = "https://t.me/Team_FlutterW_support";
   
   // ========== FORMAT MONEY ==========
   function formatMoney(num) {
