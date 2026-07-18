@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>9jaCash — Link Your Bank</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<script src="firebase.js"></script>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b;min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;transition:all 0.3s ease;}
+
+/* Dark mode */
+body.dark-mode{background:#0f172a;color:#f8fafc;}
+body.dark-mode .soft-bg{background:radial-gradient(ellipse at 0% 0%,rgba(99,102,241,0.15),transparent 50%),radial-gradient(ellipse at 100% 100%,rgba(236,72,153,0.10),transparent 50%),#0f172a;}
+body.dark-mode .card{background:#1e293b;border-color:#334155;box-shadow:0 4px 24px rgba(0,0,0,0.2);}
+body.dark-mode .ob-card{background:#1e293b;border-color:#334155;}
+body.dark-mode .inp{background:#0f172a;border-color:#334155;color:#f8fafc;}
+body.dark-mode .inp:focus{border-color:#6366f1;box-shadow:0 0 0 4px rgba(99,102,241,0.15);background:#0f172a;}
+body.dark-mode .inp::placeholder{color:#64748b;}
+body.dark-mode select.inp option{background:#1e293b;color:#f8fafc;}
+body.dark-mode .lbl{color:#94a3b8;}
+body.dark-mode .count{color:#64748b;}
+body.dark-mode .skip-btn{color:#94a3b8;}
+body.dark-mode .skip-btn:hover{color:#818cf8;}
+body.dark-mode .skip-btn:disabled{color:#475569 !important;}
+body.dark-mode .loader-text{color:#f8fafc;}
+body.dark-mode .loader-sub{color:#94a3b8;}
+body.dark-mode .dot{background:#334155;}
+body.dark-mode .header-title{color:#f8fafc;}
+body.dark-mode .header-sub{color:#94a3b8;}
+body.dark-mode .promo-ok{color:#34d399;}
+body.dark-mode .promo-bad{color:#f87171;}
+body.dark-mode .step-label{color:#94a3b8;}
+body.dark-mode .back-link{color:#94a3b8;}
+body.dark-mode .back-link:hover{color:#818cf8;}
+body.dark-mode .success-title{color:#f8fafc;}
+body.dark-mode .success-text{color:#94a3b8;}
+
+/* Soft background */
+.soft-bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 0% 0%,rgba(99,102,241,0.10),transparent 50%),radial-gradient(ellipse at 100% 100%,rgba(236,72,153,0.07),transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(16,185,129,0.04),transparent 50%),#f8fafc;transition:all 0.3s ease;}
+
+/* Floating shapes */
+.shape{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none;animation:shapeFloat 15s ease-in-out infinite;}
+.shape-1{width:200px;height:200px;background:rgba(99,102,241,0.12);top:5%;right:10%;animation-delay:0s;}
+.shape-2{width:160px;height:160px;background:rgba(16,185,129,0.10);bottom:20%;left:5%;animation-delay:5s;}
+.shape-3{width:120px;height:120px;background:rgba(236,72,153,0.08);top:40%;left:30%;animation-delay:10s;}
+@keyframes shapeFloat{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(20px,-20px) scale(1.1);}}
+
+/* Card — matches dashboard */
+.card{background:#fff;border-radius:24px;padding:28px;border:1px solid #f1f5f9;box-shadow:0 4px 24px rgba(0,0,0,0.06),0 1px 3px rgba(0,0,0,0.04);transition:all 0.3s ease;width:100%;max-width:420px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#6366f1,#8b5cf6,#ec4899);}
+
+/* Onboarding card */
+.ob-card{background:#fff;border-radius:24px;padding:32px 24px;border:1px solid #f1f5f9;box-shadow:0 4px 24px rgba(0,0,0,0.06),0 1px 3px rgba(0,0,0,0.04);text-align:center;max-width:420px;width:100%;position:relative;overflow:hidden;}
+.ob-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#6366f1,#8b5cf6,#ec4899);}
+
+/* Input — matches dashboard */
+.inp{width:100%;padding:16px 18px;border-radius:16px;background:#f8fafc;border:2px solid #e2e8f0;color:#1e293b;font-size:15px;font-weight:600;outline:none;transition:all 0.3s;font-family:'Plus Jakarta Sans',sans-serif;}
+.inp:focus{border-color:#6366f1;box-shadow:0 0 0 4px rgba(99,102,241,0.1);background:#fff;}
+.inp::placeholder{color:#94a3b8;font-weight:500;}
+.inp:disabled{background:#f1f5f9;color:#94a3b8;border-color:#e2e8f0;cursor:not-allowed;}
+
+select.inp{color:#1e293b;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%2394a3b8' d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:44px;}
+select.inp option{background:#fff;color:#1e293b;}
+
+/* Label */
+.lbl{display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+
+/* Character count */
+.count{text-align:right;font-size:11px;color:#94a3b8;margin-top:6px;font-weight:500;}
+
+/* Primary button — matches dashboard */
+.btn-primary{width:100%;padding:18px;border-radius:18px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:16px;font-weight:800;border:none;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;box-shadow:0 4px 20px rgba(99,102,241,0.3);}
+.btn-primary::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:0.5s;}
+.btn-primary:hover::before{left:100%;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(99,102,241,0.4);}
+.btn-primary:active{transform:scale(0.97);}
+.btn-primary:disabled{background:#e2e8f0;color:#94a3b8;box-shadow:none;cursor:not-allowed;transform:none;}
+.btn-primary:disabled::before{display:none;}
+
+/* Promo messages */
+.promo-ok{color:#10b981;font-weight:700;}
+.promo-bad{color:#ef4444;font-weight:700;}
+
+/* Animations */
+@keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.8);}to{opacity:1;transform:scale(1);}}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.s1{animation:slideUp 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;}
+.s2{animation:slideUp 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;}
+.s3{animation:slideUp 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;}
+.s4{animation:slideUp 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.4s both;}
+.s5{animation:slideUp 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.5s both;}
+.s6{animation:slideUp 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.6s both;}
+
+/* Loader */
+.loader{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;}
+.loader-ring{width:56px;height:56px;border:4px solid rgba(99,102,241,0.1);border-top:4px solid #6366f1;border-radius:50%;animation:spin 1s linear infinite;}
+.loader-text{color:#1e293b;font-size:20px;font-weight:800;margin-top:24px;letter-spacing:-0.3px;}
+.loader-sub{color:#94a3b8;font-size:14px;margin-top:8px;font-weight:500;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.hide{display:none !important;}
+
+/* Skip button */
+.skip-btn{background:transparent;color:#64748b;font-size:14px;font-weight:600;border:none;cursor:pointer;padding:8px 16px;transition:all 0.3s;font-family:'Plus Jakarta Sans',sans-serif;}
+.skip-btn:hover{color:#6366f1;}
+.skip-btn:disabled{color:#cbd5e1 !important;cursor:not-allowed !important;}
+.skip-btn:disabled:hover{color:#cbd5e1 !important;}
+
+/* Icon box */
+.icon-box{width:64px;height:64px;border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:24px;color:#fff;box-shadow:0 8px 30px rgba(0,0,0,0.15);}
+
+/* Step dots */
+.step-dots{display:flex;justify-content:center;gap:6px;margin-top:24px;}
+.dot{width:6px;height:6px;border-radius:50%;background:#e2e8f0;transition:all 0.3s;}
+.dot.active{width:24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:3px;}
+
+/* App container */
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 20px 40px;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+
+/* Header */
+.header-title{font-size:18px;font-weight:800;color:#1e293b;transition:color 0.3s;}
+.header-sub{font-size:13px;color:#64748b;font-weight:500;transition:color 0.3s;}
+
+/* Back link */
+.back-link{display:flex;align-items:center;gap:8px;color:#64748b;font-size:14px;font-weight:600;text-decoration:none;transition:color 0.3s;margin-bottom:20px;cursor:pointer;}
+.back-link:hover{color:#6366f1;}
+
+/* Success check */
+.success-ring{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#10b981,#34d399);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 8px 30px rgba(16,185,129,0.3);animation:scaleIn 0.5s ease both;}
+.success-ring i{color:#fff;font-size:36px;}
+.success-title{font-size:22px;font-weight:800;color:#1e293b;margin-bottom:8px;transition:color 0.3s;}
+.success-text{font-size:14px;color:#64748b;line-height:1.6;transition:color 0.3s;}
+
+/* Step label */
+.step-label{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
+
+/* Theme toggle */
+.theme-toggle{position:fixed;top:20px;right:20px;width:44px;height:44px;border-radius:14px;background:#fff;border:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:16px;cursor:pointer;transition:all 0.3s;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+.theme-toggle:hover{background:#f1f5f9;color:#6366f1;}
+body.dark-mode .theme-toggle{background:#1e293b;border-color:#334155;color:#94a3b8;}
+body.dark-mode .theme-toggle:hover{background:#334155;color:#818cf8;}
+
+/* Toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:#1e293b;color:#fff;padding:14px 24px;border-radius:16px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;z-index:200;transition:all 0.4s;box-shadow:0 10px 40px rgba(0,0,0,0.15);border:1px solid #334155;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast i{color:#10b981;}
+.toast.error i{color:#ef4444;}
+body.dark-mode .toast{background:#1e293b;border-color:#334155;}
+
+/* Progress bar */
+.progress-bar{height:4px;background:#e2e8f0;border-radius:2px;margin-bottom:24px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:2px;transition:width 0.5s ease;width:0%;}
+</style>
+</head>
+<body>
+  
+  <div class="soft-bg">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+  
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
+  
+  <!-- Toast -->
+  <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done</span></div>
+  
+  <!-- FORM STEP -->
+  <div id="formStep" class="app">
+    <div class="card s1">
+      
+      <!-- Progress -->
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      
+      <!-- Header -->
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] flex items-center justify-center shadow-lg shadow-indigo-200">
+          <i class="fa-solid fa-building-columns text-white text-lg"></i>
+        </div>
+        <div>
+          <h1 class="header-title">Link Your Bank</h1>
+          <p class="header-sub">Get paid directly to your account</p>
+        </div>
+      </div>
+      
+      <form id="bankForm" class="space-y-5">
+        
+        <!-- Step indicator -->
+        <p class="step-label" id="stepLabel">Step 1 of 4 — Personal Info</p>
+        
+        <!-- Phone -->
+        <div class="s2" id="fieldPhone">
+          <label class="lbl">Phone Number</label>
+          <input type="tel" id="phone" maxlength="11" placeholder="08012345678" class="inp" />
+          <p id="phoneCount" class="count">0 / 11</p>
+        </div>
+        
+        <!-- Full Name -->
+        <div class="s3 hide" id="fieldName">
+          <label class="lbl">Full Name (as in bank)</label>
+          <input type="text" id="fullName" placeholder="Okafor Chukwuemeka John" class="inp" />
+        </div>
+        
+        <!-- Bank Name -->
+        <div class="s4 hide" id="fieldBank">
+          <label class="lbl">Select Bank</label>
+          <select id="bankName" class="inp">
+            <option value="" disabled selected>Choose your bank</option>
+            <option value="Access Bank">Access Bank</option>
+            <option value="Access Bank (Diamond)">Access Bank (Diamond)</option>
+            <option value="ALAT by Wema">ALAT by Wema</option>
+            <option value="ASO Savings and Loans">ASO Savings and Loans</option>
+            <option value="Bowen Microfinance Bank">Bowen Microfinance Bank</option>
+            <option value="CEMCS Microfinance Bank">CEMCS Microfinance Bank</option>
+            <option value="Citibank Nigeria">Citibank Nigeria</option>
+            <option value="Coronation Merchant Bank">Coronation Merchant Bank</option>
+            <option value="Ecobank Nigeria">Ecobank Nigeria</option>
+            <option value="Ekondo Microfinance Bank">Ekondo Microfinance Bank</option>
+            <option value="Eyowo">Eyowo</option>
+            <option value="Fidelity Bank">Fidelity Bank</option>
+            <option value="Firmus MFB">Firmus MFB</option>
+            <option value="First Bank of Nigeria">First Bank of Nigeria</option>
+            <option value="First City Monument Bank">First City Monument Bank</option>
+            <option value="FSDH Merchant Bank">FSDH Merchant Bank</option>
+            <option value="Globus Bank">Globus Bank</option>
+            <option value="Guaranty Trust Bank">Guaranty Trust Bank</option>
+            <option value="Hackman Microfinance Bank">Hackman Microfinance Bank</option>
+            <option value="Hasal Microfinance Bank">Hasal Microfinance Bank</option>
+            <option value="Heritage Bank">Heritage Bank</option>
+            <option value="Ibile Microfinance Bank">Ibile Microfinance Bank</option>
+            <option value="Infinity Microfinance Bank">Infinity Microfinance Bank</option>
+            <option value="Jaiz Bank">Jaiz Bank</option>
+            <option value="Kadpoly Microfinance Bank">Kadpoly Microfinance Bank</option>
+            <option value="Keystone Bank">Keystone Bank</option>
+            <option value="Kuda Microfinance Bank">Kuda Microfinance Bank</option>
+            <option value="Lagos Building Investment Company">Lagos Building Investment Company</option>
+            <option value="Links MFB">Links MFB</option>
+            <option value="Lotus Bank">Lotus Bank</option>
+            <option value="Mayfair MFB">Mayfair MFB</option>
+            <option value="Mint MFB">Mint MFB</option>
+            <option value="Moniepoint">Moniepoint</option>
+            <option value="NPF Microfinance Bank">NPF Microfinance Bank</option>
+            <option value="Opay">Opay</option>
+            <option value="Paga">Paga</option>
+            <option value="PalmPay">PalmPay</option>
+            <option value="Parallex Bank">Parallex Bank</option>
+            <option value="Parkway - ReadyCash">Parkway - ReadyCash</option>
+            <option value="Paycom">Paycom</option>
+            <option value="Petra Microfinance Bank">Petra Microfinance Bank</option>
+            <option value="Polaris Bank">Polaris Bank</option>
+            <option value="PremiumTrust Bank">PremiumTrust Bank</option>
+            <option value="Providus Bank">Providus Bank</option>
+            <option value="QuickFund MFB">QuickFund MFB</option>
+            <option value="Rand Merchant Bank">Rand Merchant Bank</option>
+            <option value="Rubies Bank">Rubies Bank</option>
+            <option value="Signature Bank">Signature Bank</option>
+            <option value="Sparkle Bank">Sparkle Bank</option>
+            <option value="Stanbic IBTC Bank">Stanbic IBTC Bank</option>
+            <option value="Standard Chartered Bank">Standard Chartered Bank</option>
+            <option value="Sterling Bank">Sterling Bank</option>
+            <option value="SunTrust Bank">SunTrust Bank</option>
+            <option value="TAJBank">TAJBank</option>
+            <option value="Tanadi Microfinance Bank">Tanadi Microfinance Bank</option>
+            <option value="Titan Trust Bank">Titan Trust Bank</option>
+            <option value="U&C Microfinance Bank">U&C Microfinance Bank</option>
+            <option value="Union Bank of Nigeria">Union Bank of Nigeria</option>
+            <option value="United Bank for Africa">United Bank for Africa</option>
+            <option value="Unity Bank">Unity Bank</option>
+            <option value="VFD Microfinance Bank">VFD Microfinance Bank</option>
+            <option value="Wema Bank">Wema Bank</option>
+            <option value="Zenith Bank">Zenith Bank</option>
+            <option value="9 Payment Service Bank">9 Payment Service Bank</option>
+          </select>
+        </div>
+        
+        <!-- Account Number -->
+        <div class="s5 hide" id="fieldAccount">
+          <label class="lbl">Account Number</label>
+          <input type="text" id="accountNumber" maxlength="10" placeholder="1234567890" class="inp" />
+          <p id="acctCount" class="count">0 / 10</p>
+        </div>
+        
+        <!-- Promo Code -->
+        <div class="s6 hide" id="fieldPromo">
+          <label class="lbl">Promo Code <span style="font-weight:400;text-transform:none;color:#94a3b8;">(Optional)</span></label>
+          <input type="text" id="promoCode" maxlength="20" placeholder="Enter code for bonus" class="inp" />
+          <p id="promoMsg" class="count">Optional — enter a valid code for bonus</p>
+        </div>
+        
+        <!-- Navigation buttons -->
+        <div class="s6 flex gap-3 pt-2" id="navButtons">
+          <button type="button" id="backBtn" class="btn-primary" style="flex:1;background:#f1f5f9;color:#64748b;box-shadow:none;" onclick="prevStep()" disabled>
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back</span>
+          </button>
+          <button type="button" id="nextBtn" class="btn-primary" style="flex:2;" onclick="nextStep()" disabled>
+            <span>Next</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+        
+        <!-- Submit button (hidden until last step) -->
+        <div class="s6 hide pt-2" id="submitWrap">
+          <button type="submit" id="continueBtn" class="btn-primary">
+            <span>Create Account</span>
+            <i class="fa-solid fa-check"></i>
+          </button>
+        </div>
+        
+      </form>
+    </div>
+  </div>
+  
+  <!-- LOADING -->
+  <div id="loader" class="hide loader">
+    <div class="loader-ring"></div>
+    <div class="loader-text">Setting up your wallet...</div>
+    <div class="loader-sub">Please wait</div>
+  </div>
+  
+  <!-- SUCCESS SCREEN -->
+  <div id="successStep" class="hide app">
+    <div class="ob-card s1">
+      <div class="success-ring">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h2 class="success-title">Account Created!</h2>
+      <p class="success-text">Your bank account has been linked successfully. Welcome to 9jaCash.</p>
+      <button onclick="startOnboarding()" class="btn-primary mt-6">
+        <span>Get Started</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+  
+  <!-- ONBOARDING -->
+  <div id="onboardStep" class="hide app">
+    
+    <!-- Step 1: Telegram -->
+    <div id="ob1" class="ob-card s1">
+      <div class="icon-box bg-gradient-to-br from-[#229ed9] to-[#1d98d2]">
+        <i class="fa-brands fa-telegram text-white text-2xl"></i>
+      </div>
+      <h2 class="text-xl font-extrabold mb-2">Join Our Community</h2>
+      <p class="text-sm text-[#64748b] mb-6 leading-relaxed">Get instant alerts on bonuses, withdrawals & exclusive rewards.</p>
+      <a id="tgLink" href="#" target="_blank" class="btn-primary block mb-3" style="background:linear-gradient(135deg,#229ed9,#1d98d2);box-shadow:0 4px 20px rgba(34,158,217,0.3);" onclick="tgClicked()">
+        <i class="fa-brands fa-telegram"></i>
+        <span>Join Telegram</span>
+      </a>
+      <button id="skipBtn" class="skip-btn" disabled onclick="nextOb(2)">
+        Skip for now (<span id="skipTimer">10</span>s)
+      </button>
+      <div class="step-dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <p class="text-xs text-[#94a3b8] mt-3 font-medium">Step 1 of 4</p>
+    </div>
+    
+    <!-- Step 2: Mining -->
+    <div id="ob2" class="ob-card s1 hide">
+      <div class="icon-box bg-gradient-to-br from-[#6366f1] to-[#8b5cf6]">
+        <i class="fa-solid fa-coins text-white text-2xl"></i>
+      </div>
+      <h2 class="text-xl font-extrabold mb-2">Earn Every Minute</h2>
+      <p class="text-sm text-[#64748b] mb-6 leading-relaxed">Auto mining runs 24/7. Watch your balance grow in real-time.</p>
+      <button onclick="nextOb(3)" class="btn-primary">
+        <span>Next</span>
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+      <div class="step-dots">
+        <div class="dot"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <p class="text-xs text-[#94a3b8] mt-3 font-medium">Step 2 of 4</p>
+    </div>
+    
+    <!-- Step 3: Daily -->
+    <div id="ob3" class="ob-card s1 hide">
+      <div class="icon-box bg-gradient-to-br from-[#f59e0b] to-[#d97706]">
+        <i class="fa-solid fa-calendar-check text-white text-2xl"></i>
+      </div>
+      <h2 class="text-xl font-extrabold mb-2">Daily Rewards</h2>
+      <p class="text-sm text-[#64748b] mb-6 leading-relaxed">Check in every day to collect bonus cash and boost mining power.</p>
+      <button onclick="nextOb(4)" class="btn-primary" style="background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 4px 20px rgba(245,158,11,0.3);">
+        <span>Next</span>
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+      <div class="step-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+      </div>
+      <p class="text-xs text-[#94a3b8] mt-3 font-medium">Step 3 of 4</p>
+    </div>
+    
+    <!-- Step 4: Ready -->
+    <div id="ob4" class="ob-card s1 hide">
+      <div class="icon-box bg-gradient-to-br from-[#10b981] to-[#34d399]">
+        <i class="fa-solid fa-rocket text-white text-2xl"></i>
+      </div>
+      <h2 class="text-xl font-extrabold mb-2">You're All Set!</h2>
+      <p class="text-sm text-[#64748b] mb-6 leading-relaxed">Your dashboard is ready. Start earning immediately.</p>
+      <button onclick="goDash()" class="btn-primary" style="background:linear-gradient(135deg,#10b981,#34d399);box-shadow:0 4px 20px rgba(16,185,129,0.3);">
+        <span>Go to Dashboard</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+      <div class="step-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot active"></div>
+      </div>
+      <p class="text-xs text-[#94a3b8] mt-3 font-medium">Step 4 of 4</p>
+    </div>
+    
+  </div>
+  <script>
+// ========== PROMO CODES ==========
+const VALID_CODES = ["SMART-TECH09", "AMUTV-29", "BUOPU-95", "NJPAK-09", "UFMZQ-19", "WOOFW-52"];
+
+function checkPromo(code) {
+  if (!code || code.trim() === "") return { ok: true, msg: "Optional — enter a valid code for bonus", bonus: false };
+  const c = code.trim().toUpperCase();
+  if (VALID_CODES.includes(c)) return { ok: true, msg: "✓ Promo code applied! Bonus unlocked", bonus: true };
+  return { ok: false, msg: "✗ Invalid promo code", bonus: false };
+}
+
+// ========== FORM STEP MANAGEMENT ==========
+let currentStep = 1;
+const totalSteps = 4;
+const stepLabels = [
+  "Step 1 of 4 — Personal Info",
+  "Step 2 of 4 — Bank Details",
+  "Step 3 of 4 — Account Number",
+  "Step 4 of 4 — Promo Code"
+];
+
+const fields = ['fieldPhone', 'fieldName', 'fieldBank', 'fieldAccount', 'fieldPromo'];
+const inputs = {
+  1: 'phone',
+  2: 'fullName',
+  3: 'bankName',
+  4: 'accountNumber',
+  5: 'promoCode'
+};
+
+function showStep(step) {
+  currentStep = step;
+  
+  // Update progress bar
+  const progress = ((step - 1) / totalSteps) * 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+  
+  // Update step label
+  document.getElementById('stepLabel').textContent = stepLabels[step - 1] || '';
+  
+  // Show/hide fields
+  fields.forEach((f, i) => {
+    const el = document.getElementById(f);
+    if (el) {
+      if (i < step) {
+        el.classList.remove('hide');
+        el.style.animation = 'slideUp 0.5s ease both';
+      } else {
+        el.classList.add('hide');
+      }
+    }
+  });
+  
+  // Update buttons
+  document.getElementById('backBtn').disabled = step === 1;
+  
+  if (step === totalSteps) {
+    document.getElementById('navButtons').classList.add('hide');
+    document.getElementById('submitWrap').classList.remove('hide');
+    document.getElementById('submitWrap').style.animation = 'slideUp 0.5s ease both';
+  } else {
+    document.getElementById('navButtons').classList.remove('hide');
+    document.getElementById('submitWrap').classList.add('hide');
+  }
+  
+  checkNextEnabled();
+}
+
+function nextStep() {
+  if (currentStep < totalSteps) {
+    showStep(currentStep + 1);
+  }
+}
+
+function prevStep() {
+  if (currentStep > 1) {
+    showStep(currentStep - 1);
+  }
+}
+
+function checkNextEnabled() {
+  const nextBtn = document.getElementById('nextBtn');
+  const inputId = inputs[currentStep];
+  const input = document.getElementById(inputId);
+  
+  if (!input) {
+    nextBtn.disabled = true;
+    return;
+  }
+  
+  let valid = false;
+  const val = input.value.trim();
+  
+  if (currentStep === 1) valid = val.length === 11 && /^\d{11}$/.test(val);
+  else if (currentStep === 2) valid = val.length > 2;
+  else if (currentStep === 3) valid = val !== '';
+  else if (currentStep === 4) valid = val.length === 10 && /^\d{10}$/.test(val);
+  
+  nextBtn.disabled = !valid;
+}
+
+// ========== INPUT LISTENERS ==========
+document.getElementById('phone').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '');
+  document.getElementById('phoneCount').textContent = this.value.length + ' / 11';
+  checkNextEnabled();
+});
+
+document.getElementById('fullName').addEventListener('input', checkNextEnabled);
+document.getElementById('bankName').addEventListener('change', checkNextEnabled);
+
+document.getElementById('accountNumber').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '');
+  document.getElementById('acctCount').textContent = this.value.length + ' / 10';
+  checkNextEnabled();
+});
+
+document.getElementById('promoCode').addEventListener('input', function() {
+  const r = checkPromo(this.value);
+  const msg = document.getElementById('promoMsg');
+  msg.textContent = r.msg;
+  msg.className = 'count ' + (r.ok ? (r.bonus ? 'promo-ok' : '') : 'promo-bad');
+  this.style.borderColor = r.ok ? (r.bonus ? '#10b981' : '#e2e8f0') : '#ef4444';
+});
+
+document.getElementById('promoCode').addEventListener('blur', function() {
+  this.value = this.value.toUpperCase();
+});
+
+// ========== FORM SUBMIT ==========
+document.getElementById('bankForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const phone = document.getElementById('phone').value.trim();
+  const fullName = document.getElementById('fullName').value.trim();
+  const bankName = document.getElementById('bankName').value;
+  const accountNumber = document.getElementById('accountNumber').value.trim();
+  const promoCode = document.getElementById('promoCode').value.trim().toUpperCase();
+  
+  // Validate all
+  if (phone.length !== 11 || !/^\d{11}$/.test(phone)) {
+    showToast('Phone must be 11 digits', 'error');
+    return;
+  }
+  if (fullName.length < 3) {
+    showToast('Enter your full name', 'error');
+    return;
+  }
+  if (!bankName) {
+    showToast('Select your bank', 'error');
+    return;
+  }
+  if (accountNumber.length !== 10 || !/^\d{10}$/.test(accountNumber)) {
+    showToast('Account number must be 10 digits', 'error');
+    return;
+  }
+  
+  const promo = checkPromo(promoCode);
+  if (!promo.ok) {
+    showToast('Invalid promo code. Leave empty if none.', 'error');
+    return;
+  }
+  
+  // Build user data
+  const userData = {
+    phone: phone,
+    fullName: fullName,
+    name: fullName,
+    bankName: bankName,
+    accountNumber: accountNumber,
+    promoCode: promoCode || null,
+    promoBonus: promo.bonus,
+    createdAt: new Date().toISOString(),
+    balance: 0,
+    miningPower: 1,
+    totalMined: 0,
+    lastCheckIn: null,
+    lastWithdraw: null,
+    status: 'active'
+  };
+  
+  // Save
+  localStorage.setItem('9jaCashUser', JSON.stringify(userData));
+  localStorage.setItem('walletBalance', '0');
+  saveToFirebase(userData);
+  
+  // Show success
+  document.getElementById('formStep').classList.add('hide');
+  document.getElementById('successStep').classList.remove('hide');
+});
+
+// ========== SAVE TO FIREBASE ==========
+function saveToFirebase(data) {
+  if (!window._9jaCash || !window._9jaCash.db) {
+    console.log('Firebase not ready, saved to localStorage only');
+    return;
+  }
+  
+  const db = window._9jaCash.db;
+  const userId = data.phone;
+  
+  db.collection('users').doc(userId).set(data)
+    .then(function() {
+      console.log('User saved to Firebase');
+      return db.collection('linkedAccounts').doc(userId).set({
+        phone: data.phone,
+        fullName: data.fullName,
+        bankName: data.bankName,
+        accountNumber: data.accountNumber,
+        createdAt: data.createdAt,
+        status: 'active'
+      });
+    })
+    .catch(function(err) {
+      console.error('Firebase save failed:', err);
+    });
+}
+
+// ========== SUCCESS → ONBOARDING ==========
+function startOnboarding() {
+  document.getElementById('successStep').classList.add('hide');
+  document.getElementById('onboardStep').classList.remove('hide');
+  loadTgLink();
+  startSkipTimer();
+}
+
+// ========== TELEGRAM ==========
+function loadTgLink() {
+  const defaultLink = 'https://t.me/Your9jaCashChannel';
+  const el = document.getElementById('tgLink');
+  
+  if (window._9jaCash && window._9jaCash.db) {
+    window._9jaCash.db.collection('settings').doc('payment').get()
+      .then(function(doc) {
+        el.href = (doc.exists && doc.data().telegramLink) ? doc.data().telegramLink : defaultLink;
+      })
+      .catch(function() {
+        el.href = defaultLink;
+      });
+  } else {
+    el.href = defaultLink;
+  }
+}
+
+function tgClicked() {
+  setTimeout(function() {
+    nextOb(2);
+  }, 600);
+}
+
+// ========== SKIP TIMER ==========
+let skipCountdown;
+
+function startSkipTimer() {
+  const skipBtn = document.getElementById('skipBtn');
+  const timerSpan = document.getElementById('skipTimer');
+  let seconds = 10;
+  
+  skipBtn.disabled = true;
+  timerSpan.textContent = seconds;
+  
+  skipCountdown = setInterval(function() {
+    seconds--;
+    timerSpan.textContent = seconds;
+    
+    if (seconds <= 0) {
+      clearInterval(skipCountdown);
+      skipBtn.disabled = false;
+      skipBtn.innerHTML = 'Skip for now <i class="fa-solid fa-chevron-right text-xs ml-1"></i>';
+    }
+  }, 1000);
+}
+
+// ========== ONBOARDING NAV ==========
+function nextOb(n) {
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('ob' + i).classList.add('hide');
+  }
+  document.getElementById('ob' + n).classList.remove('hide');
+}
+
+function goDash() {
+  localStorage.setItem('9jaCashOnboard', 'done');
+  window.location.href = 'dashboard.html';
+}
+
+// ========== THEME ==========
+function initTheme() {
+  const isDark = localStorage.getItem('9jaCashDark') === 'true';
+  if (isDark) {
+    document.body.classList.add('dark-mode');
+    document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+  }
+}
+
+function toggleTheme() {
+  const isDark = document.body.classList.toggle('dark-mode');
+  localStorage.setItem('9jaCashDark', isDark);
+  document.getElementById('themeIcon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+}
+
+// ========== TOAST ==========
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  const msgEl = document.getElementById('toastMsg');
+  const icon = t.querySelector('i');
+  
+  msgEl.textContent = msg;
+  if (type === 'error') {
+    icon.className = 'fa-solid fa-circle-xmark';
+    icon.style.color = '#ef4444';
+  } else {
+    icon.className = 'fa-solid fa-circle-check';
+    icon.style.color = '#10b981';
+  }
+  
+  t.classList.add('show');
+  setTimeout(function() {
+    t.classList.remove('show');
+  }, 2500);
+}
+
+// ========== INIT ==========
+window.addEventListener('DOMContentLoaded', function() {
+  initTheme();
+  
+  // Check if already onboarded
+  const user = localStorage.getItem('9jaCashUser');
+  const done = localStorage.getItem('9jaCashOnboard');
+  if (user && done) {
+    window.location.href = 'dashboard.html';
+    return;
+  }
+  
+  // Start at step 1
+  showStep(1);
+});
+</script>
+
+</body>
+
+</html>
