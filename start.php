@@ -718,7 +718,7 @@ function nextOb(n) {
 
 function goDash() {
   localStorage.setItem('9jaCashOnboard', 'done');
-  window.location.href = 'dashboard.html';
+  window.location.href = 'dashboard.php';
 }
 
 // ========== THEME ==========
@@ -765,7 +765,7 @@ window.addEventListener('DOMContentLoaded', function() {
   const user = localStorage.getItem('9jaCashUser');
   const done = localStorage.getItem('9jaCashOnboard');
   if (user && done) {
-    window.location.href = 'dashboard.html';
+    window.location.href = 'dashboard.php';
     return;
   }
   
