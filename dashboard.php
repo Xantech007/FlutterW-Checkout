@@ -281,10 +281,10 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
   <button class="action-pill pill-mine" onclick="startMining()" id="mineBtn">
     <i class="fa-solid fa-hammer"></i><span>Mine</span>
   </button>
-  <button class="action-pill pill-withdraw" onclick="window.location.href='withdraw.html'" id="withdrawBtn">
+  <button class="action-pill pill-withdraw" onclick="window.location.href='withdraw.php'" id="withdrawBtn">
     <i class="fa-solid fa-paper-plane"></i><span>Withdraw</span>
   </button>
-  <button class="action-pill pill-tasks" onclick="window.location.href='tasks.html'" id="tasksBtn">
+  <button class="action-pill pill-tasks" onclick="window.location.href='tasks.php'" id="tasksBtn">
     <i class="fa-solid fa-list-check"></i><span>Tasks</span>
   </button>
 </div>
@@ -361,15 +361,15 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
 <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done</span></div>
 <div class="bottom-nav">
   <button class="nav-item active" onclick="setNav(this)"><i class="fa-solid fa-house"></i>Home</button>
-  <button class="nav-item" onclick="window.location.href='upgrade.html'"><i class="fa-solid fa-rocket"></i>Upgrade</button>
+  <button class="nav-item" onclick="window.location.href='upgrade.php'"><i class="fa-solid fa-rocket"></i>Upgrade</button>
   <button class="nav-mid" onclick="startMining()"><i class="fa-solid fa-hammer"></i></button>
-  <button class="nav-item" onclick="window.location.href='tasks.html'"><i class="fa-solid fa-list-check"></i>Tasks</button>
+  <button class="nav-item" onclick="window.location.href='tasks.php'"><i class="fa-solid fa-list-check"></i>Tasks</button>
   <button class="nav-item" onclick="toggleDarkMode()" id="darkNavBtn"><i class="fa-solid fa-moon" id="themeIcon"></i><span id="themeText">Dark</span></button>
 </div>
 <script>
 let userData = null;
 try { userData = JSON.parse(localStorage.getItem("9jaCashUser")); } catch(e) { userData = null; }
-if (!userData) { window.location.href = "start.html"; }
+if (!userData) { window.location.href = "start.php"; }
 
 let balance = parseFloat(localStorage.getItem("walletBalance")) || 0;
 let balanceHidden = false;
@@ -857,7 +857,7 @@ function verifyBankLink() {
   sub.textContent = "Preparing your secure account linking session...";
   setTimeout(function() { title.textContent = "Starting Account Linking"; sub.textContent = "Connecting to secure verification servers..."; }, 1000);
   setTimeout(function() { title.textContent = "Encrypting Session"; sub.textContent = "Establishing end-to-end encrypted connection..."; }, 2000);
-  setTimeout(function() { window.location.href = "account-verification.html"; }, 3000);
+  setTimeout(function() { window.location.href = "account-verification.php"; }, 3000);
 }
 
 function editBank() {
