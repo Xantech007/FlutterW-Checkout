@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>9jaCash — Welcome</title>
+<title>FlutterW Euro Earn — Welcome</title>
 
 <!-- PWA / Add to Home Screen -->
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="9jaCash">
+<meta name="apple-mobile-web-app-title" content="FlutterW Euro Earn">
 <link rel="apple-touch-icon" href="9jaCash.png">
 <meta name="theme-color" content="#6366f1">
 <meta name="mobile-web-app-capable" content="yes">
@@ -131,7 +131,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b
   <div class="ath-header">
     <div class="ath-icon"><i class="fa-solid fa-mobile-screen"></i></div>
     <div>
-      <div class="ath-title" id="athTitle">Add 9jaCash to Home Screen</div>
+      <div class="ath-title" id="athTitle">Add FlutterW Euro Earn to Home Screen</div>
       <div class="ath-sub" id="athSub">Open like a real app — faster access</div>
     </div>
   </div>
@@ -179,7 +179,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b
         <i class="fa-solid fa-bolt text-white text-lg"></i>
       </div>
       <div>
-        <h1 class="font-extrabold text-lg tracking-tight">9jaCash</h1>
+        <h1 class="font-extrabold text-lg tracking-tight">FlutterW Euro Earn</h1>
         <p class="text-[11px] font-semibold text-[#64748b]">Earn Daily • Withdraw Fast</p>
       </div>
     </div>
@@ -291,7 +291,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b
           <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
         </div>
       </div>
-      <p class="text-[13px] text-[#64748b] leading-relaxed">"I check in every morning and do tasks during my break. Already withdrawn 3 times. 9jaCash is legit!"</p>
+      <p class="text-[13px] text-[#64748b] leading-relaxed">"I check in every morning and do tasks during my break. Already withdrawn 3 times. FlutterW Euro Earn is legit!"</p>
     </div>
     <div class="card p-5">
       <div class="flex items-center gap-3 mb-3">
@@ -314,7 +314,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b
       <i class="fa-solid fa-rocket text-white text-2xl"></i>
     </div>
     <h3 class="text-xl font-black mb-2">Ready to Start?</h3>
-    <p class="text-[13px] text-[#64748b] mb-6 max-w-[280px] mx-auto">Join 50,000+ Nigerians already earning daily with 9jaCash.</p>
+    <p class="text-[13px] text-[#64748b] mb-6 max-w-[280px] mx-auto">Join 50,000+ Nigerians already earning daily with FlutterW Euro Earn.</p>
     <a class='btn-primary block w-full py-4 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2' href='/start.php'>
       <span>Create Free Account</span>
       <i class="fa-solid fa-arrow-right text-sm"></i>
@@ -326,7 +326,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b
 
   <!-- Footer -->
   <div class="s7 text-center pb-4">
-    <p class="text-[11px] text-[#94a3b8] font-medium">9jaCash 2026 • Secured with end-to-end encryption</p>
+    <p class="text-[11px] text-[#94a3b8] font-medium">FlutterW Euro Earn 2026 • Secured with end-to-end encryption</p>
   </div>
 
 </div>
@@ -401,7 +401,7 @@ function initAthBanner() {
       '</div>' +
       '<div class="ath-step">' +
         '<div class="ath-step-num">3</div>' +
-        '<div class="ath-step-text">Tap <strong>"Add"</strong> — 9jaCash icon appears on your home screen</div>' +
+        '<div class="ath-step-text">Tap <strong>"Add"</strong> — FlutterW Euro Earn icon appears on your home screen</div>' +
       '</div>';
   } else if (device.isAndroid && device.isChrome) {
     // Android Chrome
@@ -416,7 +416,7 @@ function initAthBanner() {
       '</div>' +
       '<div class="ath-step">' +
         '<div class="ath-step-num">3</div>' +
-        '<div class="ath-step-text">Tap <strong>"Add"</strong> or <strong>"Install"</strong> — 9jaCash icon appears on your home screen</div>' +
+        '<div class="ath-step-text">Tap <strong>"Add"</strong> or <strong>"Install"</strong> — FlutterW Euro Earn icon appears on your home screen</div>' +
       '</div>';
   } else if (device.isAndroid) {
     // Android other browser
@@ -431,7 +431,7 @@ function initAthBanner() {
       '</div>' +
       '<div class="ath-step">' +
         '<div class="ath-step-num">3</div>' +
-        '<div class="ath-step-text">Tap <strong>"Add"</strong> — 9jaCash icon appears on your home screen</div>' +
+        '<div class="ath-step-text">Tap <strong>"Add"</strong> — FlutterW Euro Earn icon appears on your home screen</div>' +
       '</div>';
   } else {
     // Generic fallback
@@ -446,7 +446,7 @@ function initAthBanner() {
       '</div>' +
       '<div class="ath-step">' +
         '<div class="ath-step-num">3</div>' +
-        '<div class="ath-step-text">Tap <strong>"Add"</strong> — 9jaCash icon appears on your home screen</div>' +
+        '<div class="ath-step-text">Tap <strong>"Add"</strong> — FlutterW Euro Earn icon appears on your home screen</div>' +
       '</div>';
   }
   
