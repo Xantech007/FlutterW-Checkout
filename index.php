@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FlutterW Euro Earn">
-<link rel="apple-touch-icon" href="9jaCash.png">
+<link rel="apple-touch-icon" href="FlutterWEuroEarn.png">
 <meta name="theme-color" content="#6366f1">
 <meta name="mobile-web-app-capable" content="yes">
 
@@ -219,9 +219,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b
         <div class="icon-box bg-[#ecfdf5] text-[#10b981]"><i class="fa-solid fa-calendar-check"></i></div>
         <div class="flex-1">
           <h4 class="font-bold text-[15px] mb-0.5">Daily Check-In</h4>
-          <p class="text-[12px] text-[#64748b]">Claim ₦500 every day. Build your streak for bigger rewards.</p>
+          <p class="text-[12px] text-[#64748b]">Claim €5 every day. Build your streak for bigger rewards.</p>
         </div>
-        <div class="text-[#10b981] font-extrabold text-sm">₦500</div>
+        <div class="text-[#10b981] font-extrabold text-sm">€5</div>
       </div>
       <div class="card flex items-center gap-4 p-5">
         <div class="icon-box bg-[#eef2ff] text-[#6366f1]"><i class="fa-solid fa-list-check"></i></div>
@@ -229,21 +229,21 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b
           <h4 class="font-bold text-[15px] mb-0.5">Complete Tasks</h4>
           <p class="text-[12px] text-[#64748b]">Follow, like, share on social media. Earn per task.</p>
         </div>
-        <div class="text-[#6366f1] font-extrabold text-sm">₦500+</div>
+        <div class="text-[#6366f1] font-extrabold text-sm">€5+</div>
       </div>
       <div class="card flex items-center gap-4 p-5">
         <div class="icon-box bg-[#fff7ed] text-[#f59e0b]"><i class="fa-solid fa-hammer"></i></div>
         <div class="flex-1">
           <h4 class="font-bold text-[15px] mb-0.5">Auto Mining</h4>
-          <p class="text-[12px] text-[#64748b]">Start mining and earn up to ₦30,000 daily. Upgrade for more.</p>
+          <p class="text-[12px] text-[#64748b]">Start mining and earn up to €300 daily. Upgrade for more.</p>
         </div>
-        <div class="text-[#f59e0b] font-extrabold text-sm">₦30K</div>
+        <div class="text-[#f59e0b] font-extrabold text-sm">€300</div>
       </div>
       <div class="card flex items-center gap-4 p-5">
         <div class="icon-box bg-[#fef2f2] text-[#ef4444]"><i class="fa-solid fa-paper-plane"></i></div>
         <div class="flex-1">
           <h4 class="font-bold text-[15px] mb-0.5">Instant Withdraw</h4>
-          <p class="text-[12px] text-[#64748b]">Withdraw to any Nigerian bank. Minimum ₦50,000.</p>
+          <p class="text-[12px] text-[#64748b]">Withdraw to any European bank. Minimum €500.</p>
         </div>
         <div class="text-[#ef4444] font-extrabold text-sm">Fast</div>
       </div>
@@ -261,7 +261,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b
       </div>
       <div class="card flex-shrink-0 w-[140px] p-4 text-center">
         <div class="w-10 h-10 rounded-xl bg-[#eef2ff] text-[#6366f1] flex items-center justify-center mx-auto mb-2 text-lg"><i class="fa-solid fa-coins"></i></div>
-        <div class="text-xl font-extrabold text-[#1e293b]">₦2.5M+</div>
+        <div class="text-xl font-extrabold text-[#1e293b]">€2.5M+</div>
         <div class="text-[11px] font-semibold text-[#64748b]">Paid Out</div>
       </div>
       <div class="card flex-shrink-0 w-[140px] p-4 text-center">
@@ -282,10 +282,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b
     <h3 class="text-sm font-bold text-[#64748b] uppercase tracking-wider mb-4 ml-1">What Users Say</h3>
     <div class="card p-5 mb-3">
       <div class="flex items-center gap-3 mb-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] flex items-center justify-center text-white font-bold text-sm">C</div>
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] flex items-center justify-center text-white font-bold text-sm">L</div>
         <div>
-          <div class="font-bold text-[14px]">Chidi O.</div>
-          <div class="text-[11px] text-[#64748b]">Lagos • Withdrawn ₦150K</div>
+          <div class="font-bold text-[14px]">Lucas M.</div>
+          <div class="text-[11px] text-[#64748b]">Berlin • Withdrawn €1,500</div>
         </div>
         <div class="ml-auto flex text-[#f59e0b] text-[10px]">
           <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
@@ -295,10 +295,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b
     </div>
     <div class="card p-5">
       <div class="flex items-center gap-3 mb-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#10b981] to-[#34d399] flex items-center justify-center text-white font-bold text-sm">A</div>
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#10b981] to-[#34d399] flex items-center justify-center text-white font-bold text-sm">S</div>
         <div>
-          <div class="font-bold text-[14px]">Amina K.</div>
-          <div class="text-[11px] text-[#64748b]">Abuja • Withdrawn ₦320K</div>
+          <div class="font-bold text-[14px]">Sophie B.</div>
+          <div class="text-[11px] text-[#64748b]">Paris • Withdrawn €3,200</div>
         </div>
         <div class="ml-auto flex text-[#f59e0b] text-[10px]">
           <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
@@ -314,7 +314,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b
       <i class="fa-solid fa-rocket text-white text-2xl"></i>
     </div>
     <h3 class="text-xl font-black mb-2">Ready to Start?</h3>
-    <p class="text-[13px] text-[#64748b] mb-6 max-w-[280px] mx-auto">Join 50,000+ Nigerians already earning daily with FlutterW Euro Earn.</p>
+    <p class="text-[13px] text-[#64748b] mb-6 max-w-[280px] mx-auto">Join 50,000+ Europeans already earning daily with FlutterW Euro Earn.</p>
     <a class='btn-primary block w-full py-4 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2' href='/start.php'>
       <span>Create Free Account</span>
       <i class="fa-solid fa-arrow-right text-sm"></i>
@@ -334,18 +334,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;color:#1e293b
 <!-- Bottom Ticker -->
 <div class="ticker-wrap">
   <div class="ticker-track">
-    <span class="ticker-item"><i class="fa-solid fa-circle-check text-[#10b981]"></i> Chidi withdrew ₦50,000</span>
-    <span class="ticker-item"><i class="fa-solid fa-fire text-[#f59e0b]"></i> Amina withdrew ₦125,000</span>
-    <span class="ticker-item"><i class="fa-solid fa-bolt text-[#6366f1]"></i> Emeka withdrew ₦30,000</span>
-    <span class="ticker-item"><i class="fa-solid fa-rocket text-[#ec4899]"></i> Fatima withdrew ₦200,000</span>
-    <span class="ticker-item"><i class="fa-solid fa-coins text-[#10b981]"></i> Tunde withdrew ₦75,000</span>
-    <span class="ticker-item"><i class="fa-solid fa-trophy text-[#f59e0b]"></i> Blessing withdrew ₦500,000</span>
-    <span class="ticker-item"><i class="fa-solid fa-circle-check text-[#10b981]"></i> Chidi withdrew ₦50,000</span>
-    <span class="ticker-item"><i class="fa-solid fa-fire text-[#f59e0b]"></i> Amina withdrew ₦125,000</span>
-    <span class="ticker-item"><i class="fa-solid fa-bolt text-[#6366f1]"></i> Emeka withdrew ₦30,000</span>
-    <span class="ticker-item"><i class="fa-solid fa-rocket text-[#ec4899]"></i> Fatima withdrew ₦200,000</span>
-    <span class="ticker-item"><i class="fa-solid fa-coins text-[#10b981]"></i> Tunde withdrew ₦75,000</span>
-    <span class="ticker-item"><i class="fa-solid fa-trophy text-[#f59e0b]"></i> Blessing withdrew ₦500,000</span>
+    <span class="ticker-item"><i class="fa-solid fa-circle-check text-[#10b981]"></i> Lucas withdrew €500</span>
+    <span class="ticker-item"><i class="fa-solid fa-fire text-[#f59e0b]"></i> Sophie withdrew €1,250</span>
+    <span class="ticker-item"><i class="fa-solid fa-bolt text-[#6366f1]"></i> Matteo withdrew €300</span>
+    <span class="ticker-item"><i class="fa-solid fa-rocket text-[#ec4899]"></i> Freja withdrew €2,000</span>
+    <span class="ticker-item"><i class="fa-solid fa-coins text-[#10b981]"></i> Jan withdrew €750</span>
+    <span class="ticker-item"><i class="fa-solid fa-trophy text-[#f59e0b]"></i> Elena withdrew €5,000</span>
+    <span class="ticker-item"><i class="fa-solid fa-circle-check text-[#10b981]"></i> Lucas withdrew €500</span>
+    <span class="ticker-item"><i class="fa-solid fa-fire text-[#f59e0b]"></i> Sophie withdrew €1,250</span>
+    <span class="ticker-item"><i class="fa-solid fa-bolt text-[#6366f1]"></i> Matteo withdrew €300</span>
+    <span class="ticker-item"><i class="fa-solid fa-rocket text-[#ec4899]"></i> Freja withdrew €2,000</span>
+    <span class="ticker-item"><i class="fa-solid fa-coins text-[#10b981]"></i> Jan withdrew €750</span>
+    <span class="ticker-item"><i class="fa-solid fa-trophy text-[#f59e0b]"></i> Elena withdrew €5,000</span>
   </div>
 </div>
 
@@ -373,8 +373,8 @@ function getDeviceInfo() {
 // ========== ADD TO HOME SCREEN BANNER ==========
 function initAthBanner() {
   // Check if already done or dismissed
-  if (localStorage.getItem("9jaCashAthDone") === "true") return;
-  if (localStorage.getItem("9jaCashAthDismissed") === "true") return;
+  if (localStorage.getItem("FlutterWEuroEarnAthDone") === "true") return;
+  if (localStorage.getItem("FlutterWEuroEarnAthDismissed") === "true") return;
   
   const device = getDeviceInfo();
   
@@ -460,7 +460,7 @@ function initAthBanner() {
 }
 
 function markAthDone() {
-  localStorage.setItem("9jaCashAthDone", "true");
+  localStorage.setItem("FlutterWEuroEarnAthDone", "true");
   document.getElementById("athBanner").classList.remove("show");
   setTimeout(function() {
     document.getElementById("athBanner").classList.add("hidden");
@@ -469,7 +469,7 @@ function markAthDone() {
 }
 
 function dismissAth() {
-  localStorage.setItem("9jaCashAthDismissed", "true");
+  localStorage.setItem("FlutterWEuroEarnAthDismissed", "true");
   document.getElementById("athBanner").classList.remove("show");
   setTimeout(function() {
     document.getElementById("athBanner").classList.add("hidden");
@@ -479,10 +479,10 @@ function dismissAth() {
 
 // ========== NOTIFICATION PERMISSION ==========
 function initNotifyBanner() {
-  if (localStorage.getItem("9jaCashNotifyDecided") === "true") return;
+  if (localStorage.getItem("FlutterWEuroEarnNotifyDecided") === "true") return;
   if (!("Notification" in window)) return;
   if (Notification.permission === "granted") {
-    localStorage.setItem("9jaCashNotifyDecided", "true");
+    localStorage.setItem("FlutterWEuroEarnNotifyDecided", "true");
     return;
   }
   
@@ -499,7 +499,7 @@ function requestNotify() {
   }
   
   Notification.requestPermission().then(function(permission) {
-    localStorage.setItem("9jaCashNotifyDecided", "true");
+    localStorage.setItem("FlutterWEuroEarnNotifyDecided", "true");
     document.getElementById("notifyBanner").classList.remove("show");
     setTimeout(function() {
       document.getElementById("notifyBanner").classList.add("hidden");
@@ -516,7 +516,7 @@ function requestNotify() {
 }
 
 function dismissNotify() {
-  localStorage.setItem("9jaCashNotifyDecided", "true");
+  localStorage.setItem("FlutterWEuroEarnNotifyDecided", "true");
   document.getElementById("notifyBanner").classList.remove("show");
   setTimeout(function() {
     document.getElementById("notifyBanner").classList.add("hidden");
