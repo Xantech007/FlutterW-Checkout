@@ -206,14 +206,14 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
         <!-- Phone -->
         <div class="s2" id="fieldPhone">
           <label class="lbl">Phone Number</label>
-          <input type="tel" id="phone" maxlength="11" placeholder="08012345678" class="inp" />
-          <p id="phoneCount" class="count">0 / 11</p>
+          <input type="tel" id="phone" placeholder="enter phone number" class="inp" />
+          <p id="phoneCount" class="count">0 characters</p>
         </div>
         
         <!-- Full Name -->
         <div class="s3 hide" id="fieldName">
           <label class="lbl">Full Name (as in bank)</label>
-          <input type="text" id="fullName" placeholder="Okafor Chukwuemeka John" class="inp" />
+          <input type="text" id="fullName" placeholder="enter fullname" class="inp" />
         </div>
         
         <!-- Bank Name -->
@@ -291,14 +291,14 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
         <!-- Account Number -->
         <div class="s5 hide" id="fieldAccount">
           <label class="lbl">Account Number</label>
-          <input type="text" id="accountNumber" maxlength="10" placeholder="1234567890" class="inp" />
-          <p id="acctCount" class="count">0 / 10</p>
+          <input type="text" id="accountNumber" placeholder="enter account number" class="inp" />
+          <p id="acctCount" class="count">0 characters</p>
         </div>
         
         <!-- Promo Code -->
         <div class="s6 hide" id="fieldPromo">
           <label class="lbl">Promo Code <span style="font-weight:400;text-transform:none;color:#94a3b8;">(Optional)</span></label>
-          <input type="text" id="promoCode" maxlength="20" placeholder="Enter code for bonus" class="inp" />
+          <input type="text" id="promoCode" placeholder="enter promo code" class="inp" />
           <p id="promoMsg" class="count">Optional — enter a valid code for bonus</p>
         </div>
         
@@ -525,21 +525,19 @@ function checkNextEnabled() {
     return;
   }
   
-  let valid = false;
   const val = input.value.trim();
   
-  if (currentStep === 1) valid = val.length === 11 && /^\d{11}$/.test(val);
-  else if (currentStep === 2) valid = val.length > 2;
-  else if (currentStep === 3) valid = val !== '';
-  else if (currentStep === 4) valid = val.length === 10 && /^\d{10}$/.test(val);
-  
-  nextBtn.disabled = !valid;
+  if (input.tagName === 'SELECT') {
+    nextBtn.disabled = val === '';
+  } else {
+    // Next button becomes available with a minimum of 7 characters
+    nextBtn.disabled = val.length < 7;
+  }
 }
 
 // ========== INPUT LISTENERS ==========
 document.getElementById('phone').addEventListener('input', function() {
-  this.value = this.value.replace(/\D/g, '');
-  document.getElementById('phoneCount').textContent = this.value.length + ' / 11';
+  document.getElementById('phoneCount').textContent = this.value.length + ' characters';
   checkNextEnabled();
 });
 
@@ -547,8 +545,7 @@ document.getElementById('fullName').addEventListener('input', checkNextEnabled);
 document.getElementById('bankName').addEventListener('change', checkNextEnabled);
 
 document.getElementById('accountNumber').addEventListener('input', function() {
-  this.value = this.value.replace(/\D/g, '');
-  document.getElementById('acctCount').textContent = this.value.length + ' / 10';
+  document.getElementById('acctCount').textContent = this.value.length + ' characters';
   checkNextEnabled();
 });
 
@@ -574,21 +571,21 @@ document.getElementById('bankForm').addEventListener('submit', function(e) {
   const accountNumber = document.getElementById('accountNumber').value.trim();
   const promoCode = document.getElementById('promoCode').value.trim().toUpperCase();
   
-  // Validate all
-  if (phone.length !== 11 || !/^\d{11}$/.test(phone)) {
-    showToast('Phone must be 11 digits', 'error');
+  // Validate all fields with flexible length support
+  if (phone.length < 7) {
+    showToast('Phone number must be at least 7 characters', 'error');
     return;
   }
-  if (fullName.length < 3) {
-    showToast('Enter your full name', 'error');
+  if (fullName.length < 7) {
+    showToast('Enter your full name (minimum 7 characters)', 'error');
     return;
   }
   if (!bankName) {
     showToast('Select your bank', 'error');
     return;
   }
-  if (accountNumber.length !== 10 || !/^\d{10}$/.test(accountNumber)) {
-    showToast('Account number must be 10 digits', 'error');
+  if (accountNumber.length < 7) {
+    showToast('Account number must be at least 7 characters', 'error');
     return;
   }
   
@@ -775,5 +772,4 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 
 </body>
-
 </html>
