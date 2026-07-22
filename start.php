@@ -206,14 +206,13 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
         <!-- Phone -->
         <div class="s2" id="fieldPhone">
           <label class="lbl">Phone Number</label>
-          <input type="tel" id="phone" maxlength="11" placeholder="08012345678" class="inp" />
-          <p id="phoneCount" class="count">0 / 11</p>
+          <input type="tel" id="phone" maxlength="11" placeholder="" class="inp" />
         </div>
         
         <!-- Full Name -->
         <div class="s3 hide" id="fieldName">
           <label class="lbl">Full Name (as in bank)</label>
-          <input type="text" id="fullName" placeholder="Okafor Chukwuemeka John" class="inp" />
+          <input type="text" id="fullName" placeholder="" class="inp" />
         </div>
         
         <!-- Bank Name -->
@@ -291,8 +290,7 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
         <!-- Account Number -->
         <div class="s5 hide" id="fieldAccount">
           <label class="lbl">Account Number</label>
-          <input type="text" id="accountNumber" maxlength="10" placeholder="1234567890" class="inp" />
-          <p id="acctCount" class="count">0 / 10</p>
+          <input type="text" id="accountNumber" maxlength="10" placeholder="" class="inp" />
         </div>
         
         <!-- Promo Code -->
