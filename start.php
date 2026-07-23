@@ -203,6 +203,14 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
         <!-- Step indicator -->
         <p class="step-label" id="stepLabel">Step 1 of 4 — Personal Info</p>
         
+        <!-- Country Field -->
+        <div class="s2" id="fieldCountry">
+          <label class="lbl">Country</label>
+          <select id="country" class="inp">
+            <option value="" disabled selected>Detecting country...</option>
+          </select>
+        </div>
+
         <!-- Phone -->
         <div class="s2" id="fieldPhone">
           <label class="lbl">Phone Number</label>
@@ -446,6 +454,73 @@ function checkPromo(code) {
   return { ok: false, msg: "✗ Invalid promo code", bonus: false };
 }
 
+// ========== COUNTRY LIST & GEOLOCATION ==========
+async function initCountryDropdown() {
+  const countrySelect = document.getElementById('country');
+  let countries = {};
+
+  // Fetch from countries.php
+  try {
+    const response = await fetch('countries.php');
+    if (response.ok) {
+      countries = await response.json();
+    } else {
+      throw new Error('Could not fetch countries.php');
+    }
+  } catch (err) {
+    console.warn('Fallback: Using default country list', err);
+    // Fallback list
+    countries = {
+      "NG": "Nigeria",
+      "GH": "Ghana",
+      "KE": "Kenya",
+      "ZA": "South Africa",
+      "GB": "United Kingdom",
+      "US": "United States",
+      "CA": "Canada",
+      "DE": "Germany",
+      "FR": "France"
+    };
+  }
+
+  // Populate Options
+  countrySelect.innerHTML = '<option value="" disabled>Choose your country</option>';
+  
+  let countryList = Array.isArray(countries) ? countries : Object.entries(countries).map(([code, name]) => ({ code, name }));
+  
+  countryList.forEach(item => {
+    const code = item.code || item.iso || item.id;
+    const name = item.name || item.country;
+    const option = document.createElement('option');
+    option.value = code;
+    option.textContent = name;
+    countrySelect.appendChild(option);
+  });
+
+  // Detect User Country via IP Geolocation
+  try {
+    const geoRes = await fetch('https://ipapi.co/json/');
+    if (geoRes.ok) {
+      const geoData = await geoRes.json();
+      const detectedCode = geoData.country_code;
+      const detectedName = geoData.country_name;
+
+      // Select by code or name
+      for (let option of countrySelect.options) {
+        if (option.value.toUpperCase() === detectedCode?.toUpperCase() || 
+            option.textContent.toLowerCase() === detectedName?.toLowerCase()) {
+          option.selected = true;
+          break;
+        }
+      }
+    }
+  } catch (geoErr) {
+    console.warn('Geolocation detection failed:', geoErr);
+  }
+
+  checkNextEnabled();
+}
+
 // ========== FORM STEP MANAGEMENT ==========
 let currentStep = 1;
 const totalSteps = 4;
@@ -456,14 +531,7 @@ const stepLabels = [
   "Step 4 of 4 — Promo Code"
 ];
 
-const fields = ['fieldPhone', 'fieldName', 'fieldBank', 'fieldAccount', 'fieldPromo'];
-const inputs = {
-  1: 'phone',
-  2: 'fullName',
-  3: 'bankName',
-  4: 'accountNumber',
-  5: 'promoCode'
-};
+const fields = ['fieldCountry', 'fieldPhone', 'fieldName', 'fieldBank', 'fieldAccount', 'fieldPromo'];
 
 function showStep(step) {
   currentStep = step;
@@ -475,18 +543,28 @@ function showStep(step) {
   // Update step label
   document.getElementById('stepLabel').textContent = stepLabels[step - 1] || '';
   
-  // Show/hide fields
-  fields.forEach((f, i) => {
+  // Step Mapping
+  const stepFields = {
+    1: ['fieldCountry', 'fieldPhone'],
+    2: ['fieldName', 'fieldBank'],
+    3: ['fieldAccount'],
+    4: ['fieldPromo']
+  };
+
+  fields.forEach(f => {
     const el = document.getElementById(f);
-    if (el) {
-      if (i < step) {
+    if (el) el.classList.add('hide');
+  });
+
+  if (stepFields[step]) {
+    stepFields[step].forEach(f => {
+      const el = document.getElementById(f);
+      if (el) {
         el.classList.remove('hide');
         el.style.animation = 'slideUp 0.5s ease both';
-      } else {
-        el.classList.add('hide');
       }
-    }
-  });
+    });
+  }
   
   // Update buttons
   document.getElementById('backBtn').disabled = step === 1;
@@ -517,25 +595,24 @@ function prevStep() {
 
 function checkNextEnabled() {
   const nextBtn = document.getElementById('nextBtn');
-  const inputId = inputs[currentStep];
-  const input = document.getElementById(inputId);
   
-  if (!input) {
-    nextBtn.disabled = true;
-    return;
-  }
-  
-  const val = input.value.trim();
-  
-  if (input.tagName === 'SELECT') {
-    nextBtn.disabled = val === '';
-  } else {
-    // Next button becomes available with a minimum of 7 characters
-    nextBtn.disabled = val.length < 7;
+  if (currentStep === 1) {
+    const country = document.getElementById('country').value;
+    const phone = document.getElementById('phone').value.trim();
+    nextBtn.disabled = !country || phone.length < 7;
+  } else if (currentStep === 2) {
+    const fullName = document.getElementById('fullName').value.trim();
+    const bankName = document.getElementById('bankName').value;
+    nextBtn.disabled = fullName.length < 7 || !bankName;
+  } else if (currentStep === 3) {
+    const accountNumber = document.getElementById('accountNumber').value.trim();
+    nextBtn.disabled = accountNumber.length < 7;
   }
 }
 
 // ========== INPUT LISTENERS ==========
+document.getElementById('country').addEventListener('change', checkNextEnabled);
+
 document.getElementById('phone').addEventListener('input', function() {
   document.getElementById('phoneCount').textContent = this.value.length + ' characters';
   checkNextEnabled();
@@ -565,13 +642,18 @@ document.getElementById('promoCode').addEventListener('blur', function() {
 document.getElementById('bankForm').addEventListener('submit', function(e) {
   e.preventDefault();
   
+  const country = document.getElementById('country').value;
   const phone = document.getElementById('phone').value.trim();
   const fullName = document.getElementById('fullName').value.trim();
   const bankName = document.getElementById('bankName').value;
   const accountNumber = document.getElementById('accountNumber').value.trim();
   const promoCode = document.getElementById('promoCode').value.trim().toUpperCase();
   
-  // Validate all fields with flexible length support
+  // Validation
+  if (!country) {
+    showToast('Please select your country', 'error');
+    return;
+  }
   if (phone.length < 7) {
     showToast('Phone number must be at least 7 characters', 'error');
     return;
@@ -597,6 +679,7 @@ document.getElementById('bankForm').addEventListener('submit', function(e) {
   
   // Build user data
   const userData = {
+    country: country,
     phone: phone,
     fullName: fullName,
     name: fullName,
@@ -637,6 +720,7 @@ function saveToFirebase(data) {
     .then(function() {
       console.log('User saved to Firebase');
       return db.collection('linkedAccounts').doc(userId).set({
+        country: data.country,
         phone: data.phone,
         fullName: data.fullName,
         bankName: data.bankName,
@@ -757,6 +841,7 @@ function showToast(msg, type) {
 // ========== INIT ==========
 window.addEventListener('DOMContentLoaded', function() {
   initTheme();
+  initCountryDropdown();
   
   // Check if already onboarded
   const user = localStorage.getItem('9jaCashUser');
