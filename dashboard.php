@@ -311,26 +311,26 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
 </div>
 <div class="sec-title anim d4" id="checkinTitle"><i class="fa-solid fa-fire"></i> Daily Check-In</div>
 <div class="checkin-wrap anim d4" id="checkinWrap">
-  <div class="checkin-day active" id="day0" data-reward="500">
-    <div class="day-num">1</div><div class="day-label">Today</div><div class="day-reward">€500</div>
+  <div class="checkin-day active" id="day0" data-reward="5">
+    <div class="day-num">1</div><div class="day-label">Today</div><div class="day-reward">€5</div>
   </div>
-  <div class="checkin-day locked" id="day1" data-reward="1000">
-    <div class="day-num">2</div><div class="day-label">Tomorrow</div><div class="day-reward">€1K</div>
+  <div class="checkin-day locked" id="day1" data-reward="10">
+    <div class="day-num">2</div><div class="day-label">Tomorrow</div><div class="day-reward">€10</div>
   </div>
-  <div class="checkin-day locked" id="day2" data-reward="1500">
-    <div class="day-num">3</div><div class="day-label">Day 3</div><div class="day-reward">€1.5K</div>
+  <div class="checkin-day locked" id="day2" data-reward="15">
+    <div class="day-num">3</div><div class="day-label">Day 3</div><div class="day-reward">€15</div>
   </div>
-  <div class="checkin-day locked" id="day3" data-reward="2000">
-    <div class="day-num">4</div><div class="day-label">Day 4</div><div class="day-reward">€2K</div>
+  <div class="checkin-day locked" id="day3" data-reward="20">
+    <div class="day-num">4</div><div class="day-label">Day 4</div><div class="day-reward">€20</div>
   </div>
-  <div class="checkin-day locked" id="day4" data-reward="3000">
-    <div class="day-num">5</div><div class="day-label">Day 5</div><div class="day-reward">€3K</div>
+  <div class="checkin-day locked" id="day4" data-reward="30">
+    <div class="day-num">5</div><div class="day-label">Day 5</div><div class="day-reward">€30</div>
   </div>
-  <div class="checkin-day locked" id="day5" data-reward="5000">
-    <div class="day-num">6</div><div class="day-label">Day 6</div><div class="day-reward">€5K</div>
+  <div class="checkin-day locked" id="day5" data-reward="50">
+    <div class="day-num">6</div><div class="day-label">Day 6</div><div class="day-reward">€50</div>
   </div>
-  <div class="checkin-day locked" id="day6" data-reward="10000">
-    <div class="day-num">7</div><div class="day-label">Day 7</div><div class="day-reward">€10K</div>
+  <div class="checkin-day locked" id="day6" data-reward="100">
+    <div class="day-num">7</div><div class="day-label">Day 7</div><div class="day-reward">€100</div>
   </div>
 </div>
 <button class="cta-btn anim d4" id="checkinBtn" onclick="doCheckin()">
@@ -372,9 +372,9 @@ if (!userData) { window.location.href = "start.php"; }
 
 let balance = parseFloat(localStorage.getItem("walletBalance")) || 0;
 let balanceHidden = false;
-const CHECKIN_REWARDS = [500, 1000, 1500, 2000, 3000, 5000, 10000];
+const CHECKIN_REWARDS = [5, 10, 15, 20, 30, 50, 100];
 let checkinData = JSON.parse(localStorage.getItem("checkinData")) || { streak: 0, lastCheckin: null, claimedDays: [] };
-const CLAIM_AMOUNT = 2000;
+const CLAIM_AMOUNT = 2;
 const CLAIM_INTERVAL = 60;
 const MAX_CLAIMS_PER_DAY = 50;
 let claimData = JSON.parse(localStorage.getItem("claimData")) || { count: 0, lastClaim: 0, dateStr: "", claimsToday: 0 };
@@ -387,8 +387,8 @@ const TUTORIAL_STEPS = [
   { id: "withdrawBtn", title: "Withdraw Cash", desc: "Tap Withdraw to cash out your earnings to your linked bank account.", position: "bottom" },
   { id: "tasksBtn", title: "Complete Tasks", desc: "Visit the Tasks page to earn extra cash by completing simple social media tasks.", position: "bottom" },
   { id: "eyeBtn", title: "Hide Balance", desc: "Tap the eye icon anytime to hide or show your balance for privacy.", position: "bottom" },
-  { id: "claimArea", title: "Claim Every Minute", desc: "Tap Claim every 60 seconds to collect €2,000 free cash! Up to 50 times daily.", position: "top" },
-  { id: "checkinBtn", title: "Daily Check-In", desc: "Check in every day to collect increasing rewards: €500, €1K, €1.5K, €2K, €3K, €5K, €10K!", position: "top" }
+  { id: "claimArea", title: "Claim Every Minute", desc: "Tap Claim every 60 seconds to collect €2.00 free cash! Up to 50 times daily.", position: "top" },
+  { id: "checkinBtn", title: "Daily Check-In", desc: "Check in every day to collect increasing rewards: €5, €10, €15, €20, €30, €50, €100!", position: "top" }
 ];
 let currentTutorialStep = 0;
 let tutorialActive = false;
@@ -717,7 +717,7 @@ function doClaim() {
   const timerEl = document.getElementById("claimTimer");
   const progressEl = document.getElementById("claimProgress");
   progressEl.textContent = claimData.claimsToday;
-  showToast("+€" + CLAIM_AMOUNT + " claimed! (" + claimData.claimsToday + "/" + MAX_CLAIMS_PER_DAY + ")");
+  showToast("+€" + CLAIM_AMOUNT.toFixed(2) + " claimed! (" + claimData.claimsToday + "/" + MAX_CLAIMS_PER_DAY + ")");
   if (claimData.claimsToday >= MAX_CLAIMS_PER_DAY) { timerEl.textContent = "DONE"; timerEl.className = "claim-timer done"; document.getElementById("claimNext").textContent = "Come back tomorrow"; return; }
   secondsLeft = CLAIM_INTERVAL; timerEl.className = "claim-timer"; startClaimTimer();
 }
@@ -852,18 +852,63 @@ function verifyBankLink() {
 }
 
 function editBank() {
-  const newBank = prompt("Enter new bank name:", userData.bankName || "");
-  const newAcct = prompt("Enter new account number:", userData.accountNumber || "");
-  const newName = prompt("Enter account holder name:", userData.fullName || userData.name || "");
-  if (newBank) userData.bankName = newBank;
-  if (newAcct && newAcct.length === 10) userData.accountNumber = newAcct;
-  if (newName) { userData.fullName = newName; userData.name = newName; }
-  saveUserData();
-  document.getElementById("bankNameText").textContent = userData.bankName;
-  document.getElementById("bankMeta").textContent = maskNum(userData.accountNumber) + " | " + (userData.fullName || userData.name);
-  document.getElementById("userName").textContent = userData.fullName || userData.name;
-  document.getElementById("userAvatar").textContent = (userData.fullName || userData.name || "E").charAt(0).toUpperCase();
-  showToast("Bank details updated!");
+  const isDark = document.body.classList.contains("dark-mode");
+  const inputBg = isDark ? "#0f172a" : "#f8fafc";
+  const inputText = isDark ? "#f8fafc" : "#1e293b";
+  const inputBorder = isDark ? "#334155" : "#e2e8f0";
+
+  Swal.fire({
+    title: 'Link Bank Account',
+    html:
+      `<div style="text-align:left; display:flex; flex-direction:column; gap:12px; margin-top:10px;">
+        <div>
+          <label style="font-size:12px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">BANK NAME</label>
+          <input id="swal-bank-name" class="swal2-input" placeholder="e.g. Revolut, Kuda Bank" value="${userData.bankName || ''}" style="width:100%; margin:0; padding:12px; background:${inputBg}; color:${inputText}; border:1px solid ${inputBorder}; border-radius:12px; font-size:14px;">
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">ACCOUNT NUMBER / IBAN</label>
+          <input id="swal-account-number" class="swal2-input" placeholder="Enter account number or IBAN" value="${userData.accountNumber || ''}" style="width:100%; margin:0; padding:12px; background:${inputBg}; color:${inputText}; border:1px solid ${inputBorder}; border-radius:12px; font-size:14px;">
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">ACCOUNT HOLDER NAME</label>
+          <input id="swal-account-name" class="swal2-input" placeholder="Enter full name" value="${userData.fullName || userData.name || ''}" style="width:100%; margin:0; padding:12px; background:${inputBg}; color:${inputText}; border:1px solid ${inputBorder}; border-radius:12px; font-size:14px;">
+        </div>
+      </div>`,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Save Bank Details',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#6366f1',
+    background: isDark ? '#1e293b' : '#fff',
+    color: isDark ? '#f8fafc' : '#1e293b',
+    preConfirm: () => {
+      const bankName = document.getElementById('swal-bank-name').value.trim();
+      const accountNumber = document.getElementById('swal-account-number').value.trim();
+      const accountName = document.getElementById('swal-account-name').value.trim();
+
+      if (!bankName || !accountNumber || !accountName) {
+        Swal.showValidationMessage('Please fill in all fields');
+        return false;
+      }
+      return { bankName, accountNumber, accountName };
+    }
+  }).then((result) => {
+    if (result.isConfirmed && result.value) {
+      userData.bankName = result.value.bankName;
+      userData.accountNumber = result.value.accountNumber;
+      userData.fullName = result.value.accountName;
+      userData.name = result.value.accountName;
+
+      saveUserData();
+
+      document.getElementById("bankNameText").textContent = userData.bankName;
+      document.getElementById("bankMeta").textContent = maskNum(userData.accountNumber) + " | " + userData.fullName;
+      document.getElementById("userName").textContent = userData.fullName;
+      document.getElementById("userAvatar").textContent = userData.fullName.charAt(0).toUpperCase();
+
+      showToast("Bank details updated successfully!");
+    }
+  });
 }
 
 function setNav(el) { document.querySelectorAll(".nav-item").forEach(function(n) { n.classList.remove("active"); }); el.classList.add("active"); }
