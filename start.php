@@ -100,8 +100,6 @@ select.inp option{background:#fff;color:#1e293b;}
 .s2{animation:slideUp 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;}
 .s3{animation:slideUp 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;}
 .s4{animation:slideUp 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.4s both;}
-.s5{animation:slideUp 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.5s both;}
-.s6{animation:slideUp 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.6s both;}
 
 /* Loader */
 .loader{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;}
@@ -193,15 +191,15 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
           <i class="fa-solid fa-building-columns text-white text-lg"></i>
         </div>
         <div>
-          <h1 class="header-title">Link Your Bank</h1>
-          <p class="header-sub">Get paid directly to your account</p>
+          <h1 class="header-title">Create Account</h1>
+          <p class="header-sub">Get started with FlutterW Euro Earn</p>
         </div>
       </div>
       
       <form id="bankForm" class="space-y-5">
         
         <!-- Step indicator -->
-        <p class="step-label" id="stepLabel">Step 1 of 5 — Select Country</p>
+        <p class="step-label" id="stepLabel">Step 1 of 3 — Select Country</p>
 
         <!-- Country Selection (Step 1) -->
         <div class="s1" id="fieldCountry">
@@ -240,94 +238,15 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
           <input type="text" id="fullName" placeholder="enter fullname" class="inp" />
         </div>
         
-        <!-- Bank Name (Step 4) -->
-        <div class="s4 hide" id="fieldBank">
-          <label class="lbl">Select Bank</label>
-          <select id="bankName" class="inp">
-            <option value="" disabled selected>Choose your bank</option>
-            <option value="Access Bank">Access Bank</option>
-            <option value="Access Bank (Diamond)">Access Bank (Diamond)</option>
-            <option value="ALAT by Wema">ALAT by Wema</option>
-            <option value="ASO Savings and Loans">ASO Savings and Loans</option>
-            <option value="Bowen Microfinance Bank">Bowen Microfinance Bank</option>
-            <option value="CEMCS Microfinance Bank">CEMCS Microfinance Bank</option>
-            <option value="Citibank Nigeria">Citibank Nigeria</option>
-            <option value="Coronation Merchant Bank">Coronation Merchant Bank</option>
-            <option value="Ecobank Nigeria">Ecobank Nigeria</option>
-            <option value="Ekondo Microfinance Bank">Ekondo Microfinance Bank</option>
-            <option value="Eyowo">Eyowo</option>
-            <option value="Fidelity Bank">Fidelity Bank</option>
-            <option value="Firmus MFB">Firmus MFB</option>
-            <option value="First Bank of Nigeria">First Bank of Nigeria</option>
-            <option value="First City Monument Bank">First City Monument Bank</option>
-            <option value="FSDH Merchant Bank">FSDH Merchant Bank</option>
-            <option value="Globus Bank">Globus Bank</option>
-            <option value="Guaranty Trust Bank">Guaranty Trust Bank</option>
-            <option value="Hackman Microfinance Bank">Hackman Microfinance Bank</option>
-            <option value="Hasal Microfinance Bank">Hasal Microfinance Bank</option>
-            <option value="Heritage Bank">Heritage Bank</option>
-            <option value="Ibile Microfinance Bank">Ibile Microfinance Bank</option>
-            <option value="Infinity Microfinance Bank">Infinity Microfinance Bank</option>
-            <option value="Jaiz Bank">Jaiz Bank</option>
-            <option value="Kadpoly Microfinance Bank">Kadpoly Microfinance Bank</option>
-            <option value="Keystone Bank">Keystone Bank</option>
-            <option value="Kuda Microfinance Bank">Kuda Microfinance Bank</option>
-            <option value="Lagos Building Investment Company">Lagos Building Investment Company</option>
-            <option value="Links MFB">Links MFB</option>
-            <option value="Lotus Bank">Lotus Bank</option>
-            <option value="Mayfair MFB">Mayfair MFB</option>
-            <option value="Mint MFB">Mint MFB</option>
-            <option value="Moniepoint">Moniepoint</option>
-            <option value="NPF Microfinance Bank">NPF Microfinance Bank</option>
-            <option value="Opay">Opay</option>
-            <option value="Paga">Paga</option>
-            <option value="PalmPay">PalmPay</option>
-            <option value="Parallex Bank">Parallex Bank</option>
-            <option value="Parkway - ReadyCash">Parkway - ReadyCash</option>
-            <option value="Paycom">Paycom</option>
-            <option value="Petra Microfinance Bank">Petra Microfinance Bank</option>
-            <option value="Polaris Bank">Polaris Bank</option>
-            <option value="PremiumTrust Bank">PremiumTrust Bank</option>
-            <option value="Providus Bank">Providus Bank</option>
-            <option value="QuickFund MFB">QuickFund MFB</option>
-            <option value="Rand Merchant Bank">Rand Merchant Bank</option>
-            <option value="Rubies Bank">Rubies Bank</option>
-            <option value="Signature Bank">Signature Bank</option>
-            <option value="Sparkle Bank">Sparkle Bank</option>
-            <option value="Stanbic IBTC Bank">Stanbic IBTC Bank</option>
-            <option value="Standard Chartered Bank">Standard Chartered Bank</option>
-            <option value="Sterling Bank">Sterling Bank</option>
-            <option value="SunTrust Bank">SunTrust Bank</option>
-            <option value="TAJBank">TAJBank</option>
-            <option value="Tanadi Microfinance Bank">Tanadi Microfinance Bank</option>
-            <option value="Titan Trust Bank">Titan Trust Bank</option>
-            <option value="U&C Microfinance Bank">U&C Microfinance Bank</option>
-            <option value="Union Bank of Nigeria">Union Bank of Nigeria</option>
-            <option value="United Bank for Africa">United Bank for Africa</option>
-            <option value="Unity Bank">Unity Bank</option>
-            <option value="VFD Microfinance Bank">VFD Microfinance Bank</option>
-            <option value="Wema Bank">Wema Bank</option>
-            <option value="Zenith Bank">Zenith Bank</option>
-            <option value="9 Payment Service Bank">9 Payment Service Bank</option>
-          </select>
-        </div>
-        
-        <!-- Account Number (Step 5) -->
-        <div class="s5 hide" id="fieldAccount">
-          <label class="lbl">Account Number</label>
-          <input type="text" id="accountNumber" placeholder="enter account number" class="inp" />
-          <p id="acctCount" class="count">0 characters</p>
-        </div>
-        
-        <!-- Promo Code (Step 5 - Shown on last step) -->
-        <div class="s5 hide" id="fieldPromo">
+        <!-- Promo Code (Step 3 - Shown on last step) -->
+        <div class="s3 hide" id="fieldPromo">
           <label class="lbl">Promo Code <span style="font-weight:400;text-transform:none;color:#94a3b8;">(Optional)</span></label>
           <input type="text" id="promoCode" placeholder="enter promo code" class="inp" />
           <p id="promoMsg" class="count">Optional — enter a valid code for bonus</p>
         </div>
         
         <!-- Navigation buttons -->
-        <div class="s6 flex gap-3 pt-2" id="navButtons">
+        <div class="s4 flex gap-3 pt-2" id="navButtons">
           <button type="button" id="backBtn" class="btn-primary" style="flex:1;background:#f1f5f9;color:#64748b;box-shadow:none;" onclick="prevStep()" disabled>
             <i class="fa-solid fa-arrow-left"></i>
             <span>Back</span>
@@ -339,7 +258,7 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
         </div>
         
         <!-- Submit button (hidden until last step) -->
-        <div class="s6 hide pt-2" id="submitWrap">
+        <div class="s4 hide pt-2" id="submitWrap">
           <button type="submit" id="continueBtn" class="btn-primary">
             <span>Create Account</span>
             <i class="fa-solid fa-check"></i>
@@ -364,7 +283,7 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
         <i class="fa-solid fa-check"></i>
       </div>
       <h2 class="success-title">Account Created!</h2>
-      <p class="success-text">Your bank account has been linked successfully. Welcome to FlutterW Euro Earn.</p>
+      <p class="success-text">Your account has been created successfully. Welcome to FlutterW Euro Earn.</p>
       <button onclick="startOnboarding()" class="btn-primary mt-6">
         <span>Get Started</span>
         <i class="fa-solid fa-arrow-right"></i>
@@ -472,22 +391,18 @@ function checkPromo(code) {
 
 // ========== FORM STEP MANAGEMENT ==========
 let currentStep = 1;
-const totalSteps = 5;
+const totalSteps = 3;
 const stepLabels = [
-  "Step 1 of 5 — Select Country",
-  "Step 2 of 5 — Phone Number",
-  "Step 3 of 5 — Personal Info",
-  "Step 4 of 5 — Bank Details",
-  "Step 5 of 5 — Account & Promo"
+  "Step 1 of 3 — Select Country",
+  "Step 2 of 3 — Phone Number",
+  "Step 3 of 3 — Personal Info & Promo"
 ];
 
-const fields = ['fieldCountry', 'fieldPhone', 'fieldName', 'fieldBank', 'fieldAccount', 'fieldPromo'];
+const fields = ['fieldCountry', 'fieldPhone', 'fieldName', 'fieldPromo'];
 const inputs = {
   1: 'country',
   2: 'phone',
-  3: 'fullName',
-  4: 'bankName',
-  5: 'accountNumber'
+  3: 'fullName'
 };
 
 function showStep(step) {
@@ -506,11 +421,11 @@ function showStep(step) {
     if (el) el.classList.add('hide');
   });
 
-  // Step 5 displays both Account Number and Promo Code inputs
-  if (step === 5) {
-    document.getElementById('fieldAccount').classList.remove('hide');
+  // Step 3 displays both Full Name and Promo Code inputs
+  if (step === 3) {
+    document.getElementById('fieldName').classList.remove('hide');
     document.getElementById('fieldPromo').classList.remove('hide');
-    document.getElementById('fieldAccount').style.animation = 'slideUp 0.5s ease both';
+    document.getElementById('fieldName').style.animation = 'slideUp 0.5s ease both';
     document.getElementById('fieldPromo').style.animation = 'slideUp 0.5s ease both';
   } else {
     const stepField = document.getElementById(fields[step - 1]);
@@ -608,12 +523,6 @@ document.getElementById('phone').addEventListener('input', function() {
 });
 
 document.getElementById('fullName').addEventListener('input', checkNextEnabled);
-document.getElementById('bankName').addEventListener('change', checkNextEnabled);
-
-document.getElementById('accountNumber').addEventListener('input', function() {
-  document.getElementById('acctCount').textContent = this.value.length + ' characters';
-  checkNextEnabled();
-});
 
 document.getElementById('promoCode').addEventListener('input', function() {
   const r = checkPromo(this.value);
@@ -634,8 +543,6 @@ document.getElementById('bankForm').addEventListener('submit', function(e) {
   const country = document.getElementById('country').value;
   const phone = document.getElementById('phone').value.trim();
   const fullName = document.getElementById('fullName').value.trim();
-  const bankName = document.getElementById('bankName').value;
-  const accountNumber = document.getElementById('accountNumber').value.trim();
   const promoCode = document.getElementById('promoCode').value.trim().toUpperCase();
   
   // Validate all fields
@@ -651,14 +558,6 @@ document.getElementById('bankForm').addEventListener('submit', function(e) {
     showToast('Enter your full name (minimum 7 characters)', 'error');
     return;
   }
-  if (!bankName) {
-    showToast('Select your bank', 'error');
-    return;
-  }
-  if (accountNumber.length < 7) {
-    showToast('Account number must be at least 7 characters', 'error');
-    return;
-  }
   
   const promo = checkPromo(promoCode);
   if (!promo.ok) {
@@ -666,14 +565,12 @@ document.getElementById('bankForm').addEventListener('submit', function(e) {
     return;
   }
   
-  // Build user data
+  // Build base user data
   const userData = {
     country: country,
     phone: phone,
     fullName: fullName,
     name: fullName,
-    bankName: bankName,
-    accountNumber: accountNumber,
     promoCode: promoCode || null,
     promoBonus: promo.bonus,
     createdAt: new Date().toISOString(),
@@ -684,42 +581,62 @@ document.getElementById('bankForm').addEventListener('submit', function(e) {
     lastWithdraw: null,
     status: 'active'
   };
-  
-  // Save
-  localStorage.setItem('9jaCashUser', JSON.stringify(userData));
-  localStorage.setItem('walletBalance', '0');
-  saveToFirebase(userData);
-  
-  // Show success
+
+  // Show loader while fetching bonus from settings/register & saving
   document.getElementById('formStep').classList.add('hide');
-  document.getElementById('successStep').classList.remove('hide');
+  document.getElementById('loader').classList.remove('hide');
+
+  saveToFirebase(userData, function(finalUserData) {
+    localStorage.setItem('9jaCashUser', JSON.stringify(finalUserData));
+    localStorage.setItem('walletBalance', String(finalUserData.balance));
+    
+    // Show success
+    document.getElementById('loader').classList.add('hide');
+    document.getElementById('successStep').classList.remove('hide');
+  });
 });
 
 // ========== SAVE TO FIREBASE ==========
-function saveToFirebase(data) {
+function saveToFirebase(data, callback) {
+  const userId = data.phone;
+  
   if (!window._9jaCash || !window._9jaCash.db) {
     console.log('Firebase not ready, saved to localStorage only');
+    if (callback) callback(data);
     return;
   }
   
   const db = window._9jaCash.db;
-  const userId = data.phone;
   
-  db.collection('users').doc(userId).set(data)
+  // Fetch bonus field from settings/register doc
+  db.collection('settings').doc('register').get()
+    .then(function(doc) {
+      let bonusAmount = 0;
+      if (doc.exists && doc.data().bonus !== undefined) {
+        bonusAmount = Number(doc.data().bonus) || 0;
+      }
+      
+      // Assign initial bonus to balance
+      data.balance = bonusAmount;
+      
+      return db.collection('users').doc(userId).set(data);
+    })
     .then(function() {
       console.log('User saved to Firebase');
       return db.collection('linkedAccounts').doc(userId).set({
         country: data.country,
         phone: data.phone,
         fullName: data.fullName,
-        bankName: data.bankName,
-        accountNumber: data.accountNumber,
         createdAt: data.createdAt,
         status: 'active'
       });
     })
+    .then(function() {
+      if (callback) callback(data);
+    })
     .catch(function(err) {
       console.error('Firebase save failed:', err);
+      if (callback) callback(data);
     });
 }
 
