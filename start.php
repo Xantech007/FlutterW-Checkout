@@ -201,30 +201,46 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
       <form id="bankForm" class="space-y-5">
         
         <!-- Step indicator -->
-        <p class="step-label" id="stepLabel">Step 1 of 4 — Personal Info</p>
-        
-        <!-- Country Field -->
-        <div class="s2" id="fieldCountry">
+        <p class="step-label" id="stepLabel">Step 1 of 5 — Select Country</p>
+
+        <!-- Country Selection (Step 1) -->
+        <div class="s1" id="fieldCountry">
           <label class="lbl">Country</label>
           <select id="country" class="inp">
-            <option value="" disabled selected>Detecting country...</option>
+            <option value="" disabled selected>Detecting or choose country...</option>
+            <?php
+              if (file_exists('countries.php')) {
+                  include 'countries.php';
+                  if (isset($countries) && is_array($countries)) {
+                      foreach ($countries as $code => $name) {
+                          echo '<option value="' . htmlspecialchars($name) . '" data-code="' . htmlspecialchars($code) . '">' . htmlspecialchars($name) . '</option>';
+                      }
+                  }
+              } else {
+                  // Fallback standard options if countries.php file isn't loaded
+                  $defaultCountries = ["NG" => "Nigeria", "US" => "United States", "GB" => "United Kingdom", "CA" => "Canada", "GH" => "Ghana", "KE" => "Kenya", "ZA" => "South Africa"];
+                  foreach ($defaultCountries as $code => $name) {
+                      echo '<option value="' . htmlspecialchars($name) . '" data-code="' . htmlspecialchars($code) . '">' . htmlspecialchars($name) . '</option>';
+                  }
+              }
+            ?>
           </select>
         </div>
-
-        <!-- Phone -->
-        <div class="s2" id="fieldPhone">
+        
+        <!-- Phone (Step 2) -->
+        <div class="s2 hide" id="fieldPhone">
           <label class="lbl">Phone Number</label>
           <input type="tel" id="phone" placeholder="enter phone number" class="inp" />
           <p id="phoneCount" class="count">0 characters</p>
         </div>
         
-        <!-- Full Name -->
+        <!-- Full Name (Step 3) -->
         <div class="s3 hide" id="fieldName">
           <label class="lbl">Full Name (as in bank)</label>
           <input type="text" id="fullName" placeholder="enter fullname" class="inp" />
         </div>
         
-        <!-- Bank Name -->
+        <!-- Bank Name (Step 4) -->
         <div class="s4 hide" id="fieldBank">
           <label class="lbl">Select Bank</label>
           <select id="bankName" class="inp">
@@ -296,15 +312,15 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
           </select>
         </div>
         
-        <!-- Account Number -->
+        <!-- Account Number (Step 5) -->
         <div class="s5 hide" id="fieldAccount">
           <label class="lbl">Account Number</label>
           <input type="text" id="accountNumber" placeholder="enter account number" class="inp" />
           <p id="acctCount" class="count">0 characters</p>
         </div>
         
-        <!-- Promo Code -->
-        <div class="s6 hide" id="fieldPromo">
+        <!-- Promo Code (Step 5 - Shown on last step) -->
+        <div class="s5 hide" id="fieldPromo">
           <label class="lbl">Promo Code <span style="font-weight:400;text-transform:none;color:#94a3b8;">(Optional)</span></label>
           <input type="text" id="promoCode" placeholder="enter promo code" class="inp" />
           <p id="promoMsg" class="count">Optional — enter a valid code for bonus</p>
@@ -454,116 +470,54 @@ function checkPromo(code) {
   return { ok: false, msg: "✗ Invalid promo code", bonus: false };
 }
 
-// ========== COUNTRY LIST & GEOLOCATION ==========
-async function initCountryDropdown() {
-  const countrySelect = document.getElementById('country');
-  let countries = {};
-
-  // Fetch from countries.php
-  try {
-    const response = await fetch('countries.php');
-    if (response.ok) {
-      countries = await response.json();
-    } else {
-      throw new Error('Could not fetch countries.php');
-    }
-  } catch (err) {
-    console.warn('Fallback: Using default country list', err);
-    // Fallback list
-    countries = {
-      "NG": "Nigeria",
-      "GH": "Ghana",
-      "KE": "Kenya",
-      "ZA": "South Africa",
-      "GB": "United Kingdom",
-      "US": "United States",
-      "CA": "Canada",
-      "DE": "Germany",
-      "FR": "France"
-    };
-  }
-
-  // Populate Options
-  countrySelect.innerHTML = '<option value="" disabled>Choose your country</option>';
-  
-  let countryList = Array.isArray(countries) ? countries : Object.entries(countries).map(([code, name]) => ({ code, name }));
-  
-  countryList.forEach(item => {
-    const code = item.code || item.iso || item.id;
-    const name = item.name || item.country;
-    const option = document.createElement('option');
-    option.value = code;
-    option.textContent = name;
-    countrySelect.appendChild(option);
-  });
-
-  // Detect User Country via IP Geolocation
-  try {
-    const geoRes = await fetch('https://ipapi.co/json/');
-    if (geoRes.ok) {
-      const geoData = await geoRes.json();
-      const detectedCode = geoData.country_code;
-      const detectedName = geoData.country_name;
-
-      // Select by code or name
-      for (let option of countrySelect.options) {
-        if (option.value.toUpperCase() === detectedCode?.toUpperCase() || 
-            option.textContent.toLowerCase() === detectedName?.toLowerCase()) {
-          option.selected = true;
-          break;
-        }
-      }
-    }
-  } catch (geoErr) {
-    console.warn('Geolocation detection failed:', geoErr);
-  }
-
-  checkNextEnabled();
-}
-
 // ========== FORM STEP MANAGEMENT ==========
 let currentStep = 1;
-const totalSteps = 4;
+const totalSteps = 5;
 const stepLabels = [
-  "Step 1 of 4 — Personal Info",
-  "Step 2 of 4 — Bank Details",
-  "Step 3 of 4 — Account Number",
-  "Step 4 of 4 — Promo Code"
+  "Step 1 of 5 — Select Country",
+  "Step 2 of 5 — Phone Number",
+  "Step 3 of 5 — Personal Info",
+  "Step 4 of 5 — Bank Details",
+  "Step 5 of 5 — Account & Promo"
 ];
 
 const fields = ['fieldCountry', 'fieldPhone', 'fieldName', 'fieldBank', 'fieldAccount', 'fieldPromo'];
+const inputs = {
+  1: 'country',
+  2: 'phone',
+  3: 'fullName',
+  4: 'bankName',
+  5: 'accountNumber'
+};
 
 function showStep(step) {
   currentStep = step;
   
   // Update progress bar
-  const progress = ((step - 1) / totalSteps) * 100;
+  const progress = ((step - 1) / (totalSteps - 1)) * 100;
   document.getElementById('progressFill').style.width = progress + '%';
   
   // Update step label
   document.getElementById('stepLabel').textContent = stepLabels[step - 1] || '';
   
-  // Step Mapping
-  const stepFields = {
-    1: ['fieldCountry', 'fieldPhone'],
-    2: ['fieldName', 'fieldBank'],
-    3: ['fieldAccount'],
-    4: ['fieldPromo']
-  };
-
-  fields.forEach(f => {
+  // Show/hide fields
+  fields.forEach((f) => {
     const el = document.getElementById(f);
     if (el) el.classList.add('hide');
   });
 
-  if (stepFields[step]) {
-    stepFields[step].forEach(f => {
-      const el = document.getElementById(f);
-      if (el) {
-        el.classList.remove('hide');
-        el.style.animation = 'slideUp 0.5s ease both';
-      }
-    });
+  // Step 5 displays both Account Number and Promo Code inputs
+  if (step === 5) {
+    document.getElementById('fieldAccount').classList.remove('hide');
+    document.getElementById('fieldPromo').classList.remove('hide');
+    document.getElementById('fieldAccount').style.animation = 'slideUp 0.5s ease both';
+    document.getElementById('fieldPromo').style.animation = 'slideUp 0.5s ease both';
+  } else {
+    const stepField = document.getElementById(fields[step - 1]);
+    if (stepField) {
+      stepField.classList.remove('hide');
+      stepField.style.animation = 'slideUp 0.5s ease both';
+    }
   }
   
   // Update buttons
@@ -595,19 +549,54 @@ function prevStep() {
 
 function checkNextEnabled() {
   const nextBtn = document.getElementById('nextBtn');
+  const inputId = inputs[currentStep];
+  const input = document.getElementById(inputId);
   
-  if (currentStep === 1) {
-    const country = document.getElementById('country').value;
-    const phone = document.getElementById('phone').value.trim();
-    nextBtn.disabled = !country || phone.length < 7;
-  } else if (currentStep === 2) {
-    const fullName = document.getElementById('fullName').value.trim();
-    const bankName = document.getElementById('bankName').value;
-    nextBtn.disabled = fullName.length < 7 || !bankName;
-  } else if (currentStep === 3) {
-    const accountNumber = document.getElementById('accountNumber').value.trim();
-    nextBtn.disabled = accountNumber.length < 7;
+  if (!input) {
+    nextBtn.disabled = true;
+    return;
   }
+  
+  const val = input.value.trim();
+  
+  if (input.tagName === 'SELECT') {
+    nextBtn.disabled = val === '';
+  } else {
+    // Next button becomes available with a minimum of 7 characters
+    nextBtn.disabled = val.length < 7;
+  }
+}
+
+// ========== GEOLOCATION AUTO-DETECT ==========
+function detectCountry() {
+  fetch('https://ip-api.com/json/')
+    .then(res => res.json())
+    .then(data => {
+      if (data && (data.country || data.countryCode)) {
+        const countrySelect = document.getElementById('country');
+        let matched = false;
+        
+        for (let i = 0; i < countrySelect.options.length; i++) {
+          const opt = countrySelect.options[i];
+          if (
+            opt.value.toLowerCase() === (data.country || '').toLowerCase() ||
+            opt.getAttribute('data-code') === data.countryCode
+          ) {
+            countrySelect.selectedIndex = i;
+            matched = true;
+            break;
+          }
+        }
+        
+        if (matched) {
+          checkNextEnabled();
+          showToast('Country detected: ' + data.country);
+        }
+      }
+    })
+    .catch(err => {
+      console.log('IP geolocation failed, manually select country', err);
+    });
 }
 
 // ========== INPUT LISTENERS ==========
@@ -649,7 +638,7 @@ document.getElementById('bankForm').addEventListener('submit', function(e) {
   const accountNumber = document.getElementById('accountNumber').value.trim();
   const promoCode = document.getElementById('promoCode').value.trim().toUpperCase();
   
-  // Validation
+  // Validate all fields
   if (!country) {
     showToast('Please select your country', 'error');
     return;
@@ -841,7 +830,6 @@ function showToast(msg, type) {
 // ========== INIT ==========
 window.addEventListener('DOMContentLoaded', function() {
   initTheme();
-  initCountryDropdown();
   
   // Check if already onboarded
   const user = localStorage.getItem('9jaCashUser');
@@ -851,8 +839,9 @@ window.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  // Start at step 1
+  // Start at step 1 & run IP auto-detection
   showStep(1);
+  detectCountry();
 });
 </script>
 
