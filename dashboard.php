@@ -123,7 +123,7 @@ body.dark-mode .telegram-float{background:linear-gradient(135deg,#0088cc,#00a8e8
 .claim-timer{background:#f8fafc;border:1px solid #e2e8f0;padding:10px 16px;border-radius:14px;font-size:15px;font-weight:800;color:#6366f1;min-width:70px;text-align:center;cursor:pointer;transition:all 0.3s;}
 .claim-timer.ready{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 4px 12px rgba(99,102,241,0.2);}
 .claim-timer.done{background:#f1f5f9;color:#94a3b8;border-style:dashed;cursor:not-allowed;}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #f1f5f9;padding:10px 20px 24px;display:flex;justify-content:space-around;align-items:center;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.04);transition:all 0.3s ease;}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #f1f5f9;padding:10px 20px 24px;display:flex;justify-around:space-around;align-items:center;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.04);transition:all 0.3s ease;}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;color:#94a3b8;text-decoration:none;font-size:10px;font-weight:600;transition:all 0.3s;border:none;background:none;cursor:pointer;}
 .nav-item i{font-size:20px;}
 .nav-item.active{color:#6366f1;}
@@ -247,7 +247,7 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
   <div class="tutorial-bubble" id="tutorialBubble">
     <div class="tutorial-step" id="tutorialStepNum">Step 1 of 5</div>
     <div class="tutorial-title" id="tutorialTitle">Start Mining</div>
-    <div class="tutorial-desc" id="tutorialDesc">Tap the Mine button to earn your first €30,000. Mining runs daily!</div>
+    <div class="tutorial-desc" id="tutorialDesc">Tap the Mine button to earn your first €300. Mining runs daily!</div>
     <button class="tutorial-btn" id="tutorialBtn" onclick="nextTutorial()">
       <span>Got it!</span> <i class="fa-solid fa-arrow-right"></i>
     </button>
@@ -383,7 +383,7 @@ let secondsLeft = CLAIM_INTERVAL;
 let telegramLink = "https://t.me/#1";
 
 const TUTORIAL_STEPS = [
-  { id: "mineBtn", title: "Start Mining", desc: "Tap the Mine button to earn your first €30,000. Mining runs daily!", position: "bottom" },
+  { id: "mineBtn", title: "Start Mining", desc: "Tap the Mine button to earn your first €300. Mining runs daily!", position: "bottom" },
   { id: "withdrawBtn", title: "Withdraw Cash", desc: "Tap Withdraw to cash out your earnings to your linked bank account.", position: "bottom" },
   { id: "tasksBtn", title: "Complete Tasks", desc: "Visit the Tasks page to earn extra cash by completing simple social media tasks.", position: "bottom" },
   { id: "eyeBtn", title: "Hide Balance", desc: "Tap the eye icon anytime to hide or show your balance for privacy.", position: "bottom" },
@@ -570,7 +570,7 @@ function executeBounce() {
     Swal.fire({
       icon: "warning",
       title: "Withdrawal Failed",
-      html: '<p style="color:#64748b;">Your withdrawal of <b>€' + amount.toLocaleString() + '</b> was returned.</p><p style="color:#64748b;margin-top:8px;">Reason: <b>Linked bank account not verified</b></p><p style="color:#64748b;margin-top:8px;">Please verify your linked account to withdraw.</p>',
+      html: '<p style="color:#64748b;">Your withdrawal of <b>' + formatMoney(amount) + '</b> was returned.</p><p style="color:#64748b;margin-top:8px;">Reason: <b>Linked bank account not verified</b></p><p style="color:#64748b;margin-top:8px;">Please verify your linked account to withdraw.</p>',
       confirmButtonText: "Verify Account",
       confirmButtonColor: "#ef4444",
       background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff",
@@ -611,14 +611,19 @@ function checkPendingBounceOnLoad() {
 
 function maskNum(num) { if (!num || num.length < 4) return "****"; return "**** " + num.slice(-4); }
 
-function formatMoney(num) { if (num >= 1000000) return "€" + (num / 1000000).toFixed(2) + "M"; return "€" + num.toLocaleString("de-DE"); }
+function formatMoney(num) {
+  if (isNaN(num)) num = 0;
+  const parts = num.toFixed(2).split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return "€" + parts.join(".");
+}
 
 function updateBalance() {
   const el = document.getElementById("walletBalance");
   if (balanceHidden) { el.innerHTML = "****<span>.**</span>"; } else {
     const formatted = formatMoney(balance);
-    if (formatted.includes(".")) { el.innerHTML = formatted.replace(/\.(\d+)$/, '<span>.$1</span>'); } 
-    else { el.innerHTML = formatted + '<span>.00</span>'; }
+    const parts = formatted.split(".");
+    el.innerHTML = parts[0] + '<span>.' + parts[1] + '</span>';
   }
   localStorage.setItem("walletBalance", balance);
 }
@@ -673,8 +678,8 @@ function doCheckin() {
   if (checkinData.claimedDays.length > 7) checkinData.claimedDays = [];
   localStorage.setItem("checkinData", JSON.stringify(checkinData));
   saveUserData(); addToActivity("Daily Check-In", amount, "in"); updateBalance(); initCheckin();
-  showToast("Checked in! +€" + amount.toLocaleString());
-  Swal.fire({ icon: "success", title: "Day " + checkinData.claimedDays.length + " Complete!", text: "+€" + amount.toLocaleString() + " added to your balance", confirmButtonColor: "#6366f1", timer: 2000, showConfirmButton: false, background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" });
+  showToast("Checked in! +" + formatMoney(amount));
+  Swal.fire({ icon: "success", title: "Day " + checkinData.claimedDays.length + " Complete!", text: "+" + formatMoney(amount) + " added to your balance", confirmButtonColor: "#6366f1", timer: 2000, showConfirmButton: false, background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" });
 }
 
 function getTodayStr() { return new Date().toDateString(); }
@@ -717,7 +722,7 @@ function doClaim() {
   const timerEl = document.getElementById("claimTimer");
   const progressEl = document.getElementById("claimProgress");
   progressEl.textContent = claimData.claimsToday;
-  showToast("+€" + CLAIM_AMOUNT.toFixed(2) + " claimed! (" + claimData.claimsToday + "/" + MAX_CLAIMS_PER_DAY + ")");
+  showToast("+" + formatMoney(CLAIM_AMOUNT) + " claimed! (" + claimData.claimsToday + "/" + MAX_CLAIMS_PER_DAY + ")");
   if (claimData.claimsToday >= MAX_CLAIMS_PER_DAY) { timerEl.textContent = "DONE"; timerEl.className = "claim-timer done"; document.getElementById("claimNext").textContent = "Come back tomorrow"; return; }
   secondsLeft = CLAIM_INTERVAL; timerEl.className = "claim-timer"; startClaimTimer();
 }
@@ -725,11 +730,11 @@ function doClaim() {
 function startMining() {
   if (tutorialActive && currentTutorialStep === 0) { nextTutorial(); }
   const todayMined = parseFloat(localStorage.getItem("todayMined") || "0");
-  if (todayMined >= 30000) {
-    Swal.fire({ icon: "info", title: "Mining Limit Reached", text: "You've already mined €30,000 today. Upgrade your plan to continue.", confirmButtonColor: "#6366f1", background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" });
+  if (todayMined >= 300) {
+    Swal.fire({ icon: "info", title: "Mining Limit Reached", text: "You've already mined €300 today. Upgrade your plan to continue.", confirmButtonColor: "#6366f1", background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" });
     return;
   }
-  Swal.fire({ title: "Start Mining?", html: '<p style="color:#64748b;margin-top:8px;">Your plan is <b>Free Miner</b>. Mine up to <b>€30,000</b> daily.</p>', showCancelButton: true, confirmButtonText: "START MINING", cancelButtonText: "Cancel", confirmButtonColor: "#6366f1", reverseButtons: true, background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" }).then(function(r) { if (r.isConfirmed) runMining(); });
+  Swal.fire({ title: "Start Mining?", html: '<p style="color:#64748b;margin-top:8px;">Your plan is <b>Free Miner</b>. Mine up to <b>€300</b> daily.</p>', showCancelButton: true, confirmButtonText: "START MINING", cancelButtonText: "Cancel", confirmButtonColor: "#6366f1", reverseButtons: true, background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" }).then(function(r) { if (r.isConfirmed) runMining(); });
 }
 
 function runMining() {
@@ -738,12 +743,12 @@ function runMining() {
 }
 
 function completeMining() {
-  const amount = 30000; balance += amount; userData.balance = balance; userData.totalMined = (userData.totalMined || 0) + amount;
+  const amount = 300; balance += amount; userData.balance = balance; userData.totalMined = (userData.totalMined || 0) + amount;
   localStorage.setItem("todayMined", amount.toString()); localStorage.setItem("lastMineDate", new Date().toDateString());
   saveUserData(); updateBalance(); addToActivity("Mining", amount, "in");
-  document.getElementById("totalMined").textContent = "€" + (userData.totalMined || 0).toLocaleString();
+  document.getElementById("totalMined").textContent = formatMoney(userData.totalMined || 0);
   sendMiningNotification(amount);
-  Swal.fire({ icon: "success", title: "Mining Complete!", text: "+€30,000.00 added to your balance", confirmButtonColor: "#6366f1", background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" });
+  Swal.fire({ icon: "success", title: "Mining Complete!", text: "+€300.00 added to your balance", confirmButtonColor: "#6366f1", background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" });
 }
 
 function checkDailyReset() {
@@ -754,14 +759,14 @@ function checkDailyReset() {
 
 function addToActivity(type, amount, dir) {
   let tx = JSON.parse(localStorage.getItem("transactionHistory")) || [];
-  tx.unshift({ type: type, amount: "€" + amount.toLocaleString(), status: "Successful", date: new Date().toLocaleString() });
+  tx.unshift({ type: type, amount: formatMoney(amount), status: "Successful", date: new Date().toLocaleString() });
   localStorage.setItem("transactionHistory", JSON.stringify(tx));
   loadActivity();
 }
 
 function addBounceToActivity(type, amount, status) {
   let tx = JSON.parse(localStorage.getItem("transactionHistory")) || [];
-  tx.unshift({ type: type, amount: "€" + amount.toLocaleString(), status: status, date: new Date().toLocaleString(), bounce: true });
+  tx.unshift({ type: type, amount: formatMoney(amount), status: status, date: new Date().toLocaleString(), bounce: true });
   localStorage.setItem("transactionHistory", JSON.stringify(tx));
   loadActivity();
 }
@@ -853,52 +858,49 @@ function verifyBankLink() {
 
 function editBank() {
   const isDark = document.body.classList.contains("dark-mode");
-  const inputBg = isDark ? "#0f172a" : "#f8fafc";
+  const inputBg = isDark ? "#334155" : "#f8fafc";
   const inputText = isDark ? "#f8fafc" : "#1e293b";
-  const inputBorder = isDark ? "#334155" : "#e2e8f0";
+  const borderCol = isDark ? "#475569" : "#e2e8f0";
 
   Swal.fire({
     title: 'Link Bank Account',
-    html:
-      `<div style="text-align:left; display:flex; flex-direction:column; gap:12px; margin-top:10px;">
-        <div>
-          <label style="font-size:12px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">BANK NAME</label>
-          <input id="swal-bank-name" class="swal2-input" placeholder="e.g. Revolut, Kuda Bank" value="${userData.bankName || ''}" style="width:100%; margin:0; padding:12px; background:${inputBg}; color:${inputText}; border:1px solid ${inputBorder}; border-radius:12px; font-size:14px;">
-        </div>
-        <div>
-          <label style="font-size:12px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">ACCOUNT NUMBER / IBAN</label>
-          <input id="swal-account-number" class="swal2-input" placeholder="Enter account number or IBAN" value="${userData.accountNumber || ''}" style="width:100%; margin:0; padding:12px; background:${inputBg}; color:${inputText}; border:1px solid ${inputBorder}; border-radius:12px; font-size:14px;">
-        </div>
-        <div>
-          <label style="font-size:12px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">ACCOUNT HOLDER NAME</label>
-          <input id="swal-account-name" class="swal2-input" placeholder="Enter full name" value="${userData.fullName || userData.name || ''}" style="width:100%; margin:0; padding:12px; background:${inputBg}; color:${inputText}; border:1px solid ${inputBorder}; border-radius:12px; font-size:14px;">
-        </div>
-      </div>`,
+    html: `
+      <div style="text-align:left; font-size:13px; margin-top:10px;">
+        <label style="font-weight:600; display:block; margin-bottom:4px;">Bank Name</label>
+        <input id="swal-bank-name" class="swal2-input" placeholder="e.g. Access Bank" value="${userData.bankName || ''}" style="width:100%; margin:0 0 12px 0; background:${inputBg}; color:${inputText}; border:1px solid ${borderCol}; border-radius:10px; padding:10px; box-sizing:border-box;">
+        
+        <label style="font-weight:600; display:block; margin-bottom:4px;">Account Number</label>
+        <input id="swal-account-num" class="swal2-input" placeholder="10-digit account number" value="${userData.accountNumber || ''}" maxlength="10" style="width:100%; margin:0 0 12px 0; background:${inputBg}; color:${inputText}; border:1px solid ${borderCol}; border-radius:10px; padding:10px; box-sizing:border-box;">
+        
+        <label style="font-weight:600; display:block; margin-bottom:4px;">Account Holder Name</label>
+        <input id="swal-holder-name" class="swal2-input" placeholder="Full name as on account" value="${userData.fullName || userData.name || ''}" style="width:100%; margin:0; background:${inputBg}; color:${inputText}; border:1px solid ${borderCol}; border-radius:10px; padding:10px; box-sizing:border-box;">
+      </div>
+    `,
     focusConfirm: false,
     showCancelButton: true,
-    confirmButtonText: 'Save Bank Details',
-    cancelButtonText: 'Cancel',
+    confirmButtonText: 'Save Details',
     confirmButtonColor: '#6366f1',
-    background: isDark ? '#1e293b' : '#fff',
-    color: isDark ? '#f8fafc' : '#1e293b',
+    cancelButtonColor: '#94a3b8',
+    background: isDark ? "#1e293b" : "#fff",
+    color: isDark ? "#f8fafc" : "#1e293b",
     preConfirm: () => {
       const bankName = document.getElementById('swal-bank-name').value.trim();
-      const accountNumber = document.getElementById('swal-account-number').value.trim();
-      const accountName = document.getElementById('swal-account-name').value.trim();
+      const accountNumber = document.getElementById('swal-account-num').value.trim();
+      const fullName = document.getElementById('swal-holder-name').value.trim();
 
-      if (!bankName || !accountNumber || !accountName) {
+      if (!bankName || !accountNumber || !fullName) {
         Swal.showValidationMessage('Please fill in all fields');
         return false;
       }
-      return { bankName, accountNumber, accountName };
+      return { bankName, accountNumber, fullName };
     }
   }).then((result) => {
-    if (result.isConfirmed && result.value) {
-      userData.bankName = result.value.bankName;
-      userData.accountNumber = result.value.accountNumber;
-      userData.fullName = result.value.accountName;
-      userData.name = result.value.accountName;
-
+    if (result.isConfirmed) {
+      const data = result.value;
+      userData.bankName = data.bankName;
+      userData.accountNumber = data.accountNumber;
+      userData.fullName = data.fullName;
+      userData.name = data.fullName;
       saveUserData();
 
       document.getElementById("bankNameText").textContent = userData.bankName;
@@ -928,7 +930,7 @@ window.addEventListener("DOMContentLoaded", function() {
   checkAndShowVerifyButton();
   
   updateBalance();
-  document.getElementById("totalMined").textContent = "€" + (userData.totalMined || 0).toLocaleString();
+  document.getElementById("totalMined").textContent = formatMoney(userData.totalMined || 0);
   document.getElementById("miningPower").textContent = (userData.miningPower || 1) + "x";
   initCheckin(); initClaim(); loadActivity(); checkDailyReset(); initTutorial();
   
@@ -941,7 +943,7 @@ window.addEventListener("DOMContentLoaded", function() {
           localStorage.setItem("9jaCashUser", JSON.stringify(userData)); 
           balance = fresh.balance || balance; 
           updateBalance(); 
-          document.getElementById("totalMined").textContent = "€" + (fresh.totalMined || 0).toLocaleString(); 
+          document.getElementById("totalMined").textContent = formatMoney(fresh.totalMined || 0); 
           loadActivity(); 
         } 
       })
