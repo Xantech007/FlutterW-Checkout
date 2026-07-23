@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -305,7 +304,7 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
 <div class="claim-card anim d3" id="claimArea">
   <div class="claim-icon"><i class="fa-solid fa-gift"></i></div>
   <div class="claim-info">
-    <div class="claim-title">Claim €2,000</div>
+    <div class="claim-title">Claim €2.00</div>
     <div class="claim-sub">Next: <span id="claimNext">1:00</span> - <span id="claimProgress">0</span>/50 today</div>
   </div>
   <div class="claim-timer" id="claimTimer" onclick="doClaim()">1:00</div>
