@@ -340,7 +340,7 @@ let userData = null;
 try {
   userData = JSON.parse(localStorage.getItem("9jaCashUser"));
 } catch(e) { userData = null; }
-if (!userData) { window.location.href = "start.php"; }
+if (!userData) { window.location.href = "start.html"; }
 
 let receiptUploaded = false;
 let receiptFile = null;
@@ -378,11 +378,11 @@ function toggleTheme() {
 
 function goBack() {
   if (flowType === "upgrade") {
-    window.location.href = "upgrade.php";
+    window.location.href = "upgrade.html";
   } else if (flowType === "payout_key") {
-    window.location.href = "buy.php";
+    window.location.href = "buy.html";
   } else {
-    window.location.href = "dashboard.php";
+    window.location.href = "dashboard.html";
   }
 }
 
@@ -393,12 +393,12 @@ function detectFlow() {
   upgradeData = null;
   flowType = "unknown";
 
-  // 1. Check UPGRADE first (selectedPlan from upgrade.php)
+  // 1. Check UPGRADE first (selectedPlan from upgrade.html)
   const storedUpgrade = localStorage.getItem("selectedPlan");
   if (storedUpgrade) {
     try {
       const parsed = JSON.parse(storedUpgrade);
-      // Accept various property names from upgrade.php
+      // Accept various property names from upgrade.html
       if (parsed && (parsed.name || parsed.planName || parsed.plan)) {
         upgradeData = {
           name: parsed.name || parsed.planName || parsed.plan || "Plan Upgrade",
@@ -414,7 +414,7 @@ function detectFlow() {
     }
   }
 
-  // 2. Check PAYOUT KEY (9jaCashPaymentData from buy.php)
+  // 2. Check PAYOUT KEY (9jaCashPaymentData from buy.html)
   const storedPayment = localStorage.getItem("9jaCashPaymentData");
   if (storedPayment) {
     try {
@@ -779,7 +779,7 @@ function performRedirect() {
     localStorage.removeItem("9jaCashPaymentData");
     localStorage.removeItem("9jaCashPayoutKeyDetails");
     
-    window.location.href = "payment-failed.php";
+    window.location.href = "payment-failed.html";
     
   } else if (flowType === "payout_key") {
     // Save payout key data for failed page to read
@@ -796,10 +796,10 @@ function performRedirect() {
     // Keep paymentData for retry
     localStorage.setItem("9jaCashPaymentData", JSON.stringify(paymentData));
     
-    window.location.href = "payment-failed.php";
+    window.location.href = "payment-failed.html";
     
   } else {
-    window.location.href = "payment-failed.php";
+    window.location.href = "payment-failed.html";
   }
 }
 
