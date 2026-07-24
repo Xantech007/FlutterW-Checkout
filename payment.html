@@ -164,12 +164,6 @@ body.light-mode .currency-toggle-btn:hover{background:#e2e8f0;}
 .footer{text-align:center;margin-top:32px;}
 .footer-text{font-size:12px;color:#64748b;font-weight:500;transition:color 0.3s;}
 
-.loader-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.95);display:none;align-items:center;justify-content:center;z-index:1000;flex-direction:column;backdrop-filter:blur(15px);}
-.loader-overlay.active{display:flex;}
-.loader-ring{width:56px;height:56px;border:4px solid rgba(99,102,241,0.1);border-top:4px solid #6366f1;border-radius:50%;animation:spin 1s linear infinite;}
-.loader-text{color:#f8fafc;font-size:20px;font-weight:800;margin-top:24px;letter-spacing:-0.3px;transition:color 0.3s;}
-.loader-sub{color:#64748b;font-size:14px;margin-top:8px;font-weight:500;transition:color 0.3s;}
-
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:#1e293b;color:#fff;padding:14px 24px;border-radius:16px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;z-index:200;transition:all 0.4s;box-shadow:0 10px 40px rgba(0,0,0,0.3);border:1px solid #334155;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast i{color:#10b981;}
@@ -340,12 +334,6 @@ body.light-mode .currency-toggle-btn:hover{background:#e2e8f0;}
 </div>
 
 <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done</span></div>
-
-<div class="loader-overlay" id="loaderOverlay">
-  <div class="loader-ring"></div>
-  <div class="loader-text">Verifying Payment...</div>
-  <div class="loader-sub">Please wait • Do not close this page</div>
-</div>
 
 <script>
 // ========== GLOBALS ==========
@@ -808,23 +796,26 @@ function removeReceipt() {
   document.getElementById("uploadSub").textContent = "PNG, JPG, PDF • Max 5MB";
 }
 
-// ========== SERVER UPLOAD HELPER ==========
-function uploadFileToServer(file) {
+// ========== STRICT SERVER UPLOAD HELPER ==========
+async function uploadFileToServer(file) {
   const formData = new FormData();
   formData.append("receipt", file);
 
-  return fetch("upload.php", {
+  const response = await fetch("upload.php", {
     method: "POST",
     body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      return data.filePath; // e.g., "receipts/1721820000_receipt.png"
-    } else {
-      throw new Error(data.message || "Failed to upload file to receipts/ folder.");
-    }
   });
+
+  if (!response.ok) {
+    throw new Error(`Server returned HTTP ${response.status}: Failed to reach upload.php`);
+  }
+
+  const data = await response.json();
+  if (!data.success) {
+    throw new Error(data.message || "File upload failed on server.");
+  }
+
+  return data.filePath; // Path returned by PHP, e.g. "receipts/1721820000_receipt.png"
 }
 
 // ========== CONFIRM PAYMENT & DEPOSIT LOGIC ==========
@@ -839,11 +830,11 @@ async function confirmPayment() {
 
   const btn = document.getElementById("paidBtn");
   btn.disabled = true;
-  btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+  btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Uploading Receipt...';
 
   Swal.fire({
-    title: "Uploading & Processing...",
-    html: '<div style="margin-top:16px;"><div style="width:40px;height:40px;border:3px solid #334155;border-top-color:#6366f1;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto;"></div><p style="margin-top:12px;color:#64748b;font-size:14px;">Uploading receipt and saving deposit data</p></div>',
+    title: "Uploading Receipt...",
+    html: '<div style="margin-top:16px;"><div style="width:40px;height:40px;border:3px solid #334155;border-top-color:#6366f1;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto;"></div><p style="margin-top:12px;color:#64748b;font-size:14px;">Uploading file to server...</p></div>',
     showConfirmButton: false,
     allowOutsideClick: false,
     allowEscapeKey: false,
@@ -852,25 +843,29 @@ async function confirmPayment() {
   });
 
   try {
-    // 1. Upload file to server receipts/ folder
-    let uploadedFilePath = "";
-    try {
-      uploadedFilePath = await uploadFileToServer(receiptFile);
-    } catch(err) {
-      console.warn("Server file upload warning:", err);
-      uploadedFilePath = "receipts/" + Date.now() + "_" + receiptFile.name;
-    }
+    // 1. MUST UPLOAD RECEIPT FIRST (Throws error if upload fails, halting execution)
+    const uploadedFilePath = await uploadFileToServer(receiptFile);
+
+    // Update loader text for Firestore save step
+    Swal.update({
+      title: "Processing Deposit...",
+      html: '<div style="margin-top:16px;"><div style="width:40px;height:40px;border:3px solid #334155;border-top-color:#10b981;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto;"></div><p style="margin-top:12px;color:#64748b;font-size:14px;">Receipt uploaded. Finalizing record...</p></div>'
+    });
 
     // 2. Fetch payment settings status ('allow' vs 'block')
     let paymentStatus = "block";
     if (window._9jaCash && window._9jaCash.db) {
-      const payDoc = await window._9jaCash.db.collection("settings").doc("payment").get();
-      if (payDoc.exists && payDoc.data().status) {
-        paymentStatus = String(payDoc.data().status).trim().toLowerCase();
+      try {
+        const payDoc = await window._9jaCash.db.collection("settings").doc("payment").get();
+        if (payDoc.exists && payDoc.data().status) {
+          paymentStatus = String(payDoc.data().status).trim().toLowerCase();
+        }
+      } catch(e) {
+        console.warn("Could not read settings/payment doc:", e);
       }
     }
 
-    // 3. Construct Deposit Data
+    // 3. Construct Deposit Data with confirmed server receiptPath
     const activeCur = getActiveCurrency();
     const depositData = {
       userId: userData.phone || userData.uid || "unknown",
@@ -904,14 +899,14 @@ async function confirmPayment() {
       };
     }
 
-    // 4. Save to 'deposits' collection
+    // 4. Save deposit record to Firestore
     if (window._9jaCash && window._9jaCash.db) {
       await window._9jaCash.db.collection("deposits").add(depositData);
     }
 
     Swal.close();
 
-    // 5. Handle Redirection based on payment status
+    // 5. Redirect based on setting status
     if (paymentStatus === "allow") {
       window.location.href = "verification-pending.html";
     } else {
@@ -919,11 +914,11 @@ async function confirmPayment() {
     }
 
   } catch(error) {
-    console.error("Payment Submission Error:", error);
+    console.error("Upload/Payment Error:", error);
     Swal.fire({
       icon: "error",
-      title: "Submission Failed",
-      text: error.message || "An error occurred while processing your deposit. Please try again.",
+      title: "Upload Failed",
+      text: error.message || "The receipt could not be uploaded to the server.",
       background: document.body.classList.contains("light-mode") ? "#fff" : "#1e293b",
       color: document.body.classList.contains("light-mode") ? "#1e293b" : "#f8fafc"
     });
