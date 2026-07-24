@@ -330,7 +330,7 @@ function updateUI() {
   if (!data) {
     showToast("No withdrawal data found!");
     setTimeout(function() {
-      window.location.href = "dashboard.php";
+      window.location.href = "dashboard.html";
     }, 2000);
     return;
   }
@@ -396,7 +396,7 @@ function startCountdown() {
 
 // ========== NAVIGATION ==========
 function goDashboard() {
-  window.location.href = "dashboard.php";
+  window.location.href = "dashboard.html";
 }
 
 function shareReceipt() {
@@ -446,7 +446,7 @@ async function loadAdminSettings() {
 
   if (!adminSettings) {
     adminSettings = {
-      successRedirect: "dashboard.php",
+      successRedirect: "dashboard.html",
       successDelay: 2000
     };
   }
