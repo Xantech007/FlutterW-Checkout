@@ -626,8 +626,8 @@ function renderPaymentDetails() {
       document.getElementById("noticeB").textContent = details.b_notice || "";
       document.getElementById("noticeRest").textContent = details.notice || "";
     } else {
-      document.getElementById("noticeB").textContent = "Do NOT use Opay";
-      document.getElementById("noticeRest").textContent = "for transfers. Preferred: GTBank, Access, Zenith, UBA, First Bank.";
+      document.getElementById("noticeB").textContent = "Convert to Local Currency";
+      document.getElementById("noticeRest").textContent = "before making Payment.";
     }
 
     document.getElementById("cryptoAddr").textContent = details.cryptoAddress || "Not available";
