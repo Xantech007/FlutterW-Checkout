@@ -134,7 +134,7 @@ body.dark-mode .compare-table{background:#1e293b;border-color:#334155;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast i{color:#10b981;}
 
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #f1f5f9;padding:10px 20px 24px;display:flex;justify-around:space-around;align-items:center;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.04);transition:all 0.3s ease;}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #f1f5f9;padding:10px 20px 24px;display:flex;justify-content:space-around;align-items:center;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.04);transition:all 0.3s ease;}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;color:#94a3b8;text-decoration:none;font-size:10px;font-weight:600;transition:all 0.3s;border:none;background:none;cursor:pointer;}
 .nav-item i{font-size:20px;}
 .nav-item.active{color:#6366f1;}
@@ -191,7 +191,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
       <li><div class="feature-icon purple"><i class="fa-solid fa-check"></i></div><div class="feature-text">Daily rewards up to <strong>€240</strong></div></li>
       <li><div class="feature-icon orange"><i class="fa-solid fa-check"></i></div><div class="feature-text">Withdraw <strong>anytime</strong></div></li>
     </ul>
-    <button class="plan-btn btn-basic" onclick="upgradePlan('Basic Plan', 1720)" id="btnBasic">
+    <button class="plan-btn btn-basic" onclick="triggerUpgrade('Basic Plan', 1720)" id="btnBasic">
       Upgrade to Basic <i class="fa-solid fa-arrow-right"></i>
     </button>
   </div>
@@ -218,7 +218,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
       <li><div class="feature-icon purple"><i class="fa-solid fa-check"></i></div><div class="feature-text">Higher daily <strong>mining cap</strong></div></li>
       <li><div class="feature-icon orange"><i class="fa-solid fa-check"></i></div><div class="feature-text"><strong>Priority</strong> withdrawals</div></li>
     </ul>
-    <button class="plan-btn btn-silver" onclick="upgradePlan('Silver Plan', 3800)" id="btnSilver">
+    <button class="plan-btn btn-silver" onclick="triggerUpgrade('Silver Plan', 3800)" id="btnSilver">
       Upgrade to Silver <i class="fa-solid fa-arrow-right"></i>
     </button>
   </div>
@@ -244,7 +244,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
       <li><div class="feature-icon purple"><i class="fa-solid fa-check"></i></div><div class="feature-text">High-profit <strong>algorithm</strong></div></li>
       <li><div class="feature-icon orange"><i class="fa-solid fa-check"></i></div><div class="feature-text"><strong>Instant</strong> withdrawals</div></li>
     </ul>
-    <button class="plan-btn btn-gold" onclick="upgradePlan('Gold Plan', 6400)" id="btnGold">
+    <button class="plan-btn btn-gold" onclick="triggerUpgrade('Gold Plan', 6400)" id="btnGold">
       Upgrade to Gold <i class="fa-solid fa-arrow-right"></i>
     </button>
   </div>
@@ -270,7 +270,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
       <li><div class="feature-icon purple"><i class="fa-solid fa-check"></i></div><div class="feature-text"><strong>Unlimited</strong> daily potential</div></li>
       <li><div class="feature-icon orange"><i class="fa-solid fa-check"></i></div><div class="feature-text"><strong>Lifetime</strong> priority access</div></li>
     </ul>
-    <button class="plan-btn btn-diamond" onclick="upgradePlan('Diamond Plan', 12500)" id="btnDiamond">
+    <button class="plan-btn btn-diamond" onclick="triggerUpgrade('Diamond Plan', 12500)" id="btnDiamond">
       Upgrade to Diamond <i class="fa-solid fa-arrow-right"></i>
     </button>
   </div>
@@ -343,37 +343,37 @@ if (!userData) {
   window.location.href = "start.html";
 }
 
-let planAmounts = {
+// Stores fetched costs dynamically
+let planCosts = {
   "Basic Plan": 230,
   "Silver Plan": 350,
   "Gold Plan": 750,
   "Diamond Plan": 1800
 };
 
-function fetchPlanAmounts() {
-  const db = (window._9jaCash && window._9jaCash.db) ? window._9jaCash.db : (typeof firebase !== "undefined" ? firebase.firestore() : null);
-  if (!db) return;
-
-  db.collection("settings").doc("payment").get().then((doc) => {
+function fetchPlanCosts() {
+  const db = (window._9jaCash && window._9jaCash.db) ? window._9jaCash.db : firebase.firestore();
+  
+  db.collection("settings").doc("payment").get().then(function(doc) {
     if (doc.exists) {
       const data = doc.data();
-      if (data.basicAmt !== undefined) planAmounts["Basic Plan"] = parseFloat(data.basicAmt);
-      if (data.silverAmt !== undefined) planAmounts["Silver Plan"] = parseFloat(data.silverAmt);
-      if (data.goldAmt !== undefined) planAmounts["Gold Plan"] = parseFloat(data.goldAmt);
-      if (data.diamondAmt !== undefined) planAmounts["Diamond Plan"] = parseFloat(data.diamondAmt);
+      if (data.basicAmt !== undefined) planCosts["Basic Plan"] = Number(data.basicAmt) / 100;
+      if (data.silverAmt !== undefined) planCosts["Silver Plan"] = Number(data.silverAmt) / 100;
+      if (data.goldAmt !== undefined) planCosts["Gold Plan"] = Number(data.goldAmt) / 100;
+      if (data.diamondAmt !== undefined) planCosts["Diamond Plan"] = Number(data.diamondAmt) / 100;
 
       updatePriceUI();
     }
-  }).catch((error) => {
-    console.error("Error fetching payment settings:", error);
+  }).catch(function(err) {
+    console.error("Error fetching plan costs: ", err);
   });
 }
 
 function updatePriceUI() {
-  document.getElementById("priceBasic").textContent = "€" + planAmounts["Basic Plan"].toLocaleString();
-  document.getElementById("priceSilver").textContent = "€" + planAmounts["Silver Plan"].toLocaleString();
-  document.getElementById("priceGold").textContent = "€" + planAmounts["Gold Plan"].toLocaleString();
-  document.getElementById("priceDiamond").textContent = "€" + planAmounts["Diamond Plan"].toLocaleString();
+  document.getElementById("priceBasic").textContent = "€" + planCosts["Basic Plan"].toLocaleString();
+  document.getElementById("priceSilver").textContent = "€" + planCosts["Silver Plan"].toLocaleString();
+  document.getElementById("priceGold").textContent = "€" + planCosts["Gold Plan"].toLocaleString();
+  document.getElementById("priceDiamond").textContent = "€" + planCosts["Diamond Plan"].toLocaleString();
 }
 
 function initDarkMode() {
@@ -400,7 +400,7 @@ function toggleDarkMode() {
 window.addEventListener("DOMContentLoaded", function() {
   initDarkMode();
   checkCurrentPlan();
-  fetchPlanAmounts();
+  fetchPlanCosts();
 });
 
 function checkCurrentPlan() {
@@ -428,8 +428,12 @@ function checkCurrentPlan() {
   });
 }
 
-function upgradePlan(planName, earningLimit) {
-  const amount = planAmounts[planName] || 0;
+function triggerUpgrade(planName, earningLimit) {
+  const amount = planCosts[planName] || 0;
+  upgradePlan(amount, earningLimit, planName);
+}
+
+function upgradePlan(amount, earningLimit, planName) {
   const currentPlan = userData.plan || "Free";
   const planOrder = ["Free", "Basic Plan", "Silver Plan", "Gold Plan", "Diamond Plan"];
   const currentIndex = planOrder.indexOf(currentPlan);
