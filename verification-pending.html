@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Verification Status - FlutterW Euro Earn</title>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-<script src="firebase.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -144,14 +141,14 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
     <div class="timeline-dot active" id="dot1"><i class="fa-solid fa-hourglass-half"></i></div>
     <div class="timeline-content">
       <div class="timeline-title" id="step1Title">Receipt Submitted</div>
-      <div class="timeline-desc" id="step1Desc">Proof of deposit received on server</div>
+      <div class="timeline-desc" id="step1Desc">Proof of deposit received</div>
     </div>
   </div>
   <div class="timeline-item">
     <div class="timeline-dot" id="dot2"><i class="fa-solid fa-shield-halved"></i></div>
     <div class="timeline-content">
       <div class="timeline-title" id="step2Title">Verification Process</div>
-      <div class="timeline-desc" id="step2Desc">Matching transaction details with bank node</div>
+      <div class="timeline-desc" id="step2Desc">Matching transaction details</div>
     </div>
   </div>
   <div class="timeline-item">
@@ -181,11 +178,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 </div>
 
 <script>
-let userData = null;
-try {
-  userData = JSON.parse(localStorage.getItem("9jaCashUser"));
-} catch (e) { userData = null; }
-
 // Helper to safely format numbers
 function formatDepositAmount(rawAmount, symbol, isLocal) {
   const num = parseFloat(rawAmount);
@@ -200,28 +192,12 @@ function formatDepositAmount(rawAmount, symbol, isLocal) {
 }
 
 // Helper to safely parse dates
-function parseFormattedDate(rawDate, createdAt) {
+function parseFormattedDate(rawDate) {
   try {
     if (rawDate && typeof rawDate === "string" && rawDate.trim().length > 0 && !rawDate.includes("now")) {
       return rawDate;
     }
-    
-    let d = null;
-    if (createdAt) {
-      if (typeof createdAt.toDate === "function") {
-        d = createdAt.toDate();
-      } else if (createdAt.seconds) {
-        d = new Date(createdAt.seconds * 1000);
-      } else if (typeof createdAt === "string" || typeof createdAt === "number") {
-        d = new Date(createdAt);
-      }
-    }
-    
-    if (!d || isNaN(d.getTime())) {
-      d = new Date();
-    }
-    
-    return d.toLocaleString("en-US", {
+    return new Date().toLocaleString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -234,21 +210,6 @@ function parseFormattedDate(rawDate, createdAt) {
   }
 }
 
-// Extract data passed via URL query parameters
-function getUrlParams() {
-  const params = new URLSearchParams(window.location.search);
-  const data = {};
-  
-  if (params.has('amount')) data.amount = params.get('amount');
-  if (params.has('plan')) data.plan = params.get('plan');
-  if (params.has('method')) data.paymentMethod = params.get('method');
-  if (params.has('date')) data.date = params.get('date');
-  if (params.has('symbol')) data.currencySymbol = params.get('symbol');
-  if (params.has('isLocal')) data.isLocalCurrency = params.get('isLocal') === 'true';
-
-  return Object.keys(data).length > 0 ? data : null;
-}
-
 // RENDER FUNCTION
 function renderDepositDetails(data) {
   if (!data) return;
@@ -256,76 +217,57 @@ function renderDepositDetails(data) {
   const rawAmount = data.amount || data.depositAmount || data.planPrice || 0;
   const symbol = data.currencySymbol || (data.isLocalCurrency ? "$" : "€");
   const formattedAmount = formatDepositAmount(rawAmount, symbol, data.isLocalCurrency);
-  const formattedDate = parseFormattedDate(data.date, data.createdAt);
+  const formattedDate = parseFormattedDate(data.date || data.createdAt);
 
   document.getElementById("amountDisplay").textContent = formattedAmount;
   document.getElementById("planDisplay").textContent = data.plan || data.planName || (data.flowType === "upgrade" ? "Plan Upgrade" : "Deposit Payment");
-  document.getElementById("methodDisplay").textContent = data.paymentMethod ? (data.paymentMethod.toUpperCase() + (data.paymentMethod.toLowerCase().includes("transfer") ? "" : " TRANSFER")) : "BANK TRANSFER";
+  document.getElementById("methodDisplay").textContent = data.paymentMethod ? (data.paymentMethod.toUpperCase() + " TRANSFER") : "BANK TRANSFER";
   document.getElementById("dateDisplay").textContent = formattedDate;
 }
 
-// FETCH DEPOSIT DATA
-async function fetchLatestDeposit() {
-  // 1. Try URL parameters first
-  let passedData = getUrlParams();
-
-  // 2. Try sessionStorage or localStorage if URL parameters were not provided
-  if (!passedData) {
-    try {
-      passedData = JSON.parse(
-        sessionStorage.getItem("passedVerificationData") ||
-        sessionStorage.getItem("pendingDeposit") ||
-        localStorage.getItem("pendingDeposit") ||
-        localStorage.getItem("latestDeposit")
-      );
-    } catch(e){}
+// FETCH DEPOSIT DATA EXCLUSIVELY FROM LOCALSTORAGE
+function loadLocalStorageData() {
+  let localData = null;
+  
+  try {
+    localData = JSON.parse(localStorage.getItem("pendingDeposit") || localStorage.getItem("latestDeposit"));
+  } catch(e) {
+    console.warn("Error parsing deposit local storage data:", e);
   }
 
-  if (passedData) {
-    renderDepositDetails(passedData);
-    return;
-  }
-
-  // 3. Fallback: Fetch from Firestore
-  const userId = userData ? (userData.phone || userData.uid || userData.id) : null;
-  if (userId && window._9jaCash && window._9jaCash.db) {
+  // Fallback to checking active user session details if deposit item missing
+  if (!localData) {
     try {
-      let snapshot = null;
-      
-      try {
-        snapshot = await window._9jaCash.db.collection("deposits")
-          .where("userId", "==", userId)
-          .orderBy("createdAt", "desc")
-          .limit(1)
-          .get();
-      } catch (indexErr) {
-        console.warn("Index query failed, falling back to unordered fetch:", indexErr);
-        snapshot = await window._9jaCash.db.collection("deposits")
-          .where("userId", "==", userId)
-          .get();
+      const user = JSON.parse(localStorage.getItem("9jaCashUser"));
+      if (user) {
+        localData = {
+          amount: user.lastDepositAmount || user.balance || 0,
+          plan: user.currentPlan || user.plan,
+          paymentMethod: user.paymentMethod || "Bank",
+          date: user.lastDepositDate || new Date().toLocaleString()
+        };
       }
-
-      if (snapshot && !snapshot.empty) {
-        let docs = snapshot.docs.map(doc => doc.data());
-        docs.sort((a, b) => {
-          let timeA = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
-          let timeB = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
-          return timeB - timeA;
-        });
-        
-        renderDepositDetails(docs[0]);
-        return;
-      }
-    } catch (err) {
-      console.warn("Could not fetch deposit from Firestore:", err);
+    } catch(e) {
+      console.warn("Error parsing user local storage data:", e);
     }
   }
 
-  // Default state if no data found anywhere
-  document.getElementById("amountDisplay").textContent = "€0.00";
-  document.getElementById("planDisplay").textContent = "Deposit Payment";
-  document.getElementById("methodDisplay").textContent = "BANK TRANSFER";
-  document.getElementById("dateDisplay").textContent = new Date().toLocaleString();
+  if (localData) {
+    renderDepositDetails(localData);
+  } else {
+    // Default fallback display if no data exists in localStorage
+    document.getElementById("amountDisplay").textContent = "€0.00";
+    document.getElementById("planDisplay").textContent = "Deposit Payment";
+    document.getElementById("methodDisplay").textContent = "Bank Transfer";
+    document.getElementById("dateDisplay").textContent = new Date().toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+  }
 }
 
 // SWITCH TO SUCCESS STATUS
@@ -364,8 +306,8 @@ function switchToSuccess() {
 }
 
 // INITIALIZE
-window.addEventListener("DOMContentLoaded", async function() {
-  await fetchLatestDeposit();
+window.addEventListener("DOMContentLoaded", function() {
+  loadLocalStorageData();
   setTimeout(switchToSuccess, 10000);
 });
 </script>
