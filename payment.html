@@ -60,7 +60,8 @@ body.light-mode .order-label{color:#94a3b8;}
 body.light-mode .order-value{color:#1e293b;}
 body.light-mode .order-badge{background:#ecfdf5;color:#10b981;border-color:#10b981;}
 body.light-mode .flow-badge{background:#f1f5f9;color:#64748b;border-color:#e2e8f0;}
-body.light-mode .convert-btn{background:#f1f5f9;color:#4f46e5;border-color:#cbd5e1;}
+body.light-mode .currency-toggle-btn{background:#f1f5f9;border-color:#e2e8f0;color:#1e293b;}
+body.light-mode .currency-toggle-btn:hover{background:#e2e8f0;}
 
 .soft-bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 0% 0%,rgba(99,102,241,0.12),transparent 50%),radial-gradient(ellipse at 100% 100%,rgba(236,72,153,0.08),transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(16,185,129,0.06),transparent 50%),#0f172a;transition:all 0.3s ease;}
 
@@ -81,14 +82,10 @@ body.light-mode .convert-btn{background:#f1f5f9;color:#4f46e5;border-color:#cbd5
 
 .amount-header{text-align:center;padding:20px 0 24px;}
 .amount-label{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;transition:color 0.3s;}
-.amount-num{font-size:48px;font-weight:900;color:#f8fafc;line-height:1;letter-spacing:-2px;transition:color 0.3s;}
+.amount-num{font-size:44px;font-weight:900;color:#f8fafc;line-height:1;letter-spacing:-1px;transition:color 0.3s;}
 .amount-num span{color:#6366f1;}
 .amount-hint{font-size:13px;color:#64748b;margin-top:10px;font-weight:500;transition:color 0.3s;}
 .amount-hint span{color:#818cf8;font-weight:700;}
-
-.convert-btn{display:inline-flex;align-items:center;gap:8px;background:#1e293b;border:1px solid #334155;color:#818cf8;border-radius:50px;padding:6px 16px;font-size:12px;font-weight:700;margin-top:12px;cursor:pointer;transition:all 0.3s;}
-.convert-btn:hover{background:#334155;transform:translateY(-1px);}
-.convert-btn:active{transform:scale(0.95);}
 
 .timer-pill{display:inline-flex;align-items:center;gap:8px;background:#1e293b;border:1px solid #334155;border-radius:50px;padding:8px 18px;margin-top:16px;font-size:13px;font-weight:700;color:#94a3b8;transition:all 0.3s;}
 .timer-pill i{color:#6366f1;font-size:14px;}
@@ -97,7 +94,7 @@ body.light-mode .convert-btn{background:#f1f5f9;color:#4f46e5;border-color:#cbd5
 .timer-pill.expired{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.2);color:#f87171;}
 .timer-pill.expired i{color:#f87171;}
 
-.order-card{background:#1e293b;border:1px solid #334155;border-radius:20px;padding:20px;margin-bottom:20px;transition:all 0.3s;}
+.order-card{background:#1e293b;border:1px solid #334155;border-radius:20px;padding:20px;margin-bottom:16px;transition:all 0.3s;}
 .order-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
 .order-icon{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;box-shadow:0 4px 16px rgba(99,102,241,0.3);}
 .order-title{font-size:16px;font-weight:800;color:#f8fafc;transition:color 0.3s;}
@@ -108,6 +105,10 @@ body.light-mode .convert-btn{background:#f1f5f9;color:#4f46e5;border-color:#cbd5
 .order-value{font-size:14px;font-weight:700;color:#f8fafc;transition:color 0.3s;}
 .order-value.highlight{color:#6366f1;}
 .order-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#10b981;background:rgba(16,185,129,0.1);padding:3px 10px;border-radius:20px;border:1px solid rgba(16,185,129,0.2);}
+
+.currency-toggle-btn{width:100%;padding:12px 16px;border-radius:16px;background:#1e293b;border:1px solid #334155;color:#f8fafc;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px;}
+.currency-toggle-btn:hover{border-color:#6366f1;color:#818cf8;}
+.currency-toggle-btn i{font-size:14px;color:#10b981;}
 
 .tab-bar{display:flex;gap:8px;margin-bottom:20px;}
 .tab-btn{flex:1;padding:14px;border-radius:16px;background:#1e293b;border:1px solid #334155;color:#94a3b8;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Plus Jakarta Sans',sans-serif;}
@@ -212,13 +213,6 @@ body.light-mode .convert-btn{background:#f1f5f9;color:#4f46e5;border-color:#cbd5
 <div class="amount-header anim d1">
   <div class="amount-label"><i class="fa-solid fa-lock" style="margin-right:6px;"></i>Amount Due</div>
   <div class="amount-num" id="payAmountDisplay">€0<span>.00</span></div>
-  
-  <div>
-    <button class="convert-btn" id="convertBtn" onclick="convertToLocalCurrency()">
-      <i class="fa-solid fa-globe"></i> Convert to Local Currency
-    </button>
-  </div>
-
   <div class="amount-hint" id="payHint">Loading payment details...</div>
   <div class="timer-pill" id="timerPill">
     <i class="fa-solid fa-hourglass-half"></i>
@@ -255,6 +249,11 @@ body.light-mode .convert-btn{background:#f1f5f9;color:#4f46e5;border-color:#cbd5
     <div class="order-value highlight" id="orderTotal">Loading...</div>
   </div>
 </div>
+
+<!-- CURRENCY CONVERTER BUTTON -->
+<button class="currency-toggle-btn anim d2" id="currencyToggleBtn" onclick="toggleCurrencyMode()">
+  <i class="fa-solid fa-coins"></i> <span id="currencyToggleText">Convert to Local Currency</span>
+</button>
 
 <div class="notice-box anim d2">
   <div class="notice-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -365,12 +364,13 @@ let currentTab = "bank";
 let flowType = "unknown";
 let isProcessing = false;
 
-// Regional conversion state
-let currentCurrencySymbol = "€";
-let currentExchangeRate = 1;
+// Currency Mode Globals
+let isLocalCurrency = false;
+let defaultPaymentDetails = null;
+let regionalPaymentDetails = null;
 
-// ========== FORMAT MONEY ==========
-function formatMoney(num, symbol = currentCurrencySymbol) {
+// ========== FORMAT MONEY helper ==========
+function formatMoney(num, symbol = "€") {
   if (num === null || num === undefined || num === "") return symbol + "0";
   let n = parseFloat(num);
   if (isNaN(n)) return symbol + "0";
@@ -468,6 +468,17 @@ function updateFlowBadge() {
   }
 }
 
+// ========== GET CURRENT ACTIVE CURRENCY SYMBOL & RATE ==========
+function getActiveCurrency() {
+  if (isLocalCurrency && regionalPaymentDetails && regionalPaymentDetails.rate) {
+    return {
+      symbol: regionalPaymentDetails.currencySymbol || regionalPaymentDetails.symbol || "$",
+      rate: parseFloat(regionalPaymentDetails.rate) || 1
+    };
+  }
+  return { symbol: "€", rate: 1 };
+}
+
 // ========== UPDATE ORDER SUMMARY ==========
 function updateOrderSummary() {
   const orderTitle = document.getElementById("orderTitle");
@@ -482,30 +493,33 @@ function updateOrderSummary() {
   const orderExtraValue2 = document.getElementById("orderExtraValue2");
   const orderTotal = document.getElementById("orderTotal");
 
+  const activeCur = getActiveCurrency();
+
   if (flowType === "upgrade" && upgradeData) {
-    const totalAmount = (parseFloat(upgradeData.amount) || 0) * currentExchangeRate;
-    
+    const rawPrice = (parseFloat(upgradeData.amount) || 0) * activeCur.rate;
+    const rawLimit = (parseFloat(upgradeData.earningLimit) || 0) * activeCur.rate;
+
     orderTitle.textContent = "Upgrade Plan";
     orderSub.textContent = "Plan upgrade payment";
     orderItem.textContent = upgradeData.name;
-    orderPrice.textContent = formatMoney(totalAmount);
+    orderPrice.textContent = formatMoney(rawPrice, activeCur.symbol);
     
     orderExtraRow.style.display = "flex";
     orderExtraLabel.textContent = "Earning Limit";
-    orderExtraValue.innerHTML = '<span class="order-badge"><i class="fa-solid fa-check"></i> ' + formatMoney((parseFloat(upgradeData.earningLimit) || 0) * currentExchangeRate) + "</span>";
+    orderExtraValue.innerHTML = '<span class="order-badge"><i class="fa-solid fa-check"></i> ' + formatMoney(rawLimit, activeCur.symbol) + "</span>";
     
     orderExtraRow2.style.display = "none";
-    orderTotal.textContent = formatMoney(totalAmount);
+    orderTotal.textContent = formatMoney(rawPrice, activeCur.symbol);
     
     document.getElementById("pageTitle").textContent = "Upgrade Payment";
 
   } else if (flowType === "payout_key" && paymentData) {
-    const totalAmount = (parseFloat(paymentData.price) || 0) * currentExchangeRate;
+    const rawPrice = (parseFloat(paymentData.price) || 0) * activeCur.rate;
 
     orderTitle.textContent = "Payout Key";
     orderSub.textContent = "Payout key purchase";
     orderItem.textContent = paymentData.plan || "Payout Key";
-    orderPrice.textContent = formatMoney(totalAmount);
+    orderPrice.textContent = formatMoney(rawPrice, activeCur.symbol);
     
     orderExtraRow.style.display = "flex";
     orderExtraLabel.textContent = "Daily Limit";
@@ -516,16 +530,16 @@ function updateOrderSummary() {
     orderExtraLabel2.textContent = "Linked Account";
     orderExtraValue2.textContent = (paymentData.bankName || "—") + " • " + (paymentData.accNumber || "—");
     
-    orderTotal.textContent = formatMoney(totalAmount);
+    orderTotal.textContent = formatMoney(rawPrice, activeCur.symbol);
     
     document.getElementById("pageTitle").textContent = "Payout Key Payment";
 
   } else {
     orderItem.textContent = "Unknown";
-    orderPrice.textContent = formatMoney(0);
+    orderPrice.textContent = activeCur.symbol + "0";
     orderExtraRow.style.display = "none";
     orderExtraRow2.style.display = "none";
-    orderTotal.textContent = formatMoney(0);
+    orderTotal.textContent = activeCur.symbol + "0";
   }
 }
 
@@ -539,8 +553,9 @@ function updateAmountDisplay() {
     baseAmount = parseFloat(paymentData.price) || 0;
   }
 
-  const convertedAmount = baseAmount * currentExchangeRate;
-  const formatted = formatMoney(convertedAmount);
+  const activeCur = getActiveCurrency();
+  const convertedAmount = baseAmount * activeCur.rate;
+  const formatted = formatMoney(convertedAmount, activeCur.symbol);
   
   const amountDisplay = document.getElementById("payAmountDisplay");
   if (formatted.includes(".")) {
@@ -563,69 +578,6 @@ function updateAmountDisplay() {
   }
 }
 
-// ========== DYNAMIC REGIONAL CURRENCY CONVERSION ==========
-function convertToLocalCurrency() {
-  let country = userData ? userData.country : null;
-  if (!country) {
-    country = prompt("Please enter your country (e.g., Ghana, USA, Spain):");
-    if (!country) return;
-  }
-
-  // Format country string into standard region document ID key (e.g. "ghana" -> "ghanaRegion")
-  const regionDocId = country.trim().toLowerCase().replace(/\s+/g, '') + "Region";
-
-  if (!window._9jaCash || !window._9jaCash.db) {
-    showToast("Database not ready. Try again!");
-    return;
-  }
-
-  const btn = document.getElementById("convertBtn");
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Converting...';
-  btn.disabled = true;
-
-  window._9jaCash.db.collection("settings").doc(regionDocId).get()
-    .then(function(doc) {
-      if (doc.exists) {
-        const data = doc.data();
-        
-        currentExchangeRate = parseFloat(data.rate) || 1;
-        currentCurrencySymbol = data.currencySymbol || "€";
-
-        // Update display with local currency conversions
-        updateAmountDisplay();
-        updateOrderSummary();
-
-        // Update payment account details for the regional document
-        document.getElementById("accNumber").textContent = data.accNumber || "—";
-        document.getElementById("bankName").textContent = data.bank || "—";
-        document.getElementById("accName").textContent = data.accName || "—";
-        document.getElementById("cryptoAddr").textContent = data.cryptoAddress || "Not available";
-        document.getElementById("cryptoNetwork").textContent = data.cryptoNetwork || "—";
-        document.getElementById("cryptoAmount").textContent = data.cryptoAmount ? "$" + data.cryptoAmount : "—";
-
-        btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Converted (' + data.currencySymbol + ')';
-        btn.disabled = false;
-        showToast("Converted to " + country.toUpperCase() + " currency!");
-      } else {
-        btn.innerHTML = '<i class="fa-solid fa-globe"></i> Convert to Local Currency';
-        btn.disabled = false;
-        Swal.fire({
-          icon: "error",
-          title: "Region Not Found",
-          text: "No payment details available for " + country + " (" + regionDocId + ").",
-          background: document.body.classList.contains("light-mode") ? "#fff" : "#1e293b",
-          color: document.body.classList.contains("light-mode") ? "#1e293b" : "#f8fafc"
-        });
-      }
-    })
-    .catch(function(err) {
-      console.error("Conversion error:", err);
-      btn.innerHTML = '<i class="fa-solid fa-globe"></i> Convert to Local Currency';
-      btn.disabled = false;
-      showToast("Error loading currency details!");
-    });
-}
-
 // ========== TAB SWITCHING ==========
 function switchTab(tab) {
   currentTab = tab;
@@ -635,27 +587,88 @@ function switchTab(tab) {
   document.getElementById("panelCrypto").style.display = tab === "crypto" ? "block" : "none";
 }
 
-// ========== LOAD DEFAULT PAYMENT DETAILS FROM FIREBASE ==========
+// ========== MAP USER COUNTRY TO REGION DOCUMENT NAME ==========
+function getRegionDocName(countryName) {
+  if (!countryName) return "ghanaRegion";
+  const normalized = countryName.trim().toLowerCase();
+  
+  const countryMap = {
+    "ghana": "ghanaRegion",
+    "usa": "usaRegion",
+    "united states": "usaRegion",
+    "united states of america": "usaRegion",
+    "spain": "spainRegion",
+    "nigeria": "nigeriaRegion",
+    "uk": "ukRegion",
+    "united kingdom": "ukRegion",
+    "canada": "canadaRegion",
+    "kenya": "kenyaRegion",
+    "south africa": "southafricaRegion"
+  };
+
+  if (countryMap[normalized]) {
+    return countryMap[normalized];
+  }
+  
+  const cleanName = normalized.replace(/[^a-z0-9]/g, "");
+  return cleanName + "Region";
+}
+
+// ========== RENDER BANK & CRYPTO DETAILS ==========
+function renderPaymentDetails() {
+  const details = (isLocalCurrency && regionalPaymentDetails) ? regionalPaymentDetails : defaultPaymentDetails;
+
+  if (details) {
+    document.getElementById("accNumber").textContent = details.accNumber || "—";
+    document.getElementById("bankName").textContent = details.bank || details.bankName || "—";
+    document.getElementById("accName").textContent = details.accName || "—";
+    document.getElementById("cryptoAddr").textContent = details.cryptoAddress || "Not available";
+    document.getElementById("cryptoNetwork").textContent = details.cryptoNetwork || "—";
+    document.getElementById("cryptoAmount").textContent = details.cryptoAmount ? "$" + details.cryptoAmount : "—";
+  } else {
+    setFallbackDetails();
+  }
+
+  updateOrderSummary();
+  updateAmountDisplay();
+}
+
+// ========== LOAD PAYMENT DETAILS FROM FIREBASE ==========
 function loadPaymentDetails() {
   if (window._9jaCash && window._9jaCash.db) {
+    // 1. Fetch default Euro payment details
     window._9jaCash.db.collection("settings").doc("payment").get()
       .then(function(doc) {
         if (doc.exists) {
-          const data = doc.data();
-          document.getElementById("accNumber").textContent = data.accNumber || "—";
-          document.getElementById("bankName").textContent = data.bank || "—";
-          document.getElementById("accName").textContent = data.accName || "—";
-          document.getElementById("cryptoAddr").textContent = data.cryptoAddress || "Not available";
-          document.getElementById("cryptoNetwork").textContent = data.cryptoNetwork || "—";
-          document.getElementById("cryptoAmount").textContent = data.cryptoAmount ? "$" + data.cryptoAmount : "—";
+          defaultPaymentDetails = doc.data();
         } else {
-          setFallbackDetails();
+          defaultPaymentDetails = {};
+        }
+        renderPaymentDetails();
+      })
+      .catch(function(err) {
+        console.error("Error loading default payment details:", err);
+        setFallbackDetails();
+      });
+
+    // 2. Fetch regional payment details based on country
+    const userCountry = userData.country || "Ghana";
+    const regionDoc = getRegionDocName(userCountry);
+
+    window._9jaCash.db.collection("settings").doc(regionDoc).get()
+      .then(function(doc) {
+        if (doc.exists) {
+          regionalPaymentDetails = doc.data();
+        } else {
+          console.warn("Region document does not exist:", regionDoc);
+          regionalPaymentDetails = null;
         }
       })
       .catch(function(err) {
-        console.error("Error loading payment details:", err);
-        setFallbackDetails();
+        console.error("Error fetching regional details:", err);
+        regionalPaymentDetails = null;
       });
+
   } else {
     setFallbackDetails();
   }
@@ -668,6 +681,25 @@ function setFallbackDetails() {
   document.getElementById("cryptoAddr").textContent = "Not available";
   document.getElementById("cryptoNetwork").textContent = "—";
   document.getElementById("cryptoAmount").textContent = "—";
+}
+
+// ========== TOGGLE CURRENCY MODE ==========
+function toggleCurrencyMode() {
+  const btnText = document.getElementById("currencyToggleText");
+  const userCountry = userData.country || "Local";
+
+  if (!isLocalCurrency) {
+    if (!regionalPaymentDetails) {
+      showToast("Fetching local regional details...");
+    }
+    isLocalCurrency = true;
+    btnText.textContent = "Switch to Euro (EUR)";
+  } else {
+    isLocalCurrency = false;
+    btnText.textContent = "Convert to " + userCountry + " Currency";
+  }
+
+  renderPaymentDetails();
 }
 
 // ========== COPY TEXT ==========
@@ -769,9 +801,14 @@ function confirmPayment() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
 
+  const activeCur = getActiveCurrency();
+
   let receiptData = {
     userId: userData.phone || userData.uid || "unknown",
     userName: userData.name || userData.fullName || "Unknown",
+    userCountry: userData.country || "Unknown",
+    isLocalCurrency: isLocalCurrency,
+    currencySymbol: activeCur.symbol,
     flowType: flowType,
     status: "pending_verification",
     date: new Date().toLocaleString(),
@@ -781,12 +818,12 @@ function confirmPayment() {
 
   if (flowType === "upgrade" && upgradeData) {
     receiptData.plan = upgradeData.name;
-    receiptData.amount = upgradeData.amount;
-    receiptData.earningLimit = upgradeData.earningLimit;
+    receiptData.amount = upgradeData.amount * activeCur.rate;
+    receiptData.earningLimit = upgradeData.earningLimit * activeCur.rate;
     receiptData.type = "upgrade";
   } else if (paymentData) {
     receiptData.plan = paymentData.plan || null;
-    receiptData.amount = paymentData.price || 0;
+    receiptData.amount = (paymentData.price || 0) * activeCur.rate;
     receiptData.dailyLimit = paymentData.dailyLimit || null;
     receiptData.type = paymentData.type || "payment";
     receiptData.bankDetails = {
@@ -903,8 +940,11 @@ window.addEventListener("DOMContentLoaded", function() {
   initTheme();
   detectFlow();
   updateFlowBadge();
-  updateOrderSummary();
-  updateAmountDisplay();
+  
+  if (userData && userData.country) {
+    document.getElementById("currencyToggleText").textContent = "Convert to " + userData.country + " Currency";
+  }
+
   loadPaymentDetails();
   startTimer();
 });
