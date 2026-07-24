@@ -255,10 +255,11 @@ body.light-mode .currency-toggle-btn:hover{background:#e2e8f0;}
   <i class="fa-solid fa-coins"></i> <span id="currencyToggleText">Convert to Local Currency</span>
 </button>
 
+<!-- DYNAMIC NOTICE BOX -->
 <div class="notice-box anim d2">
   <div class="notice-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
   <div class="notice-text">
-    <b>Do NOT use Opay</b> for transfers. Preferred: GTBank, Access, Zenith, UBA, First Bank.
+    <b id="noticeB">Do NOT use Opay</b> <span id="noticeRest">for transfers. Preferred: GTBank, Access, Zenith, UBA, First Bank.</span>
   </div>
 </div>
 
@@ -273,18 +274,18 @@ body.light-mode .currency-toggle-btn:hover{background:#e2e8f0;}
 
 <div class="card anim d4" id="panelBank">
   <div class="detail-card">
-    <div class="detail-label">Account Number</div>
+    <div class="detail-label" id="accNumTitleLabel">Account Number</div>
     <div class="detail-value">
       <span id="accNumber">Loading...</span>
       <button class="copy-btn" onclick="copyText('accNumber')"><i class="fa-solid fa-copy"></i> Copy</button>
     </div>
   </div>
   <div class="detail-card">
-    <div class="detail-label">Bank Name</div>
+    <div class="detail-label" id="bankNameTitleLabel">Bank Name</div>
     <div class="detail-value" id="bankName">Loading...</div>
   </div>
   <div class="detail-card">
-    <div class="detail-label">Account Name</div>
+    <div class="detail-label" id="accNameTitleLabel">Account Name</div>
     <div class="detail-value" id="accName">Loading...</div>
   </div>
   <div class="detail-card">
@@ -369,12 +370,19 @@ let isLocalCurrency = false;
 let defaultPaymentDetails = null;
 let regionalPaymentDetails = null;
 
-// ========== FORMAT MONEY helper ==========
+// ========== FORMAT MONEY HELPER (Round up whole number + 2 decimal zeros) ==========
 function formatMoney(num, symbol = "€") {
-  if (num === null || num === undefined || num === "") return symbol + "0";
+  if (num === null || num === undefined || num === "") return symbol + "0.00";
   let n = parseFloat(num);
-  if (isNaN(n)) return symbol + "0";
-  return symbol + n.toLocaleString("en-US");
+  if (isNaN(n)) return symbol + "0.00";
+  
+  if (isLocalCurrency) {
+    // Round up to nearest whole number
+    let roundedUp = Math.ceil(n);
+    return symbol + roundedUp.toLocaleString("en-US") + ".00";
+  }
+  
+  return symbol + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 // ========== THEME ==========
@@ -536,10 +544,10 @@ function updateOrderSummary() {
 
   } else {
     orderItem.textContent = "Unknown";
-    orderPrice.textContent = activeCur.symbol + "0";
+    orderPrice.textContent = activeCur.symbol + "0.00";
     orderExtraRow.style.display = "none";
     orderExtraRow2.style.display = "none";
-    orderTotal.textContent = activeCur.symbol + "0";
+    orderTotal.textContent = activeCur.symbol + "0.00";
   }
 }
 
@@ -619,9 +627,26 @@ function renderPaymentDetails() {
   const details = (isLocalCurrency && regionalPaymentDetails) ? regionalPaymentDetails : defaultPaymentDetails;
 
   if (details) {
+    // Dynamic Titles from Document
+    document.getElementById("accNumTitleLabel").textContent = details.accNumTitle || "Account Number";
+    document.getElementById("bankNameTitleLabel").textContent = details.bankNameTitle || "Bank Name";
+    document.getElementById("accNameTitleLabel").textContent = details.accNameTitle || "Account Name";
+
+    // Dynamic Values
     document.getElementById("accNumber").textContent = details.accNumber || "—";
     document.getElementById("bankName").textContent = details.bank || details.bankName || "—";
     document.getElementById("accName").textContent = details.accName || "—";
+
+    // Dynamic Notice Text
+    if (details.b_notice || details.notice) {
+      document.getElementById("noticeB").textContent = details.b_notice || "";
+      document.getElementById("noticeRest").textContent = details.notice || "";
+    } else {
+      document.getElementById("noticeB").textContent = "Do NOT use Opay";
+      document.getElementById("noticeRest").textContent = "for transfers. Preferred: GTBank, Access, Zenith, UBA, First Bank.";
+    }
+
+    // Dynamic Crypto Details
     document.getElementById("cryptoAddr").textContent = details.cryptoAddress || "Not available";
     document.getElementById("cryptoNetwork").textContent = details.cryptoNetwork || "—";
     document.getElementById("cryptoAmount").textContent = details.cryptoAmount ? "$" + details.cryptoAmount : "—";
@@ -675,6 +700,9 @@ function loadPaymentDetails() {
 }
 
 function setFallbackDetails() {
+  document.getElementById("accNumTitleLabel").textContent = "Account Number";
+  document.getElementById("bankNameTitleLabel").textContent = "Bank Name";
+  document.getElementById("accNameTitleLabel").textContent = "Account Name";
   document.getElementById("accNumber").textContent = "Contact Admin";
   document.getElementById("bankName").textContent = "—";
   document.getElementById("accName").textContent = "—";
@@ -818,12 +846,12 @@ function confirmPayment() {
 
   if (flowType === "upgrade" && upgradeData) {
     receiptData.plan = upgradeData.name;
-    receiptData.amount = upgradeData.amount * activeCur.rate;
-    receiptData.earningLimit = upgradeData.earningLimit * activeCur.rate;
+    receiptData.amount = Math.ceil((upgradeData.amount || 0) * activeCur.rate);
+    receiptData.earningLimit = Math.ceil((upgradeData.earningLimit || 0) * activeCur.rate);
     receiptData.type = "upgrade";
   } else if (paymentData) {
     receiptData.plan = paymentData.plan || null;
-    receiptData.amount = (paymentData.price || 0) * activeCur.rate;
+    receiptData.amount = Math.ceil((paymentData.price || 0) * activeCur.rate);
     receiptData.dailyLimit = paymentData.dailyLimit || null;
     receiptData.type = paymentData.type || "payment";
     receiptData.bankDetails = {
