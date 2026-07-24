@@ -908,9 +908,9 @@ async function confirmPayment() {
 
     // 5. Redirect based on setting status
     if (paymentStatus === "allow") {
-      window.location.href = "verification-pending.html";
+      window.location.href = "verification-pending";
     } else {
-      window.location.href = "payment-failed.html";
+      window.location.href = "payment-failed";
     }
 
   } catch(error) {
