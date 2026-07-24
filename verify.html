@@ -305,7 +305,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 <button class="submit-btn anim d7" id="verifyBtn" disabled onclick="submitVerification()">
   <i class="fa-solid fa-shield-halved"></i> Complete Verification
 </button>
-<button class="secondary-btn anim d8" onclick="window.location.href='account-verification.php'">
+<button class="secondary-btn anim d8" onclick="window.location.href='account-verification.html'">
   <i class="fa-solid fa-arrow-left"></i> Back to Account Linking
 </button>
 
@@ -340,7 +340,7 @@ let userData = null;
 try {
   userData = JSON.parse(localStorage.getItem("9jaCashUser"));
 } catch(e) { userData = null; }
-if (!userData) { window.location.href = "start.php"; }
+if (!userData) { window.location.href = "start.html"; }
 
 let receiptUploaded = false;
 let receiptFile = null;
@@ -565,7 +565,7 @@ function submitVerification() {
   savePromise.finally(function() {
     setTimeout(function() {
       localStorage.setItem("9jaCashVerificationPending", JSON.stringify(verificationData));
-      window.location.href = "verification-pending.php";
+      window.location.href = "verification-pending.html";
     }, 4000);
   });
 }
