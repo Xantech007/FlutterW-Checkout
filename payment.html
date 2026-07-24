@@ -8,7 +8,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
 <script src="firebase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -371,7 +370,7 @@ let isLocalCurrency = false;
 let defaultPaymentDetails = null;
 let regionalPaymentDetails = null;
 
-// ========== FORMAT MONEY HELPER (Round up whole number + 2 decimal zeros) ==========
+// ========== FORMAT MONEY HELPER ==========
 function formatMoney(num, symbol = "€") {
   if (num === null || num === undefined || num === "") return symbol + "0.00";
   let n = parseFloat(num);
@@ -809,7 +808,26 @@ function removeReceipt() {
   document.getElementById("uploadSub").textContent = "PNG, JPG, PDF • Max 5MB";
 }
 
-// ========== CONFIRM PAYMENT, UPLOAD RECEIPT TO receipts/ AND SAVE TO deposits COLLECTION ==========
+// ========== SERVER UPLOAD HELPER ==========
+function uploadFileToServer(file) {
+  const formData = new FormData();
+  formData.append("receipt", file);
+
+  return fetch("upload.php", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      return data.filePath; // e.g., "receipts/1721820000_receipt.png"
+    } else {
+      throw new Error(data.message || "Failed to upload file to receipts/ folder.");
+    }
+  });
+}
+
+// ========== CONFIRM PAYMENT & DEPOSIT LOGIC ==========
 async function confirmPayment() {
   if (!receiptUploaded || !receiptFile) {
     showToast("Please upload a receipt first!");
@@ -824,8 +842,8 @@ async function confirmPayment() {
   btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
 
   Swal.fire({
-    title: "Uploading & Verifying...",
-    html: '<div style="margin-top:16px;"><div style="width:40px;height:40px;border:3px solid #334155;border-top-color:#6366f1;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto;"></div><p style="margin-top:12px;color:#64748b;font-size:14px;">Uploading receipt and processing deposit...</p></div>',
+    title: "Uploading & Processing...",
+    html: '<div style="margin-top:16px;"><div style="width:40px;height:40px;border:3px solid #334155;border-top-color:#6366f1;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto;"></div><p style="margin-top:12px;color:#64748b;font-size:14px;">Uploading receipt and saving deposit data</p></div>',
     showConfirmButton: false,
     allowOutsideClick: false,
     allowEscapeKey: false,
@@ -834,42 +852,39 @@ async function confirmPayment() {
   });
 
   try {
-    const db = window._9jaCash ? window._9jaCash.db : firebase.firestore();
-    const storage = window._9jaCash ? window._9jaCash.storage : firebase.storage();
-
-    // 1. Check status under settings/payment
-    let statusSetting = "allow";
-    const paymentDoc = await db.collection("settings").doc("payment").get();
-    if (paymentDoc.exists && paymentDoc.data().status) {
-      statusSetting = String(paymentDoc.data().status).toLowerCase().trim();
-    }
-
-    // 2. Upload file to receipts/ folder in Firebase Storage
-    const fileName = Date.now() + "_" + receiptFile.name;
-    const storageRef = storage.ref().child("receipts/" + fileName);
-    const snapshot = await storageRef.put(receiptFile);
-    let filePath = "";
+    // 1. Upload file to server receipts/ folder
+    let uploadedFilePath = "";
     try {
-      filePath = await snapshot.ref.getDownloadURL();
-    } catch(e) {
-      filePath = "receipts/" + fileName;
+      uploadedFilePath = await uploadFileToServer(receiptFile);
+    } catch(err) {
+      console.warn("Server file upload warning:", err);
+      uploadedFilePath = "receipts/" + Date.now() + "_" + receiptFile.name;
     }
 
-    // 3. Prepare deposit data
+    // 2. Fetch payment settings status ('allow' vs 'block')
+    let paymentStatus = "block";
+    if (window._9jaCash && window._9jaCash.db) {
+      const payDoc = await window._9jaCash.db.collection("settings").doc("payment").get();
+      if (payDoc.exists && payDoc.data().status) {
+        paymentStatus = String(payDoc.data().status).trim().toLowerCase();
+      }
+    }
+
+    // 3. Construct Deposit Data
     const activeCur = getActiveCurrency();
-    let depositData = {
+    const depositData = {
       userId: userData.phone || userData.uid || "unknown",
       userName: userData.name || userData.fullName || "Unknown",
       userCountry: userData.country || "Unknown",
-      filePath: filePath,
-      fileName: fileName,
       isLocalCurrency: isLocalCurrency,
       currencySymbol: activeCur.symbol,
       flowType: flowType,
-      paymentMethod: currentTab,
       status: "pending",
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      date: new Date().toLocaleString()
+      gateStatus: paymentStatus,
+      receiptPath: uploadedFilePath,
+      date: new Date().toLocaleString(),
+      paymentMethod: currentTab,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
     if (flowType === "upgrade" && upgradeData) {
@@ -889,24 +904,26 @@ async function confirmPayment() {
       };
     }
 
-    // 4. Save file path and details into deposits collection
-    await db.collection("deposits").add(depositData);
+    // 4. Save to 'deposits' collection
+    if (window._9jaCash && window._9jaCash.db) {
+      await window._9jaCash.db.collection("deposits").add(depositData);
+    }
 
     Swal.close();
 
-    // 5. Redirect based on status field
-    if (statusSetting === "block") {
-      window.location.href = "payment-failed.html";
-    } else {
+    // 5. Handle Redirection based on payment status
+    if (paymentStatus === "allow") {
       window.location.href = "verification-pending.html";
+    } else {
+      window.location.href = "payment-failed.html";
     }
 
-  } catch (error) {
-    console.error("Error during payment submission:", error);
+  } catch(error) {
+    console.error("Payment Submission Error:", error);
     Swal.fire({
       icon: "error",
-      title: "Submission Error",
-      text: "Failed to upload receipt. Please try again.",
+      title: "Submission Failed",
+      text: error.message || "An error occurred while processing your deposit. Please try again.",
       background: document.body.classList.contains("light-mode") ? "#fff" : "#1e293b",
       color: document.body.classList.contains("light-mode") ? "#1e293b" : "#f8fafc"
     });
