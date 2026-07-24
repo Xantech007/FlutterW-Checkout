@@ -160,7 +160,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
 <div class="app">
 
 <div class="topbar anim d1">
-  <button class="back-btn" onclick="window.location.href='dashboard.php'">
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">
     <i class="fa-solid fa-arrow-left"></i>
   </button>
   <div class="header-title">Upgrade Plan</div>
@@ -326,10 +326,10 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
 <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">Done</span></div>
 
 <div class="bottom-nav">
-  <button class="nav-item" onclick="window.location.href='dashboard.php'"><i class="fa-solid fa-house"></i>Home</button>
-  <button class="nav-item active" onclick="window.location.href='upgrade.php'"><i class="fa-solid fa-rocket"></i>Upgrade</button>
+  <button class="nav-item" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-house"></i>Home</button>
+  <button class="nav-item active" onclick="window.location.href='upgrade.html'"><i class="fa-solid fa-rocket"></i>Upgrade</button>
   <button class="nav-mid" onclick="startMining()"><i class="fa-solid fa-hammer"></i></button>
-  <button class="nav-item" onclick="window.location.href='tasks.php'"><i class="fa-solid fa-list-check"></i>Tasks</button>
+  <button class="nav-item" onclick="window.location.href='tasks.html'"><i class="fa-solid fa-list-check"></i>Tasks</button>
   <button class="nav-item" onclick="toggleDarkMode()"><i class="fa-solid fa-moon" id="themeIcon"></i><span id="themeText">Dark</span></button>
 </div>
 
@@ -340,7 +340,7 @@ try {
 } catch(e) { userData = null; }
 
 if (!userData) {
-  window.location.href = "start.php";
+  window.location.href = "start.html";
 }
 
 function initDarkMode() {
@@ -442,12 +442,12 @@ function upgradePlan(amount, earningLimit, planName) {
         date: new Date().toLocaleString(),
         status: "pending"
       };
-            // Clear any old payout key data so payment.php shows upgrade, not payout key
+            // Clear any old payout key data so payment.html shows upgrade, not payout key
       localStorage.removeItem("9jaCashPaymentData");
       localStorage.removeItem("9jaCashPaymentData");
 
       localStorage.setItem("selectedPlan", JSON.stringify(plan));
-      window.location.href = "payment.php";
+      window.location.href = "payment.html";
     }
   });
 }
