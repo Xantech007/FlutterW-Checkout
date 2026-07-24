@@ -205,23 +205,7 @@ body.dark-mode .toast{background:#1e293b;border-color:#334155;}
         <div class="s1" id="fieldCountry">
           <label class="lbl">Country</label>
           <select id="country" class="inp">
-            <option value="" disabled selected>Detecting or choose country...</option>
-            <?php
-              if (file_exists('countries.php')) {
-                  include 'countries.php';
-                  if (isset($countries) && is_array($countries)) {
-                      foreach ($countries as $code => $name) {
-                          echo '<option value="' . htmlspecialchars($name) . '" data-code="' . htmlspecialchars($code) . '">' . htmlspecialchars($name) . '</option>';
-                      }
-                  }
-              } else {
-                  // Fallback standard options if countries.php file isn't loaded
-                  $defaultCountries = ["NG" => "Nigeria", "US" => "United States", "GB" => "United Kingdom", "CA" => "Canada", "GH" => "Ghana", "KE" => "Kenya", "ZA" => "South Africa"];
-                  foreach ($defaultCountries as $code => $name) {
-                      echo '<option value="' . htmlspecialchars($name) . '" data-code="' . htmlspecialchars($code) . '">' . htmlspecialchars($name) . '</option>';
-                  }
-              }
-            ?>
+            <option value="" disabled selected>Loading countries...</option>
           </select>
         </div>
         
@@ -482,21 +466,45 @@ function checkNextEnabled() {
   }
 }
 
-// ========== GEOLOCATION AUTO-DETECT ==========
+// ========== LOAD COUNTRIES & GEOLOCATION AUTO-DETECT ==========
+function loadCountriesAndDetect() {
+  fetch('countries.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('country').innerHTML = html;
+      detectCountry();
+    })
+    .catch(err => {
+      console.error('Error loading countries.html:', err);
+      // Fallback standard options if file load fails
+      document.getElementById('country').innerHTML = `
+        <option value="" disabled selected>Select country...</option>
+        <option value="Nigeria">Nigeria</option>
+        <option value="United States">United States</option>
+        <option value="United Kingdom">United Kingdom</option>
+        <option value="Canada">Canada</option>
+        <option value="Ghana">Ghana</option>
+        <option value="Kenya">Kenya</option>
+        <option value="South Africa">South Africa</option>
+      `;
+      detectCountry();
+    });
+}
+
 function detectCountry() {
-  fetch('https://ip-api.com/json/')
+  // Using ipapi.co over HTTPS to avoid SSL/Mixed Content issues
+  fetch('https://ipapi.co/json/')
     .then(res => res.json())
     .then(data => {
-      if (data && (data.country || data.countryCode)) {
+      if (data && (data.country_name || data.country_code)) {
         const countrySelect = document.getElementById('country');
         let matched = false;
         
+        const detectedName = (data.country_name || '').toLowerCase().trim();
+        
         for (let i = 0; i < countrySelect.options.length; i++) {
           const opt = countrySelect.options[i];
-          if (
-            opt.value.toLowerCase() === (data.country || '').toLowerCase() ||
-            opt.getAttribute('data-code') === data.countryCode
-          ) {
+          if (opt.value.toLowerCase().trim() === detectedName) {
             countrySelect.selectedIndex = i;
             matched = true;
             break;
@@ -505,7 +513,7 @@ function detectCountry() {
         
         if (matched) {
           checkNextEnabled();
-          showToast('Country detected: ' + data.country);
+          showToast('Country detected: ' + data.country_name);
         }
       }
     })
@@ -756,9 +764,9 @@ window.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  // Start at step 1 & run IP auto-detection
+  // Start at step 1 & load country list + IP auto-detection
   showStep(1);
-  detectCountry();
+  loadCountriesAndDetect();
 });
 </script>
 
