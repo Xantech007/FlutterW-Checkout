@@ -165,7 +165,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
 
 <!-- Header -->
 <div class="header anim d1">
-  <button class="back-btn" onclick="window.location.href='dashboard.php'">
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">
     <i class="fa-solid fa-arrow-left"></i>
   </button>
   <div class="header-text">
@@ -213,9 +213,9 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
 
 <!-- Bottom Nav - MATCHES DASHBOARD EXACTLY -->
 <div class="bottom-nav">
-  <button class="nav-item" onclick="window.location.href='dashboard.php'"><i class="fa-solid fa-house"></i>Home</button>
-  <button class="nav-item" onclick="window.location.href='upgrade.php'"><i class="fa-solid fa-rocket"></i>Upgrade</button>
-  <button class="nav-mid" onclick="window.location.href='dashboard.php'"><i class="fa-solid fa-hammer"></i></button>
+  <button class="nav-item" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-house"></i>Home</button>
+  <button class="nav-item" onclick="window.location.href='upgrade.html'"><i class="fa-solid fa-rocket"></i>Upgrade</button>
+  <button class="nav-mid" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-hammer"></i></button>
   <button class="nav-item active" onclick="setNav(this)"><i class="fa-solid fa-list-check"></i>Tasks</button>
   <button class="nav-item" onclick="toggleDarkMode()"><i class="fa-solid fa-moon" id="themeIcon"></i><span id="themeText">Dark</span></button>
 </div>
@@ -273,7 +273,7 @@ try {
 } catch(e) { userData = null; }
 
 if (!userData) {
-  window.location.href = "start.php";
+  window.location.href = "start.html";
 }
 
 // ========== TASK STATE ==========
