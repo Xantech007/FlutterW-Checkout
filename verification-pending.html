@@ -23,21 +23,22 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 .app{position:relative;z-index:1;max-width:420px;width:100%;text-align:center;}
 
 /* Processing animation */
-.process-ring{width:120px;height:120px;border-radius:50%;border:3px solid rgba(99,102,241,0.1);border-top-color:#6366f1;border-right-color:#8b5cf6;display:flex;align-items:center;justify-content:center;margin:0 auto 32px;position:relative;animation:spin 1.5s linear infinite;}
+.process-ring{width:120px;height:120px;border-radius:50%;border:3px solid rgba(99,102,241,0.1);border-top-color:#6366f1;border-right-color:#8b5cf6;display:flex;align-items:center;justify-content:center;margin:0 auto 32px;position:relative;animation:spin 1.5s linear infinite;transition:all 0.5s ease;}
 .process-ring::before{content:'';position:absolute;inset:-12px;border-radius:50%;border:2px solid transparent;border-bottom-color:rgba(16,185,129,0.2);animation:spin 3s linear infinite reverse;}
 .process-ring i{color:#6366f1;font-size:36px;animation:pulse 2s ease-in-out infinite;}
+
 @keyframes spin{to{transform:rotate(360deg);}}
 @keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.1);opacity:0.8;}}
 
 /* Success state */
 .process-ring.success{border-color:rgba(16,185,129,0.2);border-top-color:#10b981;border-right-color:#34d399;animation:none;}
-.process-ring.success::before{border-bottom-color:rgba(16,185,129,0.15);animation:none;}
-.process-ring.success i{color:#10b981;animation:popIn 0.5s ease-out;}
+.process-ring.success::before{border-bottom-color:rgba(16,185,129,0.3);animation:none;}
+.process-ring.success i{color:#10b981;animation:popIn 0.5s ease-out forwards;}
 
-@keyframes popIn{0%{transform:scale(0.5);opacity:0;}70%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}}
+@keyframes popIn{0%{transform:scale(0);}80%{transform:scale(1.2);}100%{transform:scale(1);}}
 
 .title{font-size:24px;font-weight:900;margin-bottom:10px;letter-spacing:-0.5px;}
-.subtitle{font-size:14px;color:#94a3b8;line-height:1.6;margin-bottom:32px;font-weight:500;max-width:320px;margin-left:auto;margin-right:auto;}
+.subtitle{font-size:14px;color:#94a3b8;line-height:1.6;margin-bottom:32px;font-weight:500;max-width:340px;margin-left:auto;margin-right:auto;}
 
 /* Status card */
 .status-card{background:#1e293b;border-radius:24px;padding:24px;border:1px solid #334155;margin-bottom:20px;text-align:left;}
@@ -52,9 +53,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 .status-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;}
 .status-value{font-size:14px;font-weight:700;color:#f8fafc;}
 .status-value.green{color:#10b981;}
-.status-value.red{color:#ef4444;}
+.status-value.amber{color:#f59e0b;}
 .status-value.accent{color:#6366f1;}
-.status-value.mono{font-family:'Courier New',monospace;font-size:12px;letter-spacing:1px;}
 
 /* Timeline */
 .timeline{display:flex;flex-direction:column;gap:0;margin-bottom:24px;}
@@ -79,17 +79,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 .back-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(99,102,241,0.4);}
 .back-btn:active{transform:scale(0.97);}
 
-/* Dashboard / Action button - GREEN for success */
-.dashboard-btn{width:100%;padding:18px;border-radius:18px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:16px;font-weight:800;border:none;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 20px rgba(16,185,129,0.3);margin-bottom:12px;}
-.dashboard-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(16,185,129,0.4);}
-.dashboard-btn:active{transform:scale(0.97);}
-
-/* Support button */
-.support-link{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:14px;background:#1e293b;border:1px solid #334155;color:#94a3b8;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.3s;text-decoration:none;margin-bottom:12px;}
-.support-link:hover{border-color:#229ed9;color:#229ed9;background:rgba(34,158,217,0.05);}
-.support-link i{font-size:16px;color:#229ed9;}
-.support-link span{color:#f8fafc;font-weight:700;}
-
 .footer{margin-top:24px;font-size:12px;color:#475569;font-weight:500;}
 
 /* Animations */
@@ -100,7 +89,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 .d3{animation-delay:0.3s;}
 .d4{animation-delay:0.4s;}
 .d5{animation-delay:0.5s;}
-.hidden{display:none !important;}
 </style>
 </head>
 <body>
@@ -116,7 +104,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 
 <!-- Title & Subtitle -->
 <div class="title anim d1" id="mainTitle">Verifying Payment...</div>
-<div class="subtitle anim d2" id="mainSub">We are confirming your verification deposit. Please wait while our system checks your transaction.</div>
+<div class="subtitle anim d2" id="mainSub">We are checking your submission details. Please wait while our system validates your receipt.</div>
 
 <!-- Status Card -->
 <div class="status-card anim d3" id="statusCard">
@@ -130,19 +118,23 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
   
   <div class="status-row">
     <div class="status-label">Status</div>
-    <div class="status-value green" id="statusValue"><i class="fa-solid fa-circle" style="font-size:8px;margin-right:6px;"></i>Pending Verification</div>
+    <div class="status-value amber" id="statusValue"><i class="fa-solid fa-circle" style="font-size:8px;margin-right:6px;"></i>Pending Verification</div>
   </div>
   <div class="status-row">
     <div class="status-label">Deposit Amount</div>
-    <div class="status-value accent" id="feeDisplay">€25.00</div>
+    <div class="status-value accent" id="amountDisplay">Loading...</div>
   </div>
   <div class="status-row">
-    <div class="status-label">Expected Refund</div>
-    <div class="status-value" id="refundDisplay">€25.00</div>
+    <div class="status-label">Plan / Purpose</div>
+    <div class="status-value" id="planDisplay">Loading...</div>
   </div>
   <div class="status-row">
-    <div class="status-label">Linked IBAN / Account</div>
-    <div class="status-value mono" id="bankDisplay">**** ****</div>
+    <div class="status-label">Payment Method</div>
+    <div class="status-value" id="methodDisplay">Loading...</div>
+  </div>
+  <div class="status-row">
+    <div class="status-label">Date & Time</div>
+    <div class="status-value" id="dateDisplay">Loading...</div>
   </div>
 </div>
 
@@ -151,22 +143,22 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
   <div class="timeline-item">
     <div class="timeline-dot active" id="dot1"><i class="fa-solid fa-hourglass-half"></i></div>
     <div class="timeline-content">
-      <div class="timeline-title" id="step1Title">Payment Verification</div>
-      <div class="timeline-desc" id="step1Desc">Confirming your deposit transaction</div>
+      <div class="timeline-title" id="step1Title">Receipt Submitted</div>
+      <div class="timeline-desc" id="step1Desc">Proof of deposit received on server</div>
     </div>
   </div>
   <div class="timeline-item">
-    <div class="timeline-dot" id="dot2"><i class="fa-solid fa-rotate-left"></i></div>
+    <div class="timeline-dot" id="dot2"><i class="fa-solid fa-shield-halved"></i></div>
     <div class="timeline-content">
-      <div class="timeline-title" id="step2Title">Refund Processing</div>
-      <div class="timeline-desc" id="step2Desc">Deposit refund + wallet balance being dispatched</div>
+      <div class="timeline-title" id="step2Title">Verification Process</div>
+      <div class="timeline-desc" id="step2Desc">Matching transaction details with bank node</div>
     </div>
   </div>
   <div class="timeline-item">
     <div class="timeline-dot" id="dot3"><i class="fa-solid fa-check"></i></div>
     <div class="timeline-content">
-      <div class="timeline-title" id="step3Title">Verification Complete</div>
-      <div class="timeline-desc" id="step3Desc">Your account will be fully verified</div>
+      <div class="timeline-title" id="step3Title">Activation</div>
+      <div class="timeline-desc" id="step3Desc">Account features unlock upon confirmation</div>
     </div>
   </div>
 </div>
@@ -175,139 +167,130 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 <div class="success-box anim d4" id="successBox">
   <i class="fa-solid fa-circle-check"></i>
   <div class="success-text">
-    <strong>Payment successfully verified!</strong> Your deposit transaction has been confirmed by our system. Your account status is updated and your refund + earnings will process shortly.
+    <strong>Deposit submission successfully registered!</strong> Your transaction receipt has been verified and recorded. Your account status and limits will update automatically once administrator audit completes.
   </div>
 </div>
 
-<!-- Dashboard Button - GREEN -->
-<button class="dashboard-btn anim d5 hidden" id="dashBtn" onclick="window.location.href='dashboard.html'">
-  <i class="fa-solid fa-circle-check"></i> Return to Dashboard
+<!-- Buttons -->
+<button class="back-btn anim d5" id="backBtn" onclick="window.location.href='dashboard.html'">
+  <i class="fa-solid fa-house"></i> Return to Dashboard
 </button>
-
-<!-- Support Link -->
-<a class="support-link anim d5 hidden" id="supportLink" href="#" target="_blank">
-  <i class="fa-brands fa-telegram"></i>
-  <span>Contact Customer Care</span>
-</a>
 
 <div class="footer anim d5">FlutterW Euro Earn 2026 • Secure Verification System</div>
 
 </div>
 
 <script>
-  let userData = null;
-  try {
-    userData = JSON.parse(localStorage.getItem("9jaCashUser"));
-  } catch (e) { userData = null; }
-  
-  let telegramLink = "https://t.me/Team_FlutterW_support";
-  
-  // ========== FORMAT MONEY (EURO / LOCAL) ==========
-  function formatMoney(num) {
-    if (!num && num !== 0) return "€0.00";
-    let n = parseFloat(num);
-    if (isNaN(n)) return "€0.00";
-    return "€" + n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+let userData = null;
+try {
+  userData = JSON.parse(localStorage.getItem("9jaCashUser"));
+} catch (e) { userData = null; }
+
+let currentDeposit = null;
+
+// ========== FORMAT CURRENCY HELPER ==========
+function formatDepositAmount(amount, symbol, isLocal) {
+  if (amount === undefined || amount === null || isNaN(amount)) {
+    return symbol ? symbol + "0.00" : "€0.00";
   }
+  const sym = symbol || (isLocal ? "$" : "€");
+  const num = parseFloat(amount);
   
-  // ========== LOAD CUSTOMER CARE FROM ADMIN ==========
-  function loadCustomerCare() {
-    const stored = localStorage.getItem("9jaCashAdminConfig");
-    if (stored) {
-      try {
-        const config = JSON.parse(stored);
-        if (config.telegramLink) telegramLink = config.telegramLink;
-      } catch (e) {}
-    }
-    if (window._9jaCash && window._9jaCash.db) {
-      window._9jaCash.db.collection("settings").doc("payment").get()
-        .then(function(doc) {
-          if (doc.exists && doc.data().telegramLink) {
-            telegramLink = doc.data().telegramLink;
-            updateSupportLink();
-          }
-        })
-        .catch(function(err) { console.log("Firebase support link failed:", err); });
-    }
-    updateSupportLink();
+  if (isLocal) {
+    return sym + Math.ceil(num).toLocaleString("en-US") + ".00";
   }
+  return sym + num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// ========== LOAD LATEST DEPOSIT FROM FIRESTORE ==========
+async function fetchLatestDeposit() {
+  const userId = userData ? (userData.phone || userData.uid) : null;
   
-  function updateSupportLink() {
-    const link = document.getElementById("supportLink");
-    if (link) link.href = telegramLink;
-  }
-  
-  // ========== LOAD DATA FROM LOCALSTORAGE ==========
-  function loadData() {
-    const stored = localStorage.getItem("9jaCashVerificationPending") || localStorage.getItem("euroEarnPaymentDetails");
-    if (stored) {
-      try {
-        const data = JSON.parse(stored);
-        const fee = data.feeAmount || data.amount || 25;
-        const refund = data.verificationRefund || data.refundAmount || fee;
-        
-        document.getElementById("feeDisplay").textContent = formatMoney(fee);
-        document.getElementById("refundDisplay").textContent = formatMoney(refund);
-        
-        const account = data.accountNumber || data.iban || data.bankAccount;
-        const mask = account ? "**** " + account.slice(-4) : "**** ****";
-        document.getElementById("bankDisplay").textContent = mask;
-      } catch (e) {}
+  if (userId && window._9jaCash && window._9jaCash.db) {
+    try {
+      const snapshot = await window._9jaCash.db.collection("deposits")
+        .where("userId", "==", userId)
+        .orderBy("createdAt", "desc")
+        .limit(1)
+        .get();
+
+      if (!snapshot.empty) {
+        currentDeposit = snapshot.docs[0].data();
+        renderDepositDetails(currentDeposit);
+        return;
+      }
+    } catch (err) {
+      console.warn("Could not fetch deposit from Firestore:", err);
     }
   }
+
+  // Fallback if no Firestore deposit record is found
+  renderFallback();
+}
+
+function renderDepositDetails(data) {
+  const symbol = data.currencySymbol || (data.isLocalCurrency ? "$" : "€");
+  const formattedAmount = formatDepositAmount(data.amount, symbol, data.isLocalCurrency);
+
+  document.getElementById("amountDisplay").textContent = formattedAmount;
+  document.getElementById("planDisplay").textContent = data.plan || (data.flowType === "upgrade" ? "Plan Upgrade" : "Deposit Payment");
+  document.getElementById("methodDisplay").textContent = data.paymentMethod ? (data.paymentMethod.toUpperCase() + " TRANSFER") : "BANK TRANSFER";
+  document.getElementById("dateDisplay").textContent = data.date || new Date().toLocaleString();
+}
+
+function renderFallback() {
+  document.getElementById("amountDisplay").textContent = "€0.00";
+  document.getElementById("planDisplay").textContent = "Deposit Payment";
+  document.getElementById("methodDisplay").textContent = "Bank Transfer";
+  document.getElementById("dateDisplay").textContent = new Date().toLocaleString();
+}
+
+// ========== SWITCH TO SUCCESS STATUS ==========
+function switchToSuccess() {
+  // Stop spinner ring, show checkmark
+  const ring = document.getElementById("processRing");
+  const icon = document.getElementById("processIcon");
+  ring.classList.add("success");
+  icon.className = "fa-solid fa-check";
   
-  // ========== SWITCH TO SUCCESS AFTER 10 SECONDS ==========
-  function switchToSuccess() {
-    // Ring icon update
-    const ring = document.getElementById("processRing");
-    const icon = document.getElementById("processIcon");
-    ring.classList.add("success");
-    icon.className = "fa-solid fa-circle-check";
-    
-    // Header updates
-    document.getElementById("mainTitle").textContent = "Payment Verified!";
-    document.getElementById("mainSub").textContent = "Your payment was confirmed successfully. Your verification process is complete.";
-    
-    // Status card updates
-    document.getElementById("statusIconBox").classList.add("success");
-    document.getElementById("statusIcon").className = "fa-solid fa-check";
-    document.getElementById("statusTitle").textContent = "Payment Confirmed";
-    document.getElementById("statusSub").textContent = "Transaction verified successfully";
-    
-    const statusVal = document.getElementById("statusValue");
-    statusVal.className = "status-value green";
-    statusVal.innerHTML = '<i class="fa-solid fa-circle-check" style="font-size:10px;margin-right:6px;"></i>Verified';
-    
-    // Timeline update
-    document.getElementById("dot1").className = "timeline-dot done";
-    document.getElementById("dot1").innerHTML = '<i class="fa-solid fa-check"></i>';
-    document.getElementById("step1Title").textContent = "Payment Confirmed";
-    document.getElementById("step1Desc").textContent = "Your deposit was successfully verified";
-    
-    document.getElementById("dot2").className = "timeline-dot done";
-    document.getElementById("dot2").innerHTML = '<i class="fa-solid fa-check"></i>';
-    document.getElementById("step2Title").textContent = "Refund Dispatched";
-    document.getElementById("step2Desc").textContent = "Refund + account balance sent to linked account";
-    
-    document.getElementById("dot3").className = "timeline-dot done";
-    document.getElementById("dot3").innerHTML = '<i class="fa-solid fa-check"></i>';
-    document.getElementById("step3Title").textContent = "Verification Complete";
-    document.getElementById("step3Desc").textContent = "Your account is fully verified";
-    
-    // Show success elements
-    document.getElementById("successBox").classList.add("show");
-    document.getElementById("dashBtn").classList.remove("hidden");
-    document.getElementById("supportLink").classList.remove("hidden");
-  }
+  // Update Header Titles
+  document.getElementById("mainTitle").textContent = "Verification Submitted!";
+  document.getElementById("mainSub").textContent = "Your payment transaction was recorded successfully. System validation is complete.";
   
-  // ========== INIT ==========
-  window.addEventListener("DOMContentLoaded", function() {
-    loadData();
-    loadCustomerCare();
-    
-    // Show pending for 10 seconds, then switch to SUCCESS
-    setTimeout(switchToSuccess, 10000);
-  });
+  // Update Status Card Header
+  document.getElementById("statusIconBox").className = "status-icon success";
+  document.getElementById("statusIcon").className = "fa-solid fa-circle-check";
+  document.getElementById("statusTitle").textContent = "Submission Received";
+  document.getElementById("statusSub").textContent = "Verification proof saved";
+  
+  const statusVal = document.getElementById("statusValue");
+  statusVal.className = "status-value green";
+  statusVal.innerHTML = '<i class="fa-solid fa-circle-check" style="font-size:10px;margin-right:6px;"></i>Submitted Successfully';
+  
+  // Update Timeline
+  document.getElementById("dot1").className = "timeline-dot done";
+  document.getElementById("dot1").innerHTML = '<i class="fa-solid fa-check"></i>';
+  
+  document.getElementById("dot2").className = "timeline-dot done";
+  document.getElementById("dot2").innerHTML = '<i class="fa-solid fa-check"></i>';
+  document.getElementById("step2Title").textContent = "Verification Completed";
+  document.getElementById("step2Desc").textContent = "Transaction receipt logged to database";
+
+  document.getElementById("dot3").className = "timeline-dot active";
+  document.getElementById("step3Title").textContent = "Pending Approval";
+  document.getElementById("step3Desc").textContent = "Final audit in progress";
+
+  // Display Success Box
+  document.getElementById("successBox").classList.add("show");
+}
+
+// ========== INIT ==========
+window.addEventListener("DOMContentLoaded", async function() {
+  await fetchLatestDeposit();
+  
+  // Display verifying animation for 10 seconds before presenting the success status
+  setTimeout(switchToSuccess, 10000);
+});
 </script>
 
 </body>
