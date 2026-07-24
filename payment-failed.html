@@ -122,7 +122,7 @@ body.light-mode .top-title{color:#1e293b;}
 
 <!-- Top Bar -->
 <div class="top-bar anim d1">
-  <button class="top-btn" onclick="window.location.href='dashboard.php'">
+  <button class="top-btn" onclick="window.location.href='dashboard.html'">
     <i class="fa-solid fa-arrow-left"></i>
   </button>
   <div class="top-title">Payment Failed</div>
@@ -236,7 +236,7 @@ function detectFlow() {
   flowData = null;
   flowType = "unknown";
 
-  // 1. Check PAYOUT KEY FIRST (9jaCashPaymentData from buy.php)
+  // 1. Check PAYOUT KEY FIRST (9jaCashPaymentData from buy.html)
   const storedPayment = localStorage.getItem("9jaCashPaymentData");
   if (storedPayment) {
     try {
@@ -264,7 +264,7 @@ function detectFlow() {
     } catch(e) {}
   }
 
-  // 3. Check UPGRADE (selectedPlan from upgrade.php)
+  // 3. Check UPGRADE (selectedPlan from upgrade.html)
   const storedUpgrade = localStorage.getItem("selectedPlan");
   if (storedUpgrade) {
     try {
@@ -320,8 +320,8 @@ async function loadAdminSettings() {
   // Fallback defaults
   if (!adminSettings) {
     adminSettings = {
-      failedRetryRedirect: "payment.php",
-      failedDashboardRedirect: "dashboard.php",
+      failedRetryRedirect: "payment.html",
+      failedDashboardRedirect: "dashboard.html",
       failedRetryLabel: "Retry Payment",
       failedDashboardLabel: "Back to Dashboard",
       failedMessage: "We could not confirm your payment. Please check your details and try again.",
@@ -405,16 +405,16 @@ function updateUI() {
 // ========== BUTTON ACTIONS ==========
 function handleRetry() {
   if (flowType === "payout_key") {
-    window.location.href = "buy.php";
+    window.location.href = "buy.html";
   } else if (flowType === "upgrade") {
-    window.location.href = "upgrade.php";
+    window.location.href = "upgrade.html";
   } else {
-    window.location.href = adminSettings.failedRetryRedirect || "payment.php";
+    window.location.href = adminSettings.failedRetryRedirect || "payment.html";
   }
 }
 
 function handleDashboard() {
-  window.location.href = adminSettings.failedDashboardRedirect || "dashboard.php";
+  window.location.href = adminSettings.failedDashboardRedirect || "dashboard.html";
 }
 
 // ========== COPY SUPPORT ==========
