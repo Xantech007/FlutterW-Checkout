@@ -104,7 +104,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 
 <!-- Title & Subtitle -->
 <div class="title anim d1" id="mainTitle">Verifying Payment...</div>
-<div class="subtitle anim d2" id="mainSub">We are checking your submission details. Please wait while our system validates your transaction.</div>
+<div class="subtitle anim d2" id="mainSub">We are confirming your verification deposit. Please wait while our system checks your transaction.</div>
 
 <!-- Status Card -->
 <div class="status-card anim d3" id="statusCard">
@@ -151,14 +151,14 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
     <div class="timeline-dot" id="dot2"><i class="fa-solid fa-shield-halved"></i></div>
     <div class="timeline-content">
       <div class="timeline-title" id="step2Title">Verification Process</div>
-      <div class="timeline-desc" id="step2Desc">Matching transaction details with network node</div>
+      <div class="timeline-desc" id="step2Desc">Matching transaction details with bank node</div>
     </div>
   </div>
   <div class="timeline-item">
     <div class="timeline-dot" id="dot3"><i class="fa-solid fa-check"></i></div>
     <div class="timeline-content">
-      <div class="timeline-title" id="step3Title">Activation</div>
-      <div class="timeline-desc" id="step3Desc">Account features unlock upon confirmation</div>
+      <div class="timeline-title" id="step3Title">Verification Complete</div>
+      <div class="timeline-desc" id="step3Desc">Account features unlocked</div>
     </div>
   </div>
 </div>
@@ -167,7 +167,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 <div class="success-box anim d4" id="successBox">
   <i class="fa-solid fa-circle-check"></i>
   <div class="success-text">
-    <strong>Deposit submission successfully registered!</strong> Your transaction receipt has been verified and recorded. Your account status and features will update automatically.
+    <strong>Deposit submission successfully registered!</strong> Your transaction receipt has been verified and processed. Your account status and limits have been updated accordingly.
   </div>
 </div>
 
@@ -186,10 +186,10 @@ try {
   userData = JSON.parse(localStorage.getItem("9jaCashUser"));
 } catch (e) { userData = null; }
 
-// ========== FORMAT CURRENCY HELPER ==========
+// ========== FORMAT MONEY WITH DYNAMIC CURRENCY SYMBOL ==========
 function formatDepositAmount(amount, symbol, isLocal) {
   if (amount === undefined || amount === null || isNaN(amount)) {
-    return symbol ? symbol + "0.00" : "€0.00";
+    return (symbol || "€") + "0.00";
   }
   const sym = symbol || (isLocal ? "$" : "€");
   const num = parseFloat(amount);
@@ -203,7 +203,7 @@ function formatDepositAmount(amount, symbol, isLocal) {
 // ========== FETCH LATEST DEPOSIT FROM FIRESTORE ==========
 async function fetchLatestDeposit() {
   const userId = userData ? (userData.phone || userData.uid) : null;
-
+  
   if (userId && window._9jaCash && window._9jaCash.db) {
     try {
       const snapshot = await window._9jaCash.db.collection("deposits")
@@ -213,8 +213,8 @@ async function fetchLatestDeposit() {
         .get();
 
       if (!snapshot.empty) {
-        const data = snapshot.docs[0].data();
-        renderDepositDetails(data);
+        const deposit = snapshot.docs[0].data();
+        renderDepositDetails(deposit);
         return;
       }
     } catch (err) {
@@ -222,6 +222,7 @@ async function fetchLatestDeposit() {
     }
   }
 
+  // Fallback view if no record is found
   renderFallback();
 }
 
@@ -244,41 +245,41 @@ function renderFallback() {
 
 // ========== SWITCH TO SUCCESS STATUS ==========
 function switchToSuccess() {
-  // Stop spinner ring, show checkmark
+  // Stop spinner, display checkmark
   const ring = document.getElementById("processRing");
   const icon = document.getElementById("processIcon");
   ring.classList.add("success");
   icon.className = "fa-solid fa-check";
   
-  // Update Header Titles
+  // Header Text
   document.getElementById("mainTitle").textContent = "Verification Complete!";
-  document.getElementById("mainSub").textContent = "Your payment transaction was recorded successfully. System validation is complete.";
+  document.getElementById("mainSub").textContent = "Your payment transaction was recorded and verified successfully.";
   
-  // Update Status Card Header
+  // Status Card Update
   document.getElementById("statusIconBox").className = "status-icon success";
   document.getElementById("statusIcon").className = "fa-solid fa-circle-check";
-  document.getElementById("statusTitle").textContent = "Payment Verified";
-  document.getElementById("statusSub").textContent = "Transaction completed successfully";
+  document.getElementById("statusTitle").textContent = "Verification Successful";
+  document.getElementById("statusSub").textContent = "Payment proof validated";
   
   const statusVal = document.getElementById("statusValue");
   statusVal.className = "status-value green";
   statusVal.innerHTML = '<i class="fa-solid fa-circle-check" style="font-size:10px;margin-right:6px;"></i>Verified Successfully';
   
-  // Update Timeline
+  // Timeline Steps
   document.getElementById("dot1").className = "timeline-dot done";
   document.getElementById("dot1").innerHTML = '<i class="fa-solid fa-check"></i>';
   
   document.getElementById("dot2").className = "timeline-dot done";
   document.getElementById("dot2").innerHTML = '<i class="fa-solid fa-check"></i>';
   document.getElementById("step2Title").textContent = "Verification Completed";
-  document.getElementById("step2Desc").textContent = "Transaction receipt logged to database";
+  document.getElementById("step2Desc").textContent = "Transaction receipt logged and confirmed";
 
   document.getElementById("dot3").className = "timeline-dot done";
   document.getElementById("dot3").innerHTML = '<i class="fa-solid fa-check"></i>';
-  document.getElementById("step3Title").textContent = "Account Updated";
-  document.getElementById("step3Desc").textContent = "Features fully active";
+  document.getElementById("step3Title").textContent = "Account Activated";
+  document.getElementById("step3Desc").textContent = "Verification features unlocked";
 
-  // Display Success Box
+  // Show Success Card Box
   document.getElementById("successBox").classList.add("show");
 }
 
@@ -286,7 +287,7 @@ function switchToSuccess() {
 window.addEventListener("DOMContentLoaded", async function() {
   await fetchLatestDeposit();
   
-  // Display verification animation for 10 seconds before transitioning to verified success state
+  // Simulate 10-second check before revealing success
   setTimeout(switchToSuccess, 10000);
 });
 </script>
