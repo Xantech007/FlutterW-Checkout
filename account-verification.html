@@ -143,7 +143,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 
 <!-- Header -->
 <div class="header anim d1">
-  <button class="back-btn" onclick="window.location.href='dashboard.php'">
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">
     <i class="fa-solid fa-arrow-left"></i>
   </button>
   <div class="header-text">
@@ -255,7 +255,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
     <button class="btn-primary" id="verifyKeyBtn" onclick="verifyPayoutKey()">
       <i class="fa-solid fa-shield-halved"></i> Verify Key
     </button>
-    <button class="btn-secondary" onclick="window.location.href='buy.php'">
+    <button class="btn-secondary" onclick="window.location.href='buy.html'">
       <i class="fa-solid fa-cart-shopping"></i> Purchase
     </button>
   </div>
@@ -323,7 +323,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 <script>
 let userData = null;
 try { userData = JSON.parse(localStorage.getItem("9jaCashUser")); } catch(e) { userData = null; }
-if (!userData) { window.location.href = "start.php"; }
+if (!userData) { window.location.href = "start.html"; }
 
 let balance = parseFloat(localStorage.getItem("walletBalance")) || 0;
 let pendingBounce = null;
@@ -590,7 +590,7 @@ function verifyAndWithdraw() {
   userData.email = email;
   localStorage.setItem("9jaCashUser", JSON.stringify(userData));
   
-  // Save withdrawal data for verify.php
+  // Save withdrawal data for verify.html
   const withdrawalData = {
     amount: totalWithdrawalAmount,
     bankName: userData.bankName || "",
@@ -645,9 +645,9 @@ function verifyAndWithdraw() {
     document.getElementById("stepDot3").className = "step-dot active";
     document.getElementById("stepLabel3").className = "step-label active";
     
-    // Redirect to verify.php
+    // Redirect to verify.html
     setTimeout(function() {
-      window.location.href = "verify.php";
+      window.location.href = "verify.html";
     }, 1500);
   }, 12000);
 }
