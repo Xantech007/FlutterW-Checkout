@@ -801,7 +801,7 @@ async function uploadFileToServer(file) {
   const formData = new FormData();
   formData.append("receipt", file);
 
-  const response = await fetch("upload.php", {
+  const response = await fetch("upload", {
     method: "POST",
     body: formData
   });
@@ -908,9 +908,9 @@ async function confirmPayment() {
 
     // 5. Redirect based on setting status
     if (paymentStatus === "allow") {
-      window.location.href = "verification-pending";
+      window.location.href = "verification-pending.html";
     } else {
-      window.location.href = "payment-failed";
+      window.location.href = "payment-failed.html";
     }
 
   } catch(error) {
