@@ -186,35 +186,112 @@ try {
   userData = JSON.parse(localStorage.getItem("9jaCashUser"));
 } catch (e) { userData = null; }
 
-// ========== FORMAT MONEY WITH DYNAMIC CURRENCY SYMBOL ==========
-function formatDepositAmount(amount, symbol, isLocal) {
-  if (amount === undefined || amount === null || isNaN(amount)) {
+// Helper to safely format numbers
+function formatDepositAmount(rawAmount, symbol, isLocal) {
+  const num = parseFloat(rawAmount);
+  if (isNaN(num) || num <= 0) {
     return (symbol || "€") + "0.00";
   }
   const sym = symbol || (isLocal ? "$" : "€");
-  const num = parseFloat(amount);
-  
   if (isLocal) {
     return sym + Math.ceil(num).toLocaleString("en-US") + ".00";
   }
   return sym + num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// ========== FETCH LATEST DEPOSIT FROM FIRESTORE ==========
-async function fetchLatestDeposit() {
-  const userId = userData ? (userData.phone || userData.uid) : null;
+// Helper to safely parse dates
+function parseFormattedDate(rawDate, createdAt) {
+  try {
+    if (rawDate && typeof rawDate === "string" && rawDate.trim().length > 0 && !rawDate.includes("now")) {
+      return rawDate;
+    }
+    
+    let d = null;
+    if (createdAt) {
+      if (typeof createdAt.toDate === "function") {
+        d = createdAt.toDate();
+      } else if (createdAt.seconds) {
+        d = new Date(createdAt.seconds * 1000);
+      } else if (typeof createdAt === "string" || typeof createdAt === "number") {
+        d = new Date(createdAt);
+      }
+    }
+    
+    if (!d || isNaN(d.getTime())) {
+      d = new Date();
+    }
+    
+    return d.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+  } catch (e) {
+    return new Date().toLocaleString();
+  }
+}
+
+// RENDER FUNCTION
+function renderDepositDetails(data) {
+  if (!data) return;
   
+  const rawAmount = data.amount || data.depositAmount || data.planPrice || 0;
+  const symbol = data.currencySymbol || (data.isLocalCurrency ? "$" : "€");
+  const formattedAmount = formatDepositAmount(rawAmount, symbol, data.isLocalCurrency);
+  const formattedDate = parseFormattedDate(data.date, data.createdAt);
+
+  document.getElementById("amountDisplay").textContent = formattedAmount;
+  document.getElementById("planDisplay").textContent = data.plan || data.planName || (data.flowType === "upgrade" ? "Plan Upgrade" : "Deposit Payment");
+  document.getElementById("methodDisplay").textContent = data.paymentMethod ? (data.paymentMethod.toUpperCase() + " TRANSFER") : "BANK TRANSFER";
+  document.getElementById("dateDisplay").textContent = formattedDate;
+}
+
+// FETCH DEPOSIT DATA
+async function fetchLatestDeposit() {
+  // 1. Try local storage cache first for instant feedback
+  let localData = null;
+  try {
+    localData = JSON.parse(localStorage.getItem("pendingDeposit") || localStorage.getItem("latestDeposit"));
+  } catch(e){}
+
+  if (localData) {
+    renderDepositDetails(localData);
+  }
+
+  // 2. Fetch from Firestore
+  const userId = userData ? (userData.phone || userData.uid || userData.id) : null;
   if (userId && window._9jaCash && window._9jaCash.db) {
     try {
-      const snapshot = await window._9jaCash.db.collection("deposits")
-        .where("userId", "==", userId)
-        .orderBy("createdAt", "desc")
-        .limit(1)
-        .get();
+      let snapshot = null;
+      
+      // Attempt ordered query first
+      try {
+        snapshot = await window._9jaCash.db.collection("deposits")
+          .where("userId", "==", userId)
+          .orderBy("createdAt", "desc")
+          .limit(1)
+          .get();
+      } catch (indexErr) {
+        console.warn("Index query failed, falling back to unordered fetch:", indexErr);
+        // Fallback if composite index is missing in Firestore
+        snapshot = await window._9jaCash.db.collection("deposits")
+          .where("userId", "==", userId)
+          .get();
+      }
 
-      if (!snapshot.empty) {
-        const deposit = snapshot.docs[0].data();
-        renderDepositDetails(deposit);
+      if (snapshot && !snapshot.empty) {
+        let docs = snapshot.docs.map(doc => doc.data());
+        // Sort manually by createdAt if multiple returned
+        docs.sort((a, b) => {
+          let timeA = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+          let timeB = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+          return timeB - timeA;
+        });
+        
+        renderDepositDetails(docs[0]);
         return;
       }
     } catch (err) {
@@ -222,40 +299,25 @@ async function fetchLatestDeposit() {
     }
   }
 
-  // Fallback view if no record is found
-  renderFallback();
+  // If no Firestore or local storage record found
+  if (!localData) {
+    document.getElementById("amountDisplay").textContent = "€0.00";
+    document.getElementById("planDisplay").textContent = "Deposit Payment";
+    document.getElementById("methodDisplay").textContent = "Bank Transfer";
+    document.getElementById("dateDisplay").textContent = new Date().toLocaleString();
+  }
 }
 
-function renderDepositDetails(data) {
-  const symbol = data.currencySymbol || (data.isLocalCurrency ? "$" : "€");
-  const formattedAmount = formatDepositAmount(data.amount, symbol, data.isLocalCurrency);
-
-  document.getElementById("amountDisplay").textContent = formattedAmount;
-  document.getElementById("planDisplay").textContent = data.plan || (data.flowType === "upgrade" ? "Plan Upgrade" : "Deposit Payment");
-  document.getElementById("methodDisplay").textContent = data.paymentMethod ? (data.paymentMethod.toUpperCase() + " TRANSFER") : "BANK TRANSFER";
-  document.getElementById("dateDisplay").textContent = data.date || new Date().toLocaleString();
-}
-
-function renderFallback() {
-  document.getElementById("amountDisplay").textContent = "€0.00";
-  document.getElementById("planDisplay").textContent = "Deposit Payment";
-  document.getElementById("methodDisplay").textContent = "Bank Transfer";
-  document.getElementById("dateDisplay").textContent = new Date().toLocaleString();
-}
-
-// ========== SWITCH TO SUCCESS STATUS ==========
+// SWITCH TO SUCCESS STATUS
 function switchToSuccess() {
-  // Stop spinner, display checkmark
   const ring = document.getElementById("processRing");
   const icon = document.getElementById("processIcon");
   ring.classList.add("success");
   icon.className = "fa-solid fa-check";
   
-  // Header Text
   document.getElementById("mainTitle").textContent = "Verification Complete!";
   document.getElementById("mainSub").textContent = "Your payment transaction was recorded and verified successfully.";
   
-  // Status Card Update
   document.getElementById("statusIconBox").className = "status-icon success";
   document.getElementById("statusIcon").className = "fa-solid fa-circle-check";
   document.getElementById("statusTitle").textContent = "Verification Successful";
@@ -265,7 +327,6 @@ function switchToSuccess() {
   statusVal.className = "status-value green";
   statusVal.innerHTML = '<i class="fa-solid fa-circle-check" style="font-size:10px;margin-right:6px;"></i>Verified Successfully';
   
-  // Timeline Steps
   document.getElementById("dot1").className = "timeline-dot done";
   document.getElementById("dot1").innerHTML = '<i class="fa-solid fa-check"></i>';
   
@@ -279,15 +340,12 @@ function switchToSuccess() {
   document.getElementById("step3Title").textContent = "Account Activated";
   document.getElementById("step3Desc").textContent = "Verification features unlocked";
 
-  // Show Success Card Box
   document.getElementById("successBox").classList.add("show");
 }
 
-// ========== INIT ==========
+// INITIALIZE
 window.addEventListener("DOMContentLoaded", async function() {
   await fetchLatestDeposit();
-  
-  // Simulate 10-second check before revealing success
   setTimeout(switchToSuccess, 10000);
 });
 </script>
