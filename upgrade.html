@@ -82,7 +82,7 @@ body.dark-mode .compare-table{background:#1e293b;border-color:#334155;}
 .plan-header-gold{background:linear-gradient(135deg,#f59e0b,#d97706);}
 .plan-header-diamond{background:linear-gradient(135deg,#8b5cf6,#7c3aed);}
 
-.plan-header-content{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:flex-start;}
+.plan-header-content{position:relative;z-index:1;display:flex;justify-space-between;align-items:flex-start;}
 .plan-name{font-size:20px;font-weight:800;color:#fff;margin-bottom:4px;}
 .plan-desc{font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;}
 .plan-header-icon{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;backdrop-filter:blur(8px);}
@@ -181,7 +181,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
       <div class="plan-header-icon"><i class="fa-solid fa-leaf"></i></div>
     </div>
     <div class="plan-price-wrap">
-      <div class="plan-price"><span id="priceBasic">€230</span> <span>one-time</span></div>
+      <div class="plan-price" id="priceBasic">€230 <span>one-time</span></div>
     </div>
   </div>
   <div class="plan-body">
@@ -191,7 +191,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
       <li><div class="feature-icon purple"><i class="fa-solid fa-check"></i></div><div class="feature-text">Daily rewards up to <strong>€240</strong></div></li>
       <li><div class="feature-icon orange"><i class="fa-solid fa-check"></i></div><div class="feature-text">Withdraw <strong>anytime</strong></div></li>
     </ul>
-    <button class="plan-btn btn-basic" onclick="triggerUpgrade('Basic Plan', 1720)" id="btnBasic">
+    <button class="plan-btn btn-basic" onclick="upgradePlan(planAmounts.basicAmt, 1720, 'Basic Plan')" id="btnBasic">
       Upgrade to Basic <i class="fa-solid fa-arrow-right"></i>
     </button>
   </div>
@@ -208,7 +208,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
       <div class="plan-header-icon"><i class="fa-solid fa-gem"></i></div>
     </div>
     <div class="plan-price-wrap">
-      <div class="plan-price"><span id="priceSilver">€350</span> <span>one-time</span></div>
+      <div class="plan-price" id="priceSilver">€350 <span>one-time</span></div>
     </div>
   </div>
   <div class="plan-body">
@@ -218,7 +218,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
       <li><div class="feature-icon purple"><i class="fa-solid fa-check"></i></div><div class="feature-text">Higher daily <strong>mining cap</strong></div></li>
       <li><div class="feature-icon orange"><i class="fa-solid fa-check"></i></div><div class="feature-text"><strong>Priority</strong> withdrawals</div></li>
     </ul>
-    <button class="plan-btn btn-silver" onclick="triggerUpgrade('Silver Plan', 3800)" id="btnSilver">
+    <button class="plan-btn btn-silver" onclick="upgradePlan(planAmounts.silverAmt, 3800, 'Silver Plan')" id="btnSilver">
       Upgrade to Silver <i class="fa-solid fa-arrow-right"></i>
     </button>
   </div>
@@ -234,7 +234,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
       <div class="plan-header-icon"><i class="fa-solid fa-crown"></i></div>
     </div>
     <div class="plan-price-wrap">
-      <div class="plan-price"><span id="priceGold">€750</span> <span>one-time</span></div>
+      <div class="plan-price" id="priceGold">€750 <span>one-time</span></div>
     </div>
   </div>
   <div class="plan-body">
@@ -244,7 +244,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
       <li><div class="feature-icon purple"><i class="fa-solid fa-check"></i></div><div class="feature-text">High-profit <strong>algorithm</strong></div></li>
       <li><div class="feature-icon orange"><i class="fa-solid fa-check"></i></div><div class="feature-text"><strong>Instant</strong> withdrawals</div></li>
     </ul>
-    <button class="plan-btn btn-gold" onclick="triggerUpgrade('Gold Plan', 6400)" id="btnGold">
+    <button class="plan-btn btn-gold" onclick="upgradePlan(planAmounts.goldAmt, 6400, 'Gold Plan')" id="btnGold">
       Upgrade to Gold <i class="fa-solid fa-arrow-right"></i>
     </button>
   </div>
@@ -260,7 +260,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
       <div class="plan-header-icon"><i class="fa-solid fa-gem"></i></div>
     </div>
     <div class="plan-price-wrap">
-      <div class="plan-price"><span id="priceDiamond">€1,800</span> <span>one-time</span></div>
+      <div class="plan-price" id="priceDiamond">€1,800 <span>one-time</span></div>
     </div>
   </div>
   <div class="plan-body">
@@ -270,7 +270,7 @@ body.dark-mode .nav-mid{border-color:#0f172a;}
       <li><div class="feature-icon purple"><i class="fa-solid fa-check"></i></div><div class="feature-text"><strong>Unlimited</strong> daily potential</div></li>
       <li><div class="feature-icon orange"><i class="fa-solid fa-check"></i></div><div class="feature-text"><strong>Lifetime</strong> priority access</div></li>
     </ul>
-    <button class="plan-btn btn-diamond" onclick="triggerUpgrade('Diamond Plan', 12500)" id="btnDiamond">
+    <button class="plan-btn btn-diamond" onclick="upgradePlan(planAmounts.diamondAmt, 12500, 'Diamond Plan')" id="btnDiamond">
       Upgrade to Diamond <i class="fa-solid fa-arrow-right"></i>
     </button>
   </div>
@@ -343,37 +343,37 @@ if (!userData) {
   window.location.href = "start.html";
 }
 
-// Stores fetched costs dynamically
-let planCosts = {
-  "Basic Plan": 230,
-  "Silver Plan": 350,
-  "Gold Plan": 750,
-  "Diamond Plan": 1800
+// Global variable to store plan amounts fetched from Firestore settings/payment
+let planAmounts = {
+  basicAmt: 230,
+  silverAmt: 350,
+  goldAmt: 750,
+  diamondAmt: 1800
 };
 
-function fetchPlanCosts() {
-  const db = (window._9jaCash && window._9jaCash.db) ? window._9jaCash.db : firebase.firestore();
-  
-  db.collection("settings").doc("payment").get().then(function(doc) {
-    if (doc.exists) {
-      const data = doc.data();
-      if (data.basicAmt !== undefined) planCosts["Basic Plan"] = Number(data.basicAmt) / 100;
-      if (data.silverAmt !== undefined) planCosts["Silver Plan"] = Number(data.silverAmt) / 100;
-      if (data.goldAmt !== undefined) planCosts["Gold Plan"] = Number(data.goldAmt) / 100;
-      if (data.diamondAmt !== undefined) planCosts["Diamond Plan"] = Number(data.diamondAmt) / 100;
+function fetchPaymentSettings() {
+  if (window._9jaCash && window._9jaCash.db) {
+    window._9jaCash.db.collection("settings").doc("payment").get().then(function(doc) {
+      if (doc.exists) {
+        const data = doc.data();
+        if (data.basicAmt !== undefined) planAmounts.basicAmt = Number(data.basicAmt);
+        if (data.silverAmt !== undefined) planAmounts.silverAmt = Number(data.silverAmt);
+        if (data.goldAmt !== undefined) planAmounts.goldAmt = Number(data.goldAmt);
+        if (data.diamondAmt !== undefined) planAmounts.diamondAmt = Number(data.diamondAmt);
 
-      updatePriceUI();
-    }
-  }).catch(function(err) {
-    console.error("Error fetching plan costs: ", err);
-  });
+        updatePlanUI();
+      }
+    }).catch(function(err) {
+      console.error("Error fetching payment settings:", err);
+    });
+  }
 }
 
-function updatePriceUI() {
-  document.getElementById("priceBasic").textContent = "€" + planCosts["Basic Plan"].toLocaleString();
-  document.getElementById("priceSilver").textContent = "€" + planCosts["Silver Plan"].toLocaleString();
-  document.getElementById("priceGold").textContent = "€" + planCosts["Gold Plan"].toLocaleString();
-  document.getElementById("priceDiamond").textContent = "€" + planCosts["Diamond Plan"].toLocaleString();
+function updatePlanUI() {
+  document.getElementById("priceBasic").innerHTML = `€${planAmounts.basicAmt.toLocaleString()} <span>one-time</span>`;
+  document.getElementById("priceSilver").innerHTML = `€${planAmounts.silverAmt.toLocaleString()} <span>one-time</span>`;
+  document.getElementById("priceGold").innerHTML = `€${planAmounts.goldAmt.toLocaleString()} <span>one-time</span>`;
+  document.getElementById("priceDiamond").innerHTML = `€${planAmounts.diamondAmt.toLocaleString()} <span>one-time</span>`;
 }
 
 function initDarkMode() {
@@ -400,7 +400,7 @@ function toggleDarkMode() {
 window.addEventListener("DOMContentLoaded", function() {
   initDarkMode();
   checkCurrentPlan();
-  fetchPlanCosts();
+  fetchPaymentSettings();
 });
 
 function checkCurrentPlan() {
@@ -426,11 +426,6 @@ function checkCurrentPlan() {
       card.style.opacity = "0.7";
     }
   });
-}
-
-function triggerUpgrade(planName, earningLimit) {
-  const amount = planCosts[planName] || 0;
-  upgradePlan(amount, earningLimit, planName);
 }
 
 function upgradePlan(amount, earningLimit, planName) {
