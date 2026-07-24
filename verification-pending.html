@@ -104,7 +104,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 
 <!-- Title & Subtitle -->
 <div class="title anim d1" id="mainTitle">Verifying Payment...</div>
-<div class="subtitle anim d2" id="mainSub">We are checking your submission details. Please wait while our system validates your receipt.</div>
+<div class="subtitle anim d2" id="mainSub">We are validating your submission details. Please wait while our system confirms your deposit receipt.</div>
 
 <!-- Status Card -->
 <div class="status-card anim d3" id="statusCard">
@@ -125,7 +125,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
     <div class="status-value accent" id="amountDisplay">Loading...</div>
   </div>
   <div class="status-row">
-    <div class="status-label">Plan / Purpose</div>
+    <div class="status-label">Plan / Item</div>
     <div class="status-value" id="planDisplay">Loading...</div>
   </div>
   <div class="status-row">
@@ -143,22 +143,22 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
   <div class="timeline-item">
     <div class="timeline-dot active" id="dot1"><i class="fa-solid fa-hourglass-half"></i></div>
     <div class="timeline-content">
-      <div class="timeline-title" id="step1Title">Receipt Submitted</div>
-      <div class="timeline-desc" id="step1Desc">Proof of deposit received on server</div>
+      <div class="timeline-title" id="step1Title">Receipt Uploaded</div>
+      <div class="timeline-desc" id="step1Desc">Proof of payment successfully received</div>
     </div>
   </div>
   <div class="timeline-item">
     <div class="timeline-dot" id="dot2"><i class="fa-solid fa-shield-halved"></i></div>
     <div class="timeline-content">
       <div class="timeline-title" id="step2Title">Verification Process</div>
-      <div class="timeline-desc" id="step2Desc">Matching transaction details with bank node</div>
+      <div class="timeline-desc" id="step2Desc">Checking deposit entry against database records</div>
     </div>
   </div>
   <div class="timeline-item">
     <div class="timeline-dot" id="dot3"><i class="fa-solid fa-check"></i></div>
     <div class="timeline-content">
       <div class="timeline-title" id="step3Title">Activation</div>
-      <div class="timeline-desc" id="step3Desc">Account features unlock upon confirmation</div>
+      <div class="timeline-desc" id="step3Desc">Account features update upon admin clearance</div>
     </div>
   </div>
 </div>
@@ -167,7 +167,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#f8fafc
 <div class="success-box anim d4" id="successBox">
   <i class="fa-solid fa-circle-check"></i>
   <div class="success-text">
-    <strong>Deposit submission successfully registered!</strong> Your transaction receipt has been verified and recorded. Your account status and limits will update automatically once administrator audit completes.
+    <strong>Deposit payment successfully registered!</strong> Your transaction details and receipt have been verified and saved. Your account updates will be applied as soon as the audit completes.
   </div>
 </div>
 
@@ -186,52 +186,48 @@ try {
   userData = JSON.parse(localStorage.getItem("9jaCashUser"));
 } catch (e) { userData = null; }
 
-let currentDeposit = null;
-
-// ========== FORMAT CURRENCY HELPER ==========
-function formatDepositAmount(amount, symbol, isLocal) {
+// ========== FORMAT DEPOSIT CURRENCY ==========
+function formatDepositAmount(amount, symbol, isLocalCurrency) {
   if (amount === undefined || amount === null || isNaN(amount)) {
-    return symbol ? symbol + "0.00" : "€0.00";
+    return (symbol || "€") + "0.00";
   }
-  const sym = symbol || (isLocal ? "$" : "€");
+  const sym = symbol || (isLocalCurrency ? "$" : "€");
   const num = parseFloat(amount);
-  
-  if (isLocal) {
+
+  if (isLocalCurrency) {
     return sym + Math.ceil(num).toLocaleString("en-US") + ".00";
   }
   return sym + num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// ========== LOAD LATEST DEPOSIT FROM FIRESTORE ==========
+// ========== FETCH RECENT DEPOSIT FROM FIRESTORE ==========
 async function fetchLatestDeposit() {
-  const userId = userData ? (userData.phone || userData.uid) : null;
-  
-  if (userId && window._9jaCash && window._9jaCash.db) {
+  const currentUserId = userData ? (userData.phone || userData.uid) : null;
+
+  if (currentUserId && window._9jaCash && window._9jaCash.db) {
     try {
       const snapshot = await window._9jaCash.db.collection("deposits")
-        .where("userId", "==", userId)
+        .where("userId", "==", currentUserId)
         .orderBy("createdAt", "desc")
         .limit(1)
         .get();
 
       if (!snapshot.empty) {
-        currentDeposit = snapshot.docs[0].data();
-        renderDepositDetails(currentDeposit);
+        const deposit = snapshot.docs[0].data();
+        renderDepositDetails(deposit);
         return;
       }
     } catch (err) {
-      console.warn("Could not fetch deposit from Firestore:", err);
+      console.warn("Could not query deposits collection:", err);
     }
   }
 
-  // Fallback if no Firestore deposit record is found
   renderFallback();
 }
 
 function renderDepositDetails(data) {
-  const symbol = data.currencySymbol || (data.isLocalCurrency ? "$" : "€");
-  const formattedAmount = formatDepositAmount(data.amount, symbol, data.isLocalCurrency);
-
+  const formattedAmount = formatDepositAmount(data.amount, data.currencySymbol, data.isLocalCurrency);
+  
   document.getElementById("amountDisplay").textContent = formattedAmount;
   document.getElementById("planDisplay").textContent = data.plan || (data.flowType === "upgrade" ? "Plan Upgrade" : "Deposit Payment");
   document.getElementById("methodDisplay").textContent = data.paymentMethod ? (data.paymentMethod.toUpperCase() + " TRANSFER") : "BANK TRANSFER";
@@ -245,42 +241,42 @@ function renderFallback() {
   document.getElementById("dateDisplay").textContent = new Date().toLocaleString();
 }
 
-// ========== SWITCH TO SUCCESS STATUS ==========
+// ========== SWITCH TO SUCCESS STATE ==========
 function switchToSuccess() {
-  // Stop spinner ring, show checkmark
+  // Update ring state to complete
   const ring = document.getElementById("processRing");
   const icon = document.getElementById("processIcon");
   ring.classList.add("success");
   icon.className = "fa-solid fa-check";
   
   // Update Header Titles
-  document.getElementById("mainTitle").textContent = "Verification Submitted!";
-  document.getElementById("mainSub").textContent = "Your payment transaction was recorded successfully. System validation is complete.";
+  document.getElementById("mainTitle").textContent = "Verification Complete!";
+  document.getElementById("mainSub").textContent = "Your deposit receipt was validated and stored successfully.";
   
-  // Update Status Card Header
+  // Update Status Card
   document.getElementById("statusIconBox").className = "status-icon success";
   document.getElementById("statusIcon").className = "fa-solid fa-circle-check";
-  document.getElementById("statusTitle").textContent = "Submission Received";
-  document.getElementById("statusSub").textContent = "Verification proof saved";
+  document.getElementById("statusTitle").textContent = "Submission Confirmed";
+  document.getElementById("statusSub").textContent = "Transaction saved in system";
   
   const statusVal = document.getElementById("statusValue");
   statusVal.className = "status-value green";
   statusVal.innerHTML = '<i class="fa-solid fa-circle-check" style="font-size:10px;margin-right:6px;"></i>Submitted Successfully';
   
-  // Update Timeline
+  // Update Timeline Steps
   document.getElementById("dot1").className = "timeline-dot done";
   document.getElementById("dot1").innerHTML = '<i class="fa-solid fa-check"></i>';
   
   document.getElementById("dot2").className = "timeline-dot done";
   document.getElementById("dot2").innerHTML = '<i class="fa-solid fa-check"></i>';
-  document.getElementById("step2Title").textContent = "Verification Completed";
-  document.getElementById("step2Desc").textContent = "Transaction receipt logged to database";
+  document.getElementById("step2Title").textContent = "Verification Passed";
+  document.getElementById("step2Desc").textContent = "Deposit record matched in database";
 
   document.getElementById("dot3").className = "timeline-dot active";
-  document.getElementById("step3Title").textContent = "Pending Approval";
-  document.getElementById("step3Desc").textContent = "Final audit in progress";
+  document.getElementById("step3Title").textContent = "Awaiting Admin Audit";
+  document.getElementById("step3Desc").textContent = "Balance updates shortly after confirmation";
 
-  // Display Success Box
+  // Show Success Box
   document.getElementById("successBox").classList.add("show");
 }
 
@@ -288,7 +284,7 @@ function switchToSuccess() {
 window.addEventListener("DOMContentLoaded", async function() {
   await fetchLatestDeposit();
   
-  // Display verifying animation for 10 seconds before presenting the success status
+  // Wait 10 seconds to simulate verification before displaying success state
   setTimeout(switchToSuccess, 10000);
 });
 </script>
