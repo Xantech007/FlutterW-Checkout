@@ -234,6 +234,21 @@ function parseFormattedDate(rawDate, createdAt) {
   }
 }
 
+// Extract data passed via URL query parameters
+function getUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  const data = {};
+  
+  if (params.has('amount')) data.amount = params.get('amount');
+  if (params.has('plan')) data.plan = params.get('plan');
+  if (params.has('method')) data.paymentMethod = params.get('method');
+  if (params.has('date')) data.date = params.get('date');
+  if (params.has('symbol')) data.currencySymbol = params.get('symbol');
+  if (params.has('isLocal')) data.isLocalCurrency = params.get('isLocal') === 'true';
+
+  return Object.keys(data).length > 0 ? data : null;
+}
+
 // RENDER FUNCTION
 function renderDepositDetails(data) {
   if (!data) return;
@@ -245,29 +260,38 @@ function renderDepositDetails(data) {
 
   document.getElementById("amountDisplay").textContent = formattedAmount;
   document.getElementById("planDisplay").textContent = data.plan || data.planName || (data.flowType === "upgrade" ? "Plan Upgrade" : "Deposit Payment");
-  document.getElementById("methodDisplay").textContent = data.paymentMethod ? (data.paymentMethod.toUpperCase() + " TRANSFER") : "BANK TRANSFER";
+  document.getElementById("methodDisplay").textContent = data.paymentMethod ? (data.paymentMethod.toUpperCase() + (data.paymentMethod.toLowerCase().includes("transfer") ? "" : " TRANSFER")) : "BANK TRANSFER";
   document.getElementById("dateDisplay").textContent = formattedDate;
 }
 
 // FETCH DEPOSIT DATA
 async function fetchLatestDeposit() {
-  // 1. Try local storage cache first for instant feedback
-  let localData = null;
-  try {
-    localData = JSON.parse(localStorage.getItem("pendingDeposit") || localStorage.getItem("latestDeposit"));
-  } catch(e){}
+  // 1. Try URL parameters first
+  let passedData = getUrlParams();
 
-  if (localData) {
-    renderDepositDetails(localData);
+  // 2. Try sessionStorage or localStorage if URL parameters were not provided
+  if (!passedData) {
+    try {
+      passedData = JSON.parse(
+        sessionStorage.getItem("passedVerificationData") ||
+        sessionStorage.getItem("pendingDeposit") ||
+        localStorage.getItem("pendingDeposit") ||
+        localStorage.getItem("latestDeposit")
+      );
+    } catch(e){}
   }
 
-  // 2. Fetch from Firestore
+  if (passedData) {
+    renderDepositDetails(passedData);
+    return;
+  }
+
+  // 3. Fallback: Fetch from Firestore
   const userId = userData ? (userData.phone || userData.uid || userData.id) : null;
   if (userId && window._9jaCash && window._9jaCash.db) {
     try {
       let snapshot = null;
       
-      // Attempt ordered query first
       try {
         snapshot = await window._9jaCash.db.collection("deposits")
           .where("userId", "==", userId)
@@ -276,7 +300,6 @@ async function fetchLatestDeposit() {
           .get();
       } catch (indexErr) {
         console.warn("Index query failed, falling back to unordered fetch:", indexErr);
-        // Fallback if composite index is missing in Firestore
         snapshot = await window._9jaCash.db.collection("deposits")
           .where("userId", "==", userId)
           .get();
@@ -284,7 +307,6 @@ async function fetchLatestDeposit() {
 
       if (snapshot && !snapshot.empty) {
         let docs = snapshot.docs.map(doc => doc.data());
-        // Sort manually by createdAt if multiple returned
         docs.sort((a, b) => {
           let timeA = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
           let timeB = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
@@ -299,13 +321,11 @@ async function fetchLatestDeposit() {
     }
   }
 
-  // If no Firestore or local storage record found
-  if (!localData) {
-    document.getElementById("amountDisplay").textContent = "€0.00";
-    document.getElementById("planDisplay").textContent = "Deposit Payment";
-    document.getElementById("methodDisplay").textContent = "Bank Transfer";
-    document.getElementById("dateDisplay").textContent = new Date().toLocaleString();
-  }
+  // Default state if no data found anywhere
+  document.getElementById("amountDisplay").textContent = "€0.00";
+  document.getElementById("planDisplay").textContent = "Deposit Payment";
+  document.getElementById("methodDisplay").textContent = "BANK TRANSFER";
+  document.getElementById("dateDisplay").textContent = new Date().toLocaleString();
 }
 
 // SWITCH TO SUCCESS STATUS
