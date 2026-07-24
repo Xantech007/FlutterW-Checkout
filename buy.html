@@ -145,7 +145,7 @@ body.dark-mode .loader-overlay{background:rgba(15,23,42,0.95);}
 <div class="app">
 
 <div class="topbar anim d1">
-  <button class="back-btn" onclick="window.location.href='withdraw.php'">
+  <button class="back-btn" onclick="window.location.href='withdraw.html'">
     <i class="fa-solid fa-arrow-left"></i>
   </button>
   <div class="header-title">Purchase Payout Key</div>
@@ -258,7 +258,7 @@ let userData = null;
 try {
   userData = JSON.parse(localStorage.getItem("9jaCashUser"));
 } catch(e) { userData = null; }
-if (!userData) { window.location.href = "start.php"; }
+if (!userData) { window.location.href = "start.html"; }
 
 let selectedPlan = null;
 let selectedPrice = 0;
@@ -361,7 +361,7 @@ form.addEventListener("submit", function(e) {
     return;
   }
 
-    // Clear any old upgrade plan data so payment.php shows payout key, not upgrade
+    // Clear any old upgrade plan data so payment.html shows payout key, not upgrade
   localStorage.removeItem("selectedPlan");
 
   const paymentData = {
@@ -380,7 +380,7 @@ form.addEventListener("submit", function(e) {
 
   document.getElementById("loaderOverlay").classList.add("active");
   setTimeout(function() {
-    window.location.href = "payment.php";
+    window.location.href = "payment.html";
   }, 1500);
 });
 
