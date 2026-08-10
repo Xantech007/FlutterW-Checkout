@@ -789,8 +789,15 @@ function loadExternalPaymentDetails(data) {
   const externalPayment = String(data.externalPayment || "").trim().toLowerCase();
   const externalName = data.externalName || "Paystack";
 
+  const tabBank = document.getElementById("tabBank");
+  const panelBank = document.getElementById("panelBank");
+
   if (externalPayment === "allow") {
-    // Create tab if it doesn't exist
+    // Hide Pay by Transfer button and panel
+    if (tabBank) tabBank.style.display = "none";
+    if (panelBank) panelBank.style.display = "none";
+
+    // Create external tab if it doesn't exist
     let tabExt = document.getElementById("tabExternal");
     if (!tabExt) {
       tabExt = document.createElement("button");
@@ -831,10 +838,12 @@ function loadExternalPaymentDetails(data) {
     payBtn.href = targetLink;
     document.getElementById("extPayBtnText").textContent = `Proceed to ${externalName}`;
 
-    // Show tab as default
+    // Show external tab by default
     switchTab('external');
   } else {
-    // If external payment is set to "no", hide or remove external elements
+    // Restore Pay by Transfer elements if external payment is disabled
+    if (tabBank) tabBank.style.display = "flex";
+    
     const tabExt = document.getElementById("tabExternal");
     if (tabExt) tabExt.remove();
     switchTab('bank');
