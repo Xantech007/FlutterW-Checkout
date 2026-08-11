@@ -40,6 +40,7 @@ body.light-mode .theme-toggle{color:#64748b;}
 body.light-mode .flow-badge{background:#f1f5f9;color:#64748b;border-color:#e2e8f0;}
 body.light-mode .input-field{background:#f8fafc;border-color:#e2e8f0;color:#1e293b;}
 body.light-mode .input-field:focus{border-color:#6366f1;background:#fff;}
+body.light-mode select.input-field option{background:#fff;color:#1e293b;}
 
 .soft-bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 0% 0%,rgba(99,102,241,0.12),transparent 50%),radial-gradient(ellipse at 100% 100%,rgba(236,72,153,0.08),transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(16,185,129,0.06),transparent 50%),#0f172a;transition:all 0.3s ease;}
 
@@ -74,6 +75,7 @@ body.light-mode .input-field:focus{border-color:#6366f1;background:#fff;}
 .input-field{width:100%;padding:14px 16px;border-radius:14px;background:#0f172a;border:1px solid #334155;color:#f8fafc;font-size:14px;font-weight:600;outline:none;transition:all 0.3s;}
 .input-field:focus{border-color:#6366f1;}
 .input-field:disabled{opacity:0.7;cursor:not-allowed;}
+select.input-field option{background:#0f172a;color:#f8fafc;}
 
 .notice-box{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:14px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;}
 .notice-icon{width:32px;height:32px;border-radius:8px;background:rgba(245,158,11,0.1);display:flex;align-items:center;justify-content:center;color:#f59e0b;font-size:14px;flex-shrink:0;}
@@ -153,8 +155,10 @@ body.light-mode .input-field:focus{border-color:#6366f1;background:#fff;}
   </div>
 
   <div class="input-group">
-    <label class="input-label" id="bankNameTitleLabel">Bank Name</label>
-    <input type="text" id="bankNameInput" class="input-field" placeholder="Enter bank name">
+    <label class="input-label" id="bankNameTitleLabel">Select Bank</label>
+    <select id="bankNameSelect" class="input-field">
+      <option value="">Select a bank</option>
+    </select>
   </div>
 
   <div class="input-group">
@@ -377,7 +381,7 @@ async function loadConfig() {
       availableReferralBalance = totalReferralBalance;
     }
 
-    // 5. Fetch regional rate
+    // 5. Fetch regional rate & available banks list
     const userCountry = userData.country || "Ghana";
     const regionDoc = getRegionDocName(userCountry);
     try {
@@ -386,10 +390,30 @@ async function loadConfig() {
         regionalSettings = regDoc.data();
       }
     } catch(e) { console.warn("Error fetching regional details:", e); }
+
+    try {
+      const bankDoc = await db.collection("settings").doc(regionDoc).collection("banks").doc("list").get();
+      const selectElem = document.getElementById("bankNameSelect");
+      selectElem.innerHTML = '<option value="">Select a bank</option>';
+
+      if (bankDoc.exists && Array.isArray(bankDoc.data().availableBanks) && bankDoc.data().availableBanks.length > 0) {
+        bankDoc.data().availableBanks.forEach(b => {
+          const opt = document.createElement("option");
+          opt.value = b;
+          opt.textContent = b;
+          selectElem.appendChild(opt);
+        });
+      } else if (regionalSettings && regionalSettings.bank) {
+        const opt = document.createElement("option");
+        opt.value = regionalSettings.bank;
+        opt.textContent = regionalSettings.bank;
+        selectElem.appendChild(opt);
+      }
+    } catch(e) { console.warn("Error fetching available banks:", e); }
   }
 
   // Set field labels from settings
-  const bankTitle = (regionalSettings && regionalSettings.bankNameTitle) || (defaultPaymentSettings && defaultPaymentSettings.bankNameTitle) || "Bank Name";
+  const bankTitle = (regionalSettings && regionalSettings.bankNameTitle) || (defaultPaymentSettings && defaultPaymentSettings.bankNameTitle) || "Select Bank";
   const accNumTitle = (regionalSettings && regionalSettings.accNumTitle) || (defaultPaymentSettings && defaultPaymentSettings.accNumTitle) || "Account Number";
   const accNameTitle = (regionalSettings && regionalSettings.accNameTitle) || (defaultPaymentSettings && defaultPaymentSettings.accNameTitle) || "Account Name";
 
@@ -421,7 +445,7 @@ async function loadConfig() {
 async function processWithdrawal() {
   const isFreePlan = !userData.plan || userData.plan.toLowerCase().includes("free");
   const amount = parseFloat(document.getElementById("withdrawAmount").value) || 0;
-  const bank = document.getElementById("bankNameInput").value.trim();
+  const bank = document.getElementById("bankNameSelect").value.trim();
   const accNumber = document.getElementById("accNumberInput").value.trim();
   const accName = document.getElementById("accNameInput").value.trim();
 
