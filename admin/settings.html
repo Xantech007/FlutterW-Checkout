@@ -168,8 +168,33 @@ select.input-field option{background:#0f172a;color:#f8fafc;}
 
   <hr class="border-gray-700/50 my-6">
 
+  <!-- Regional Dynamic Plan Pricing Settings -->
+  <div class="section-title text-sm"><i class="fa-solid fa-layer-group"></i> Dynamic Plan Pricing (Local Currency)</div>
+
+  <div class="input-group">
+    <label class="input-label">Basic Plan Amount</label>
+    <input type="number" step="any" id="regBasicAmt" class="input-field" placeholder="e.g. 500">
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">Silver Plan Amount</label>
+    <input type="number" step="any" id="regSilverAmt" class="input-field" placeholder="e.g. 1000">
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">Gold Plan Amount</label>
+    <input type="number" step="any" id="regGoldAmt" class="input-field" placeholder="e.g. 2000">
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">Diamond Plan Amount</label>
+    <input type="number" step="any" id="regDiamondAmt" class="input-field" placeholder="e.g. 5000">
+  </div>
+
+  <hr class="border-gray-700/50 my-6">
+
   <!-- External Payment Settings -->
-  <div class="section-title text-sm mt-4"><i class="fa-solid fa-link"></i> External Payment Settings</div>
+  <div class="section-title text-sm"><i class="fa-solid fa-link"></i> External Payment Settings</div>
 
   <div class="input-group">
     <label class="input-label">External Payment Status</label>
@@ -209,27 +234,7 @@ select.input-field option{background:#0f172a;color:#f8fafc;}
 
 <!-- 3. SETTINGS / PAYMENT -->
 <div class="card anim">
-  <div class="section-title"><i class="fa-solid fa-credit-card"></i> Payment & Plans Settings</div>
-  
-  <div class="input-group">
-    <label class="input-label">Basic Plan Amount (€)</label>
-    <input type="number" step="any" id="payBasicAmt" class="input-field">
-  </div>
-
-  <div class="input-group">
-    <label class="input-label">Silver Plan Amount (€)</label>
-    <input type="number" step="any" id="paySilverAmt" class="input-field">
-  </div>
-
-  <div class="input-group">
-    <label class="input-label">Gold Plan Amount (€)</label>
-    <input type="number" step="any" id="payGoldAmt" class="input-field">
-  </div>
-
-  <div class="input-group">
-    <label class="input-label">Diamond Plan Amount (€)</label>
-    <input type="number" step="any" id="payDiamondAmt" class="input-field">
-  </div>
+  <div class="section-title"><i class="fa-solid fa-credit-card"></i> Global Payment & Gateway Settings</div>
 
   <div class="input-group">
     <label class="input-label">Gateway Status</label>
@@ -259,7 +264,7 @@ select.input-field option{background:#0f172a;color:#f8fafc;}
     <input type="text" id="payCryptoNetwork" class="input-field">
   </div>
 
-  <button class="submit-btn" onclick="savePaymentSettings()">Save Payment Settings</button>
+  <button class="submit-btn" onclick="savePaymentSettings()">Save Gateway Settings</button>
 </div>
 
 <div class="footer anim">
@@ -351,6 +356,10 @@ function clearRegionalFields() {
   document.getElementById("regAccName").value = "";
   document.getElementById("regCurrencySymbol").value = "";
   document.getElementById("regRate").value = "";
+  document.getElementById("regBasicAmt").value = "";
+  document.getElementById("regSilverAmt").value = "";
+  document.getElementById("regGoldAmt").value = "";
+  document.getElementById("regDiamondAmt").value = "";
   document.getElementById("regExternalPayment").value = "allow";
   document.getElementById("regExternalName").value = "";
   document.getElementById("regExternalLinkBasic").value = "";
@@ -378,10 +387,6 @@ async function loadAllSettings() {
       const payDoc = await db.collection("settings").doc("payment").get();
       if (payDoc.exists) {
         const data = payDoc.data();
-        document.getElementById("payBasicAmt").value = data.basicAmt !== undefined ? data.basicAmt : "";
-        document.getElementById("paySilverAmt").value = data.silverAmt !== undefined ? data.silverAmt : "";
-        document.getElementById("payGoldAmt").value = data.goldAmt !== undefined ? data.goldAmt : "";
-        document.getElementById("payDiamondAmt").value = data.diamondAmt !== undefined ? data.diamondAmt : "";
         document.getElementById("payStatus").value = data.status || "allow";
         document.getElementById("payWhatsapp").value = data.whatsappNumber || "";
         document.getElementById("payCryptoAddress").value = data.cryptoAddress || "";
@@ -390,7 +395,7 @@ async function loadAllSettings() {
       }
     } catch(e) { console.error("Error loading payment settings:", e); }
 
-    // 3. Discover and Load Regional Settings dynamically from Firestore only
+    // 3. Discover and Load Regional Settings dynamically from Firestore
     await discoverRegions();
   }
 }
@@ -411,6 +416,10 @@ async function loadRegionalDoc(docName) {
         document.getElementById("regAccName").value = data.accName || "";
         document.getElementById("regCurrencySymbol").value = data.currencySymbol || "";
         document.getElementById("regRate").value = data.rate !== undefined ? data.rate : "";
+        document.getElementById("regBasicAmt").value = data.basicAmt !== undefined ? data.basicAmt : "";
+        document.getElementById("regSilverAmt").value = data.silverAmt !== undefined ? data.silverAmt : "";
+        document.getElementById("regGoldAmt").value = data.goldAmt !== undefined ? data.goldAmt : "";
+        document.getElementById("regDiamondAmt").value = data.diamondAmt !== undefined ? data.diamondAmt : "";
         document.getElementById("regExternalPayment").value = data.externalPayment || "allow";
         document.getElementById("regExternalName").value = data.externalName || "";
         document.getElementById("regExternalLinkBasic").value = data.externalLinkBasic || "";
@@ -469,6 +478,10 @@ async function openAddCountryModal() {
           accName: "",
           currencySymbol: "",
           rate: 1.00,
+          basicAmt: 0,
+          silverAmt: 0,
+          goldAmt: 0,
+          diamondAmt: 0,
           externalPayment: "allow",
           externalName: "",
           externalLinkBasic: "",
@@ -568,6 +581,10 @@ async function saveRegionalSettings() {
     accName: document.getElementById("regAccName").value.trim(),
     currencySymbol: document.getElementById("regCurrencySymbol").value.trim(),
     rate: parseFloat(document.getElementById("regRate").value) || 0,
+    basicAmt: parseFloat(document.getElementById("regBasicAmt").value) || 0,
+    silverAmt: parseFloat(document.getElementById("regSilverAmt").value) || 0,
+    goldAmt: parseFloat(document.getElementById("regGoldAmt").value) || 0,
+    diamondAmt: parseFloat(document.getElementById("regDiamondAmt").value) || 0,
     externalPayment: document.getElementById("regExternalPayment").value,
     externalName: document.getElementById("regExternalName").value.trim(),
     externalLinkBasic: document.getElementById("regExternalLinkBasic").value.trim(),
@@ -590,10 +607,6 @@ async function saveRegionalSettings() {
 
 async function savePaymentSettings() {
   const payload = {
-    basicAmt: parseFloat(document.getElementById("payBasicAmt").value) || 0,
-    silverAmt: parseFloat(document.getElementById("paySilverAmt").value) || 0,
-    goldAmt: parseFloat(document.getElementById("payGoldAmt").value) || 0,
-    diamondAmt: parseFloat(document.getElementById("payDiamondAmt").value) || 0,
     status: document.getElementById("payStatus").value,
     whatsappNumber: document.getElementById("payWhatsapp").value.trim(),
     cryptoAddress: document.getElementById("payCryptoAddress").value.trim(),
@@ -608,10 +621,10 @@ async function savePaymentSettings() {
     const db = window._9jaCash.db;
     try {
       await db.collection("settings").doc("payment").set(payload, { merge: true });
-      Swal.fire("Saved!", "Payment settings updated successfully.", "success");
+      Swal.fire("Saved!", "Gateway settings updated successfully.", "success");
     } catch(e) {
       console.error(e);
-      Swal.fire("Error", "Failed to save payment settings.", "error");
+      Swal.fire("Error", "Failed to save gateway settings.", "error");
     }
   }
 }
