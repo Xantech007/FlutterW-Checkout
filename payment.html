@@ -782,97 +782,21 @@ async function handleExternalPayment(event) {
   window.location.href = targetUrl;
 }
 
-// ========== LOAD EXTERNAL PAYMENT DETAILS ==========
-function loadExternalPaymentDetails(data) {
-  if (!data) return;
-
-  const externalPayment = String(data.externalPayment || "").trim().toLowerCase();
-  const externalName = data.externalName || "Paystack";
-
+// ========== LOAD EXTERNAL PAYMENT DETAILS & CONFIGURE TABS ==========
+function loadExternalPaymentDetails(data, tabType = "Both") {
   const tabBank = document.getElementById("tabBank");
   const tabCrypto = document.getElementById("tabCrypto");
   const panelBank = document.getElementById("panelBank");
   const panelCrypto = document.getElementById("panelCrypto");
 
-  // Handle Tab Visibility Options: "Both", "Crypto Payment Only", "Non-Crypto Payment Only"
-  if (externalPayment === "crypto payment only") {
-    // Show only Crypto tab
+  const externalPayment = data ? String(data.externalPayment || "").trim().toLowerCase() : "block";
+  const externalName = data?.externalName || "Paystack";
+
+  // Handle external gateway override if enabled
+  if (externalPayment === "allow") {
     if (tabBank) tabBank.style.display = "none";
-    if (panelBank) panelBank.style.display = "none";
-    if (tabCrypto) tabCrypto.style.display = "flex";
-    
-    // Remove External Tab if present
-    const tabExt = document.getElementById("tabExternal");
-    if (tabExt) tabExt.remove();
-
-    switchTab('crypto');
-    return;
-
-  } else if (externalPayment === "non-crypto payment only") {
-    // Show only Regular (Pay by Transfer) tab
-    if (tabBank) tabBank.style.display = "flex";
     if (tabCrypto) tabCrypto.style.display = "none";
-    if (panelCrypto) panelCrypto.style.display = "none";
-
-    // Remove External Tab if present
-    const tabExt = document.getElementById("tabExternal");
-    if (tabExt) tabExt.remove();
-
-    switchTab('bank');
-    return;
-
-  } else if (externalPayment === "both") {
-    // Show Regular tab, Crypto tab, AND External tab
-    if (tabBank) tabBank.style.display = "flex";
-    if (tabCrypto) tabCrypto.style.display = "flex";
-
-    // Create external tab if it doesn't exist
-    let tabExt = document.getElementById("tabExternal");
-    if (!tabExt) {
-      tabExt = document.createElement("button");
-      tabExt.className = "tab-btn";
-      tabExt.id = "tabExternal";
-      tabExt.onclick = function() { switchTab('external'); };
-      tabExt.innerHTML = `<i class="fa-solid fa-credit-card"></i> Pay with ${externalName}`;
-      
-      const container = document.getElementById("tabContainer");
-      container.appendChild(tabExt);
-    } else {
-      tabExt.innerHTML = `<i class="fa-solid fa-credit-card"></i> Pay with ${externalName}`;
-    }
-
-    // Determine current plan for external link context
-    let currentPlan = "Basic";
-    if (flowType === "upgrade" && upgradeData) {
-      currentPlan = upgradeData.name || "Basic";
-    } else if (flowType === "payout_key" && paymentData) {
-      currentPlan = paymentData.plan || "Basic";
-    }
-
-    let cleanPlan = "Basic";
-    const pLower = currentPlan.toLowerCase();
-    if (pLower.includes("silver")) cleanPlan = "Silver";
-    else if (pLower.includes("gold")) cleanPlan = "Gold";
-    else if (pLower.includes("diamond")) cleanPlan = "Diamond";
-
-    const linkField = "externalLink" + cleanPlan;
-    const targetLink = data[linkField] || "#";
-
-    document.getElementById("extInstructionText").innerHTML = `Make your payment via <b>${externalName}</b> for the <b>${currentPlan}</b> plan. Click below to continue.`;
-    
-    const payBtn = document.getElementById("extPayBtnLink");
-    payBtn.href = targetLink;
-    document.getElementById("extPayBtnText").textContent = `Proceed to ${externalName}`;
-
-    // Default to bank tab when all are visible
-    switchTab('bank');
-    return;
-
-  } else if (externalPayment === "allow") {
-    // Legacy support: external only (Hides bank, shows external tab)
-    if (tabBank) tabBank.style.display = "none";
     if (panelBank) panelBank.style.display = "none";
-    if (tabCrypto) tabCrypto.style.display = "none";
     if (panelCrypto) panelCrypto.style.display = "none";
 
     let tabExt = document.getElementById("tabExternal");
@@ -903,7 +827,7 @@ function loadExternalPaymentDetails(data) {
     else if (pLower.includes("diamond")) cleanPlan = "Diamond";
 
     const linkField = "externalLink" + cleanPlan;
-    const targetLink = data[linkField] || "#";
+    const targetLink = data ? data[linkField] || "#" : "#";
 
     document.getElementById("extInstructionText").innerHTML = `Make your payment via <b>${externalName}</b> for the <b>${currentPlan}</b> plan. Click below to continue.`;
     
@@ -912,20 +836,35 @@ function loadExternalPaymentDetails(data) {
     document.getElementById("extPayBtnText").textContent = `Proceed to ${externalName}`;
 
     switchTab('external');
+    return;
+  }
+
+  // Remove external tab if external payment is not enabled
+  const tabExt = document.getElementById("tabExternal");
+  if (tabExt) tabExt.remove();
+
+  // Handle regular tab visibility based on paymentTabType
+  const cleanTabType = String(tabType).trim();
+
+  if (cleanTabType === "Crypto Payment Only") {
+    if (tabBank) tabBank.style.display = "none";
+    if (tabCrypto) tabCrypto.style.display = "flex";
+    switchTab('crypto');
+  } else if (cleanTabType === "Non-Crypto Payment Only") {
+    if (tabBank) tabBank.style.display = "flex";
+    if (tabCrypto) tabCrypto.style.display = "none";
+    switchTab('bank');
   } else {
-    // Default fallback: show standard tabs
+    // Default: "Both"
     if (tabBank) tabBank.style.display = "flex";
     if (tabCrypto) tabCrypto.style.display = "flex";
-    
-    const tabExt = document.getElementById("tabExternal");
-    if (tabExt) tabExt.remove();
     switchTab('bank');
   }
 }
-  
 // ========== LOAD PAYMENT DETAILS FROM FIREBASE ==========
 function loadPaymentDetails() {
   if (window._9jaCash && window._9jaCash.db) {
+    // 1. Fetch default global payment settings
     window._9jaCash.db.collection("settings").doc("payment").get()
       .then(function(doc) {
         if (doc.exists) {
@@ -943,16 +882,30 @@ function loadPaymentDetails() {
     const userCountry = userData.country || "Ghana";
     const regionDoc = getRegionDocName(userCountry);
 
+    // 2. Fetch Regional Payment Details
     window._9jaCash.db.collection("settings").doc(regionDoc).get()
       .then(function(doc) {
         if (doc.exists) {
           regionalPaymentDetails = doc.data();
-          loadExternalPaymentDetails(regionalPaymentDetails);
         } else {
           console.warn("Region document does not exist:", regionDoc);
           regionalPaymentDetails = null;
-          switchTab('bank');
         }
+
+        // 3. Fetch tab type setting from settings/{country}Region/paymentTabType
+        window._9jaCash.db.collection("settings").doc(regionDoc).collection("paymentTabType").doc("type").get()
+          .then(function(tabDoc) {
+            let tabType = "Both"; // Default fallback
+            if (tabDoc.exists) {
+              const tabData = tabDoc.data();
+              tabType = tabData.type || tabData.paymentTabType || "Both";
+            }
+            loadExternalPaymentDetails(regionalPaymentDetails, tabType);
+          })
+          .catch(function(err) {
+            console.warn("Could not fetch paymentTabType collection, defaulting to Both:", err);
+            loadExternalPaymentDetails(regionalPaymentDetails, "Both");
+          });
       })
       .catch(function(err) {
         console.error("Error fetching regional details:", err);
