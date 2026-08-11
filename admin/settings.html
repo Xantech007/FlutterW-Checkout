@@ -72,6 +72,9 @@ select.input-field option{background:#0f172a;color:#f8fafc;}
 .add-region-btn{padding:10px 16px;border-radius:10px;background:#1e293b;border:1px dashed #6366f1;color:#818cf8;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;gap:6px;}
 .add-region-btn:hover{background:rgba(99,102,241,0.1);}
 
+.secondary-btn{width:100%;padding:14px;border-radius:14px;background:#0f172a;border:1px solid #6366f1;color:#818cf8;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.secondary-btn:hover{background:rgba(99,102,241,0.1);}
+
 .submit-btn{width:100%;padding:16px;border-radius:16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:15px;font-weight:800;border:none;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 20px rgba(99,102,241,0.3);margin-top:8px;}
 .submit-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(99,102,241,0.4);}
 
@@ -143,6 +146,13 @@ select.input-field option{background:#0f172a;color:#f8fafc;}
   <div class="input-group">
     <label class="input-label" id="lblBank">Bank / Provider</label>
     <input type="text" id="regBank" class="input-field">
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">Available Banks</label>
+    <button class="secondary-btn" onclick="openAvailableBanksModal()">
+      <i class="fa-solid fa-building-columns"></i> Manage Available Banks
+    </button>
   </div>
 
   <div class="input-group">
@@ -319,7 +329,6 @@ async function discoverRegions() {
     }
   }
 
-  // If no regions found, default to an empty state or keep current selection blank
   if (existingCountries.length > 0) {
     if (!existingCountries.some(c => c.docId === currentRegionDoc)) {
       currentRegionDoc = existingCountries[0].docId;
@@ -449,6 +458,73 @@ function switchRegion(docName, countryName) {
   currentCountryName = countryName;
   renderRegionButtons();
   loadRegionalDoc(docName);
+}
+
+async function openAvailableBanksModal() {
+  if (!currentRegionDoc) {
+    Swal.fire("Error", "Please select or add a region first.", "error");
+    return;
+  }
+
+  const isLight = document.body.classList.contains("light-mode");
+  let currentBanksText = "";
+
+  if (window._9jaCash && window._9jaCash.db) {
+    try {
+      const bankDoc = await window._9jaCash.db
+        .collection("settings")
+        .doc(currentRegionDoc)
+        .collection("banks")
+        .doc("list")
+        .get();
+
+      if (bankDoc.exists && Array.isArray(bankDoc.data().availableBanks)) {
+        currentBanksText = bankDoc.data().availableBanks.join("\n");
+      }
+    } catch(e) {
+      console.error("Error fetching existing banks:", e);
+    }
+  }
+
+  const { value: textInput } = await Swal.fire({
+    title: `Available Banks (${currentCountryName})`,
+    background: isLight ? "#fff" : "#1e293b",
+    color: isLight ? "#1e293b" : "#f8fafc",
+    input: 'textarea',
+    inputValue: currentBanksText,
+    inputPlaceholder: "Enter each bank name on a new line, e.g.:\nAccess Bank\nFirst Bank\nZenith Bank",
+    showCancelButton: true,
+    confirmButtonColor: '#6366f1',
+    cancelButtonColor: '#64748b',
+    confirmButtonText: 'Save Banks',
+    inputAttributes: {
+      rows: '8',
+      style: `font-family: inherit; font-size: 14px; background: ${isLight ? '#f8fafc' : '#0f172a'}; color: ${isLight ? '#1e293b' : '#f8fafc'}; border: 1px solid #334155; border-radius: 10px; padding: 12px;`
+    }
+  });
+
+  if (textInput !== undefined) {
+    const banksArray = textInput
+      .split("\n")
+      .map(b => b.trim())
+      .filter(b => b.length > 0);
+
+    if (window._9jaCash && window._9jaCash.db) {
+      try {
+        await window._9jaCash.db
+          .collection("settings")
+          .doc(currentRegionDoc)
+          .collection("banks")
+          .doc("list")
+          .set({ availableBanks: banksArray }, { merge: true });
+
+        Swal.fire("Saved!", `Available banks for ${currentCountryName} updated successfully.`, "success");
+      } catch(e) {
+        console.error("Error saving banks:", e);
+        Swal.fire("Error", "Failed to save available banks.", "error");
+      }
+    }
+  }
 }
 
 async function openAddCountryModal() {
