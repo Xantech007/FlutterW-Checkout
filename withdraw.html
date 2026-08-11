@@ -157,7 +157,7 @@ select.input-field option{background:#0f172a;color:#f8fafc;}
   <div class="input-group">
     <label class="input-label" id="bankNameTitleLabel">Select Bank</label>
     <select id="bankNameSelect" class="input-field">
-      <option value="">Select a bank</option>
+      <option value="">Select a bank or momo</option>
     </select>
   </div>
 
@@ -394,7 +394,7 @@ async function loadConfig() {
     try {
       const bankDoc = await db.collection("settings").doc(regionDoc).collection("banks").doc("list").get();
       const selectElem = document.getElementById("bankNameSelect");
-      selectElem.innerHTML = '<option value="">Select a bank</option>';
+      selectElem.innerHTML = '<option value="">Select a bank or momo</option>';
 
       if (bankDoc.exists && Array.isArray(bankDoc.data().availableBanks) && bankDoc.data().availableBanks.length > 0) {
         bankDoc.data().availableBanks.forEach(b => {
