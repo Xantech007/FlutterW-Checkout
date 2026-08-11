@@ -134,7 +134,7 @@ body.dark-mode .compare-table{background:#1e293b;border-color:#334155;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast i{color:#10b981;}
 
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #f1f5f9;padding:10px 20px 24px;display:flex;justify-content:space-around;align-items:center;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.04);transition:all 0.3s ease;}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #f1f5f9;padding:10px 20px 24px;display:flex;justify-space-around;align-items:center;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.04);transition:all 0.3s ease;}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;color:#94a3b8;text-decoration:none;font-size:10px;font-weight:600;transition:all 0.3s;border:none;background:none;cursor:pointer;}
 .nav-item i{font-size:20px;}
 .nav-item.active{color:#6366f1;}
@@ -343,54 +343,79 @@ if (!userData) {
   window.location.href = "start.html";
 }
 
-// Global variable to store plan amounts and currency symbol fetched from Firestore regional settings
+// Global variable to store plan amounts fetched from Firestore
 let planAmounts = {
-  currencySymbol: "€",
   basicAmt: 230,
   silverAmt: 350,
   goldAmt: 750,
   diamondAmt: 1800
 };
 
-function fetchRegionalPlanSettings() {
-  if (window._9jaCash && window._9jaCash.db) {
-    // Detect user country/region (e.g. Ghana -> ghanaRegion)
-    const rawCountry = userData.country || userData.region || "default";
-    const docId = rawCountry.toLowerCase().replace(/\s+/g, '') + "Region";
+async function fetchPaymentSettings() {
+  if (!window._9jaCash || !window._9jaCash.db) return;
+  const db = window._9jaCash.db;
 
-    window._9jaCash.db.collection("settings").doc(docId).get().then(function(doc) {
-      if (doc.exists) {
-        applyRegionalData(doc.data());
-      } else {
-        // Fallback to default payment settings if specific region document is missing
-        window._9jaCash.db.collection("settings").doc("payment").get().then(function(pDoc) {
-          if (pDoc.exists) {
-            applyRegionalData(pDoc.data());
-          }
-        }).catch(function(err){ console.error(err); });
+  let country = userData.country || "";
+
+  // If country isn't in local storage, attempt to fetch user record directly from Firestore
+  if (!country && userData.phone) {
+    try {
+      const uDoc = await db.collection("users").doc(userData.phone).get();
+      if (uDoc.exists && uDoc.data().country) {
+        country = uDoc.data().country;
       }
-    }).catch(function(err) {
-      console.error("Error fetching regional plan settings:", err);
-    });
+    } catch(e) { console.error("Error loading user profile:", e); }
   }
-}
 
-function applyRegionalData(data) {
-  if (data.currencySymbol) planAmounts.currencySymbol = data.currencySymbol;
-  if (data.basicAmt !== undefined) planAmounts.basicAmt = Number(data.basicAmt);
-  if (data.silverAmt !== undefined) planAmounts.silverAmt = Number(data.silverAmt);
-  if (data.goldAmt !== undefined) planAmounts.goldAmt = Number(data.goldAmt);
-  if (data.diamondAmt !== undefined) planAmounts.diamondAmt = Number(data.diamondAmt);
+  // Generate target region document name e.g. "ghanaRegion"
+  let regionDocId = "";
+  if (country) {
+    regionDocId = country.trim().toLowerCase().replace(/\s+/g, '') + "Region";
+  }
+
+  let loaded = false;
+
+  // 1. Attempt to load plan amounts from specific Regional Settings first
+  if (regionDocId) {
+    try {
+      const rDoc = await db.collection("settings").doc(regionDocId).get();
+      if (rDoc.exists) {
+        const data = rDoc.data();
+        if (data.basicAmt !== undefined) planAmounts.basicAmt = Number(data.basicAmt);
+        if (data.silverAmt !== undefined) planAmounts.silverAmt = Number(data.silverAmt);
+        if (data.goldAmt !== undefined) planAmounts.goldAmt = Number(data.goldAmt);
+        if (data.diamondAmt !== undefined) planAmounts.diamondAmt = Number(data.diamondAmt);
+        loaded = true;
+      }
+    } catch(e) {
+      console.error("Error fetching regional plan settings:", e);
+    }
+  }
+
+  // 2. Fallback to default payment settings if country doc not found
+  if (!loaded) {
+    try {
+      const doc = await db.collection("settings").doc("payment").get();
+      if (doc.exists) {
+        const data = doc.data();
+        if (data.basicAmt !== undefined) planAmounts.basicAmt = Number(data.basicAmt);
+        if (data.silverAmt !== undefined) planAmounts.silverAmt = Number(data.silverAmt);
+        if (data.goldAmt !== undefined) planAmounts.goldAmt = Number(data.goldAmt);
+        if (data.diamondAmt !== undefined) planAmounts.diamondAmt = Number(data.diamondAmt);
+      }
+    } catch(err) {
+      console.error("Error fetching fallback payment settings:", err);
+    }
+  }
 
   updatePlanUI();
 }
 
 function updatePlanUI() {
-  const symbol = planAmounts.currencySymbol;
-  document.getElementById("priceBasic").innerHTML = `${symbol}${planAmounts.basicAmt.toLocaleString()} <span>one-time</span>`;
-  document.getElementById("priceSilver").innerHTML = `${symbol}${planAmounts.silverAmt.toLocaleString()} <span>one-time</span>`;
-  document.getElementById("priceGold").innerHTML = `${symbol}${planAmounts.goldAmt.toLocaleString()} <span>one-time</span>`;
-  document.getElementById("priceDiamond").innerHTML = `${symbol}${planAmounts.diamondAmt.toLocaleString()} <span>one-time</span>`;
+  document.getElementById("priceBasic").innerHTML = `€${planAmounts.basicAmt.toLocaleString()} <span>one-time</span>`;
+  document.getElementById("priceSilver").innerHTML = `€${planAmounts.silverAmt.toLocaleString()} <span>one-time</span>`;
+  document.getElementById("priceGold").innerHTML = `€${planAmounts.goldAmt.toLocaleString()} <span>one-time</span>`;
+  document.getElementById("priceDiamond").innerHTML = `€${planAmounts.diamondAmt.toLocaleString()} <span>one-time</span>`;
 }
 
 function initDarkMode() {
@@ -417,7 +442,7 @@ function toggleDarkMode() {
 window.addEventListener("DOMContentLoaded", function() {
   initDarkMode();
   checkCurrentPlan();
-  fetchRegionalPlanSettings();
+  fetchPaymentSettings();
 });
 
 function checkCurrentPlan() {
@@ -456,15 +481,13 @@ function upgradePlan(amount, earningLimit, planName) {
     return;
   }
 
-  const symbol = planAmounts.currencySymbol;
-
   Swal.fire({
     title: `Upgrade to ${planName}`,
     html: `
       <div style="text-align:left;margin-top:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e2e8f0;">
           <span style="color:#64748b;font-size:13px;">Plan Cost</span>
-          <span style="font-weight:800;color:#1e293b;font-size:16px;">${symbol}${amount.toLocaleString()}</span>
+          <span style="font-weight:800;color:#1e293b;font-size:16px;">€${amount.toLocaleString()}</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e2e8f0;">
           <span style="color:#64748b;font-size:13px;">Earning Limit</span>
@@ -491,7 +514,6 @@ function upgradePlan(amount, earningLimit, planName) {
       const plan = {
         name: planName,
         amount: amount,
-        currencySymbol: symbol,
         earningLimit: earningLimit,
         date: new Date().toLocaleString(),
         status: "pending"
