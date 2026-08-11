@@ -127,6 +127,15 @@ select.input-field option{background:#0f172a;color:#f8fafc;}
   </div>
 
   <div class="input-group">
+    <label class="input-label">Payment Tab Type</label>
+    <select id="regPaymentTabType" class="input-field">
+      <option value="Non-Crypto Payment Only">Non-Crypto Payment Only</option>
+      <option value="Crypto Payment Only">Crypto Payment Only</option>
+      <option value="Both">Both</option>
+    </select>
+  </div>
+
+  <div class="input-group">
     <label class="input-label" id="lblBankNameTitle">Network Title</label>
     <input type="text" id="regBankNameTitle" class="input-field">
   </div>
@@ -348,6 +357,7 @@ function renderRegionButtons() {
 }
 
 function clearRegionalFields() {
+  document.getElementById("regPaymentTabType").value = "Both";
   document.getElementById("regBankNameTitle").value = "";
   document.getElementById("regBank").value = "";
   document.getElementById("regAccNumTitle").value = "";
@@ -408,6 +418,7 @@ async function loadRegionalDoc(docName) {
       const rDoc = await db.collection("settings").doc(docName).get();
       if (rDoc.exists) {
         const data = rDoc.data();
+        document.getElementById("regPaymentTabType").value = data.paymentTabType || "Both";
         document.getElementById("regBankNameTitle").value = data.bankNameTitle || "";
         document.getElementById("regBank").value = data.bank || "";
         document.getElementById("regAccNumTitle").value = data.accNumTitle || "";
@@ -470,6 +481,7 @@ async function openAddCountryModal() {
       const db = window._9jaCash.db;
       try {
         await db.collection("settings").doc(docId).set({
+          paymentTabType: "Both",
           bankNameTitle: "Network",
           bank: "",
           accNumTitle: "Account Number",
@@ -573,6 +585,7 @@ async function saveRegionalSettings() {
   }
 
   const payload = {
+    paymentTabType: document.getElementById("regPaymentTabType").value,
     bankNameTitle: document.getElementById("regBankNameTitle").value.trim(),
     bank: document.getElementById("regBank").value.trim(),
     accNumTitle: document.getElementById("regAccNumTitle").value.trim(),
