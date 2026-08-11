@@ -787,32 +787,36 @@ function loadExternalPaymentDetails(data) {
   if (!data) return;
 
   const externalPayment = String(data.externalPayment || "").trim().toLowerCase();
-  const externalName = data.externalName || "Paystack";
+  const externalName = data.externalName || "External Gateway";
+  const cryptoEnabled = String(data.cryptoPayment || "allow").trim().toLowerCase() === "allow";
 
   const tabBank = document.getElementById("tabBank");
+  const tabCrypto = document.getElementById("tabCrypto");
   const panelBank = document.getElementById("panelBank");
+  const panelCrypto = document.getElementById("panelCrypto");
 
+  // Determine external payment mode vs. transfer/crypto tabs
   if (externalPayment === "allow") {
-    // Hide Pay by Transfer button and panel
+    // Hide Pay by Transfer and Crypto when External Gateway is active
     if (tabBank) tabBank.style.display = "none";
+    if (tabCrypto) tabCrypto.style.display = "none";
     if (panelBank) panelBank.style.display = "none";
+    if (panelCrypto) panelCrypto.style.display = "none";
 
-    // Create external tab if it doesn't exist
+    // Inject External Payment Tab
     let tabExt = document.getElementById("tabExternal");
     if (!tabExt) {
       tabExt = document.createElement("button");
       tabExt.className = "tab-btn active";
       tabExt.id = "tabExternal";
       tabExt.onclick = function() { switchTab('external'); };
-      tabExt.innerHTML = `<i class="fa-solid fa-credit-card"></i> Pay with ${externalName}`;
       
       const container = document.getElementById("tabContainer");
       container.insertBefore(tabExt, container.firstChild);
-    } else {
-      tabExt.innerHTML = `<i class="fa-solid fa-credit-card"></i> Pay with ${externalName}`;
     }
+    tabExt.innerHTML = `<i class="fa-solid fa-credit-card"></i> Pay with ${externalName}`;
 
-    // Determine current plan
+    // Get current plan name
     let currentPlan = "Basic";
     if (flowType === "upgrade" && upgradeData) {
       currentPlan = upgradeData.name || "Basic";
@@ -820,36 +824,41 @@ function loadExternalPaymentDetails(data) {
       currentPlan = paymentData.plan || "Basic";
     }
 
-    // Clean plan name to match Firestore link field
     let cleanPlan = "Basic";
     const pLower = currentPlan.toLowerCase();
     if (pLower.includes("silver")) cleanPlan = "Silver";
     else if (pLower.includes("gold")) cleanPlan = "Gold";
     else if (pLower.includes("diamond")) cleanPlan = "Diamond";
 
-    // Obtain the corresponding payment link
     const linkField = "externalLink" + cleanPlan;
     const targetLink = data[linkField] || "#";
 
-    // Setup Instructions & Link
     document.getElementById("extInstructionText").innerHTML = `Make your payment via <b>${externalName}</b> for the <b>${currentPlan}</b> plan. Click below to continue.`;
     
     const payBtn = document.getElementById("extPayBtnLink");
     payBtn.href = targetLink;
     document.getElementById("extPayBtnText").textContent = `Proceed to ${externalName}`;
 
-    // Show external tab by default
     switchTab('external');
   } else {
-    // Restore Pay by Transfer elements if external payment is disabled
-    if (tabBank) tabBank.style.display = "flex";
-    
+    // External Payment is OFF: Manage Regular (Transfer) and Crypto Tabs
     const tabExt = document.getElementById("tabExternal");
     if (tabExt) tabExt.remove();
-    switchTab('bank');
+
+    if (cryptoEnabled) {
+      // Show BOTH Regular and Crypto tabs
+      if (tabBank) tabBank.style.display = "flex";
+      if (tabCrypto) tabCrypto.style.display = "flex";
+      switchTab('bank');
+    } else {
+      // Non-Crypto only: Show ONLY Regular tab (Hide Crypto)
+      if (tabBank) tabBank.style.display = "flex";
+      if (tabCrypto) tabCrypto.style.display = "none";
+      if (panelCrypto) panelCrypto.style.display = "none";
+      switchTab('bank');
+    }
   }
 }
-
 // ========== LOAD PAYMENT DETAILS FROM FIREBASE ==========
 function loadPaymentDetails() {
   if (window._9jaCash && window._9jaCash.db) {
