@@ -783,7 +783,7 @@ async function handleExternalPayment(event) {
 }
 
 // ========== LOAD EXTERNAL PAYMENT DETAILS & CONFIGURE TABS ==========
-function loadExternalPaymentDetails(data, tabType = "Both") {
+function loadExternalPaymentDetails(data) {
   const tabBank = document.getElementById("tabBank");
   const tabCrypto = document.getElementById("tabCrypto");
   const panelBank = document.getElementById("panelBank");
@@ -808,7 +808,7 @@ function loadExternalPaymentDetails(data, tabType = "Both") {
       tabExt.innerHTML = `<i class="fa-solid fa-credit-card"></i> Pay with ${externalName}`;
       
       const container = document.getElementById("tabContainer");
-      container.insertBefore(tabExt, container.firstChild);
+      if (container) container.insertBefore(tabExt, container.firstChild);
     } else {
       tabExt.innerHTML = `<i class="fa-solid fa-credit-card"></i> Pay with ${externalName}`;
     }
@@ -829,28 +829,34 @@ function loadExternalPaymentDetails(data, tabType = "Both") {
     const linkField = "externalLink" + cleanPlan;
     const targetLink = data ? data[linkField] || "#" : "#";
 
-    document.getElementById("extInstructionText").innerHTML = `Make your payment via <b>${externalName}</b> for the <b>${currentPlan}</b> plan. Click below to continue.`;
+    const instElem = document.getElementById("extInstructionText");
+    if (instElem) {
+      instElem.innerHTML = `Make your payment via <b>${externalName}</b> for the <b>${currentPlan}</b> plan. Click below to continue.`;
+    }
     
     const payBtn = document.getElementById("extPayBtnLink");
-    payBtn.href = targetLink;
-    document.getElementById("extPayBtnText").textContent = `Proceed to ${externalName}`;
+    if (payBtn) payBtn.href = targetLink;
+    
+    const payText = document.getElementById("extPayBtnText");
+    if (payText) payText.textContent = `Proceed to ${externalName}`;
 
     switchTab('external');
     return;
   }
 
-  // Remove external tab if external payment is not enabled
+  // Remove external tab if external payment is disabled
   const tabExt = document.getElementById("tabExternal");
   if (tabExt) tabExt.remove();
 
-  // Handle regular tab visibility based on paymentTabType
-  const cleanTabType = String(tabType).trim();
+  // Extract paymentTabType directly from the regional document data
+  const tabType = data ? data.paymentTabType || "Both" : "Both";
+  const cleanTabType = String(tabType).trim().toLowerCase();
 
-  if (cleanTabType === "Crypto Payment Only") {
+  if (cleanTabType.includes("crypto payment only") && !cleanTabType.includes("non-crypto")) {
     if (tabBank) tabBank.style.display = "none";
     if (tabCrypto) tabCrypto.style.display = "flex";
     switchTab('crypto');
-  } else if (cleanTabType === "Non-Crypto Payment Only") {
+  } else if (cleanTabType.includes("non-crypto")) {
     if (tabBank) tabBank.style.display = "flex";
     if (tabCrypto) tabCrypto.style.display = "none";
     switchTab('bank');
@@ -861,59 +867,45 @@ function loadExternalPaymentDetails(data, tabType = "Both") {
     switchTab('bank');
   }
 }
+
 // ========== LOAD PAYMENT DETAILS FROM FIREBASE ==========
-function loadPaymentDetails() {
-  if (window._9jaCash && window._9jaCash.db) {
-    // 1. Fetch default global payment settings
-    window._9jaCash.db.collection("settings").doc("payment").get()
-      .then(function(doc) {
-        if (doc.exists) {
-          defaultPaymentDetails = doc.data();
-        } else {
-          defaultPaymentDetails = {};
-        }
-        renderPaymentDetails();
-      })
-      .catch(function(err) {
-        console.error("Error loading default payment details:", err);
-        setFallbackDetails();
-      });
+async function loadPaymentDetails() {
+  if (!window._9jaCash || !window._9jaCash.db) {
+    setFallbackDetails();
+    switchTab('bank');
+    return;
+  }
 
-    const userCountry = userData.country || "Ghana";
-    const regionDoc = getRegionDocName(userCountry);
+  const userCountry = (typeof userData !== "undefined" && userData.country) ? userData.country : "Ghana";
+  const regionDoc = getRegionDocName(userCountry);
 
-    // 2. Fetch Regional Payment Details
-    window._9jaCash.db.collection("settings").doc(regionDoc).get()
-      .then(function(doc) {
-        if (doc.exists) {
-          regionalPaymentDetails = doc.data();
-        } else {
-          console.warn("Region document does not exist:", regionDoc);
-          regionalPaymentDetails = null;
-        }
+  try {
+    // Fetch global payment defaults and regional settings concurrently
+    const [defaultDoc, regionSnap] = await Promise.all([
+      window._9jaCash.db.collection("settings").doc("payment").get().catch(() => null),
+      window._9jaCash.db.collection("settings").doc(regionDoc).get().catch(() => null)
+    ]);
 
-        // 3. Fetch tab type setting from settings/{country}Region/paymentTabType
-        window._9jaCash.db.collection("settings").doc(regionDoc).collection("paymentTabType").doc("type").get()
-          .then(function(tabDoc) {
-            let tabType = "Both"; // Default fallback
-            if (tabDoc.exists) {
-              const tabData = tabDoc.data();
-              tabType = tabData.type || tabData.paymentTabType || "Both";
-            }
-            loadExternalPaymentDetails(regionalPaymentDetails, tabType);
-          })
-          .catch(function(err) {
-            console.warn("Could not fetch paymentTabType collection, defaulting to Both:", err);
-            loadExternalPaymentDetails(regionalPaymentDetails, "Both");
-          });
-      })
-      .catch(function(err) {
-        console.error("Error fetching regional details:", err);
-        regionalPaymentDetails = null;
-        switchTab('bank');
-      });
+    // Assign global settings
+    if (defaultDoc && defaultDoc.exists) {
+      defaultPaymentDetails = defaultDoc.data();
+    } else {
+      defaultPaymentDetails = {};
+    }
 
-  } else {
+    // Assign regional settings
+    if (regionSnap && regionSnap.exists) {
+      regionalPaymentDetails = regionSnap.data();
+    } else {
+      regionalPaymentDetails = null;
+    }
+
+    // Render UI and apply tab visibility logic using regional data
+    renderPaymentDetails();
+    loadExternalPaymentDetails(regionalPaymentDetails);
+
+  } catch (err) {
+    console.error("Error loading payment details:", err);
     setFallbackDetails();
     switchTab('bank');
   }
